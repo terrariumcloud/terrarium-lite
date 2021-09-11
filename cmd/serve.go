@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -25,20 +24,30 @@ import (
 )
 
 // serveCmd represents the serve command
+var authClientID string
+var authEndpoint string
+var tokenEndpoint string
+var ports []int
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Starts the Terraform Registry",
 	Long:  `Starts the Terraform Registry`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("serve called")
+		loginAPI := login.NewLoginAPI(authClientID, authEndpoint, tokenEndpoint, ports)
+		http.HandleFunc("/.well-known/terraform.json", loginAPI.DiscoveryHandler())
+		port := ":8080"
+		log.Printf("Listening on %s", port)
+		log.Fatal(http.ListenAndServe(port, nil))
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
-	loginAPI := login.NewLoginAPI("terraform-cli", "/oauth/auth", "/oauth/token", []int{10000})
-	http.HandleFunc("/.well-known/terraform.json", loginAPI.DiscoveryHandler())
-	port := ":8080"
-	log.Printf("Listening on %s", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	serveCmd.Flags().StringVarP(&authClientID, "client-id", "c", "", "OAuth Client OD")
+	serveCmd.Flags().StringVarP(&authEndpoint, "auth-endpoint", "a", "", "OAuth Authorize Endpoint")
+	serveCmd.Flags().StringVarP(&tokenEndpoint, "token-endpoint", "t", "", "OAuth Token Endpoint")
+	serveCmd.Flags().IntSliceVarP(&ports, "ports", "p", []int{10000}, "OAuth Ports array allow for callback URI")
+	serveCmd.MarkFlagRequired("client-id")
+	serveCmd.MarkFlagRequired("auth-endpoint")
+	serveCmd.MarkFlagRequired("token-endpoint")
 }

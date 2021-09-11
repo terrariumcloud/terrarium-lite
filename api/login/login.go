@@ -51,13 +51,16 @@ func (l *LoginAPI) DiscoveryHandler() http.HandlerFunc {
 }
 
 func (l *LoginAPI) constructLoginObject() ([]byte, error) {
-	conf := &ServiceDiscoveryConfig{
-		Client:     l.ClientID,
-		GrantTypes: []string{"authz_code"},
-		Authz:      l.AuthEndpoint,
-		Token:      l.TokenEndpoint,
-		Ports:      l.Ports,
+	conf := &ServiceDiscoveryResponse{
+		LoginV1: &ServiceDiscoveryConfig{
+			Client:     l.ClientID,
+			GrantTypes: []string{"authz_code"},
+			Authz:      l.AuthEndpoint,
+			Token:      l.TokenEndpoint,
+			Ports:      l.Ports,
+		},
 	}
+
 	return json.Marshal(conf)
 }
 
