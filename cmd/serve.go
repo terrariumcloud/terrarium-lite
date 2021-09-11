@@ -17,7 +17,10 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 
+	"github.com/dylanrhysscott/terrarium/api/login"
 	"github.com/spf13/cobra"
 )
 
@@ -33,14 +36,9 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// serveCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	loginAPI := login.NewLoginAPI("terraform-cli", "/oauth/auth", "/oauth/token", []int{10000})
+	http.HandleFunc("/.well-known/terraform.json", loginAPI.DiscoveryHandler())
+	port := ":8080"
+	log.Printf("Listening on %s", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
