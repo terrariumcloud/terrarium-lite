@@ -34,14 +34,16 @@ var serveCmd = &cobra.Command{
 	Short: "Starts the Terraform Registry",
 	Long:  `Starts the Terraform Registry`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ca, err := ssl.NewCA(4096)
+		ca := ssl.NewCA(4096)
+		err := ca.GenerateRootCA(".certs")
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = ca.Write(".certs")
+		cert, err := ca.CreateClientCertificate([]string{"localhost"}, 4096)
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Println(string(ssl.GetCertificate(cert.Raw)))
 		loginAPI := login.NewLoginAPI(authClientID, authEndpoint, tokenEndpoint, ports)
 		http.HandleFunc("/.well-known/terraform.json", loginAPI.DiscoveryHandler())
 		port := ":8080"
