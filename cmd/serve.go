@@ -20,7 +20,6 @@ import (
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/api/login"
-	"github.com/dylanrhysscott/terrarium/pkg/ssl"
 	"github.com/spf13/cobra"
 )
 
@@ -28,32 +27,26 @@ import (
 var authClientID string
 var authEndpoint string
 var tokenEndpoint string
+var certPath string
+var certKeyPath string
 var ports []int
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Starts the Terraform Registry",
 	Long:  `Starts the Terraform Registry`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ca := ssl.NewCA(4096)
-		err := ca.GenerateRootCA(".certs")
-		if err != nil {
-			log.Fatal(err)
-		}
-		cert, err := ca.CreateClientCertificate([]string{"localhost"}, 4096)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(string(ssl.GetCertificate(cert.Raw)))
 		loginAPI := login.NewLoginAPI(authClientID, authEndpoint, tokenEndpoint, ports)
 		http.HandleFunc("/.well-known/terraform.json", loginAPI.DiscoveryHandler())
 		port := ":8080"
 		log.Printf("Listening on %s", port)
-		log.Fatal(http.ListenAndServe(port, nil))
+		log.Fatal(http.ListenAndServeTLS(port, certPath, certKeyPath, nil))
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
+	serveCmd.Flags().StringVarP(&certPath, "cert-path", "", ".certs/terrarium.pem", "Path to SSL certificate")
+	serveCmd.Flags().StringVarP(&certKeyPath, "cert-key-path", "", ".certs/terrarium.key", "Path to SSL key")
 	serveCmd.Flags().StringVarP(&authClientID, "client-id", "c", "", "OAuth Client OD")
 	serveCmd.Flags().StringVarP(&authEndpoint, "auth-endpoint", "a", "", "OAuth Authorize Endpoint")
 	serveCmd.Flags().StringVarP(&tokenEndpoint, "token-endpoint", "t", "", "OAuth Token Endpoint")

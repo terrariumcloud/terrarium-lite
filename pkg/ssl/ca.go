@@ -17,6 +17,7 @@ func Write(path string, filename string, data []byte) error {
 		}
 	}
 	fileOut := fmt.Sprintf("%s/%s", path, filename)
+	_, err = os.Stat(fileOut)
 	if os.IsNotExist(err) {
 		err := os.WriteFile(fileOut, data, 0600)
 		if err != nil {

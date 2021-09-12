@@ -11,8 +11,8 @@ import (
 )
 
 type CA interface {
-	GenerateRootCA()
-	CreateClientCertificate()
+	GenerateRootCA(commonName string, path string) error
+	CreateClientCertificate(commonName string, dns []string, bits int) (*rsa.PrivateKey, *x509.Certificate, error)
 }
 
 type CertificateAuthority struct {
@@ -32,10 +32,11 @@ func (ca *CertificateAuthority) generatePrivateKey(bits int) error {
 	return nil
 }
 
-func (ca *CertificateAuthority) generateRootCA() error {
+func (ca *CertificateAuthority) generateRootCA(commonName string) error {
 	caTemplate := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
+			CommonName:   commonName,
 			Organization: []string{"Terrarium"},
 		},
 		NotBefore:             time.Now(),
@@ -58,13 +59,12 @@ func (ca *CertificateAuthority) generateRootCA() error {
 	return nil
 }
 
-func (ca *CertificateAuthority) GenerateRootCA(path string) error {
+func (ca *CertificateAuthority) GenerateRootCA(commonName string, path string) error {
 	err := ca.generatePrivateKey(ca.Bits)
 	if err != nil {
 		return err
 	}
-
-	err = ca.generateRootCA()
+	err = ca.generateRootCA(commonName)
 	if err != nil {
 		return err
 	}
@@ -83,14 +83,15 @@ func (ca *CertificateAuthority) GenerateRootCA(path string) error {
 	return nil
 }
 
-func (ca *CertificateAuthority) CreateClientCertificate(dns []string, bits int) (*x509.Certificate, error) {
+func (ca *CertificateAuthority) CreateClientCertificate(commonName string, dns []string, bits int) (*rsa.PrivateKey, *x509.Certificate, error) {
 	key, err := rsa.GenerateKey(ca.reader, bits)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	certTemplate := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
+			CommonName:   commonName,
 			Organization: []string{"Terrarium"},
 		},
 		DNSNames:              dns,
@@ -103,13 +104,13 @@ func (ca *CertificateAuthority) CreateClientCertificate(dns []string, bits int) 
 	}
 	cert, err := x509.CreateCertificate(ca.reader, certTemplate, ca.caTemplate, &key.PublicKey, ca.CAKey)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	certEncoded, err := x509.ParseCertificate(cert)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return certEncoded, nil
+	return key, certEncoded, nil
 }
 
 func NewCA(bits int) *CertificateAuthority {
