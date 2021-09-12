@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -27,6 +28,7 @@ import (
 var authClientID string
 var authEndpoint string
 var tokenEndpoint string
+var audience string
 var certPath string
 var certKeyPath string
 var ports []int
@@ -35,7 +37,8 @@ var serveCmd = &cobra.Command{
 	Short: "Starts the Terraform Registry",
 	Long:  `Starts the Terraform Registry`,
 	Run: func(cmd *cobra.Command, args []string) {
-		loginAPI := login.NewLoginAPI(authClientID, authEndpoint, tokenEndpoint, ports)
+		authEndpointWithAud := fmt.Sprintf("%s?audience=%s", authEndpoint, audience)
+		loginAPI := login.NewLoginAPI(authClientID, authEndpointWithAud, tokenEndpoint, ports)
 		http.HandleFunc("/.well-known/terraform.json", loginAPI.DiscoveryHandler())
 		port := ":8080"
 		log.Printf("Listening on %s", port)
@@ -50,7 +53,8 @@ func init() {
 	serveCmd.Flags().StringVarP(&authClientID, "client-id", "c", "", "OAuth Client OD")
 	serveCmd.Flags().StringVarP(&authEndpoint, "auth-endpoint", "a", "", "OAuth Authorize Endpoint")
 	serveCmd.Flags().StringVarP(&tokenEndpoint, "token-endpoint", "t", "", "OAuth Token Endpoint")
-	serveCmd.Flags().IntSliceVarP(&ports, "ports", "p", []int{10000}, "OAuth Ports array allow for callback URI")
+	serveCmd.Flags().StringVarP(&audience, "audience", "", "https://terrarium.dylanscott.me", "OAuth Token API Audience")
+	serveCmd.Flags().IntSliceVarP(&ports, "ports", "p", []int{10000, 10001}, "OAuth Ports array allow for callback URI")
 	serveCmd.MarkFlagRequired("client-id")
 	serveCmd.MarkFlagRequired("auth-endpoint")
 	serveCmd.MarkFlagRequired("token-endpoint")

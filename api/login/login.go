@@ -46,6 +46,7 @@ func (l *LoginAPI) DiscoveryHandler() http.HandlerFunc {
 			http.Error(rw, string(resp), http.StatusInternalServerError)
 			return
 		}
+		rw.Header().Add("Content-Type", "application/json")
 		rw.Write(conf)
 	}
 }
