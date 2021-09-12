@@ -20,7 +20,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/dylanrhysscott/terrarium/pkg/ssl"
+	"github.com/dylanrhysscott/terrarium/internal/ssl"
 	"github.com/spf13/cobra"
 )
 
