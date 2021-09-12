@@ -20,6 +20,7 @@ import (
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/api/login"
+	"github.com/dylanrhysscott/terrarium/pkg/ssl"
 	"github.com/spf13/cobra"
 )
 
@@ -33,6 +34,14 @@ var serveCmd = &cobra.Command{
 	Short: "Starts the Terraform Registry",
 	Long:  `Starts the Terraform Registry`,
 	Run: func(cmd *cobra.Command, args []string) {
+		ca, err := ssl.NewCA(4096)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = ca.Write(".certs")
+		if err != nil {
+			log.Fatal(err)
+		}
 		loginAPI := login.NewLoginAPI(authClientID, authEndpoint, tokenEndpoint, ports)
 		http.HandleFunc("/.well-known/terraform.json", loginAPI.DiscoveryHandler())
 		port := ":8080"
