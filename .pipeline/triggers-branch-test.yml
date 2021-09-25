@@ -19,7 +19,7 @@ spec:
         generateName: "terrarium-branch-"
       spec:
         pipelineRef:
-          name: terrarium-pipeline
+          name: terrarium-branch-test
         serviceAccountName: tekton-builder
         params:
           - name: binary
