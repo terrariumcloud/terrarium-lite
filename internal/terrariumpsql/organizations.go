@@ -78,8 +78,34 @@ func (o *OrganizationBackend) ReadOne(id string) (*types.Organization, error) {
 	return nil, nil
 }
 
-func (o *OrganizationBackend) Update() {
-
+func (o *OrganizationBackend) Update(id string, name string, email string) (*types.Organization, error) {
+	query := `UPDATE organizations 
+		SET name = $1,
+			email = $2 
+		WHERE id = $3;`
+	org, err := o.ReadOne(id)
+	if err != nil {
+		return nil, err
+	}
+	updatedName := org.Name
+	updatedEmail := org.Email
+	if name != "" {
+		updatedName = name
+		org.Name = name
+	}
+	if email != "" {
+		updatedEmail = email
+		org.Email = email
+	}
+	stmt, err := o.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	_, err = stmt.Exec(updatedName, updatedEmail, id)
+	if err != nil {
+		return nil, err
+	}
+	return org, nil
 }
 
 func (o *OrganizationBackend) Delete(id string) error {

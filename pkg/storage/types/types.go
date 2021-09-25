@@ -4,9 +4,9 @@ type OrganizationStore interface {
 	Init() error
 	Create(name string, email string) (*Organization, error)
 	ReadAll() ([]Organization, error)
-	ReadOne()
-	Update()
-	Delete()
+	ReadOne(id string) (*Organization, error)
+	Update(id string, name string, email string) (*Organization, error)
+	Delete(id string) error
 }
 
 type Organization struct {

@@ -59,6 +59,11 @@ var moduleCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		log.Printf("%v", *org)
+		org, err = driver.Organizations().Update(org.ID, "Updated Org", "")
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("%v", *org)
 		err = driver.Organizations().Delete(orgs[0].ID)
 		if err != nil {
 			log.Fatal(err)
@@ -67,7 +72,6 @@ var moduleCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-
 	},
 }
 
