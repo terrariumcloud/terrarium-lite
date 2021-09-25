@@ -1,0 +1,58 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: terrarium-repo-events
+  namespace: tekton-pipelines
+spec:
+  triggers:
+    - template: 
+        ref: terrarium-pipeline
+      bindings:
+        - ref: terrarium-data
+          kind: TriggerBinding
+      interceptors:
+        - name: "Only on master"
+          ref:
+            name: cel
+          params:
+            - name: "filter"
+              value: "body.ref.contains('main')"
+        - name: "Validate Github Webhook Origin"
+          ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: tekton-webhook-secret
+                secretKey: secret
+            - name: "Github Event Filtering"
+              value: ["push"]
+  resources:
+    kubernetesResource:
+      spec:
+        template:
+          spec:
+            serviceAccountName: tekton-github-event-sa
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: terrarium-webhook
+  namespace: tekton-pipelines
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    external-dns.alpha.kubernetes.io/hostname: terrarium-hook.dylanscott.me
+
+spec:
+  rules:
+  - host: "terrarium-hook.dylanscott.me"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: el-terrarium-repo-events
+            port:
+              number: 8080
