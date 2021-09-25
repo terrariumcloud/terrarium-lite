@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"context"
 	"log"
 
 	"github.com/dylanrhysscott/terrarium/internal/terrariumpsql"
@@ -40,11 +39,11 @@ var moduleCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = driver.Connect(context.TODO())
+		err = driver.Organizations().Create("Test Org", "dylanrhysscott@gmail.com")
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = driver.Organizations().Init()
+		err = driver.Organizations().Create("Test Org2", "dylanrhysscott@gmail.com")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -52,7 +51,23 @@ var moduleCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("%v", orgs)
+		for _, org := range orgs {
+			log.Printf("%v", *org)
+		}
+		org, err := driver.Organizations().ReadOne(orgs[0].ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("%v", *org)
+		err = driver.Organizations().Delete(orgs[0].ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = driver.Organizations().Delete(orgs[1].ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 	},
 }
 

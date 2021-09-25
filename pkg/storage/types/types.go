@@ -2,7 +2,7 @@ package types
 
 type OrganizationStore interface {
 	Init() error
-	Create()
+	Create(name string, email string) (*Organization, error)
 	ReadAll() ([]Organization, error)
 	ReadOne()
 	Update()
@@ -12,5 +12,6 @@ type OrganizationStore interface {
 type Organization struct {
 	ID        string
 	Name      string
+	Email     string
 	CreatedOn string
 }

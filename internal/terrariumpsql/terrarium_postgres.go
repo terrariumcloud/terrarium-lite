@@ -53,11 +53,20 @@ func New(host string, user string, password string, database string, sslmode str
 	if password == "" {
 		return nil, errors.New("postgres password cannot be empty")
 	}
-	return &TerrariumPostgres{
+	driver := &TerrariumPostgres{
 		Host:     host,
 		User:     user,
 		Password: password,
 		Database: database,
 		SSLMode:  sslmode,
-	}, nil
+	}
+	err := driver.Connect(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+	err = driver.Organizations().Init()
+	if err != nil {
+		return nil, err
+	}
+	return driver, nil
 }
