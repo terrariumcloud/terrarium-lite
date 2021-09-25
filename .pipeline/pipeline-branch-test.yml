@@ -25,6 +25,8 @@ spec:
     - name: build
       taskRef:
         name: go-build
+      runAfter:
+        - test
       params:
         - name: binary
           value: $(params.binary)
