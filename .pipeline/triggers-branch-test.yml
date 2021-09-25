@@ -1,0 +1,49 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: terrarium-branch-test
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: binary
+      description: Name of the binary to build
+    - name: git-url
+      description: Repo URL
+    - name: git-branch
+      description: Repo Branch
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: "terrarium-branch-"
+      spec:
+        pipelineRef:
+          name: terrarium-pipeline
+        serviceAccountName: tekton-builder
+        params:
+          - name: binary
+            value: $(tt.params.binary)
+        resources:
+          - name: terrarium-git
+            resourceSpec: 
+              type: git
+              params:
+                - name: url
+                  value: $(tt.params.git-url)
+                - name: revision
+                  value: $(tt.params.git-branch)
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: terrarium-branch-data
+  namespace: tekton-pipelines
+spec:
+  params:
+  - name: git-url
+    value: $(body.repository.clone_url)
+  - name: git-branch
+    value: $(body.repository.master_branch)
+  - name: binary
+    value: "$(body.respoitory.name)"

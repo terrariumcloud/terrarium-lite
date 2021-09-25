@@ -28,6 +28,28 @@ spec:
                 secretKey: secret
             - name: "Github Event Filtering"
               value: ["push"]
+    - template: 
+        ref: terrarium-branch-test
+      bindings:
+        - ref: terrarium-branch-data
+          kind: TriggerBinding
+      interceptors:
+        - name: "Not on master"
+          ref:
+            name: cel
+          params:
+            - name: "filter"
+              value: "!body.ref.contains('main')"
+        - name: "Validate Github Webhook Origin"
+          ref:
+            name: "github"
+          params:
+            - name: "secretRef"
+              value:
+                secretName: tekton-webhook-secret
+                secretKey: secret
+            - name: "Github Event Filtering"
+              value: ["push"]
   resources:
     kubernetesResource:
       spec:

@@ -1,0 +1,34 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: terrarium-branch-test
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: binary
+      type: string
+  resources:
+    - name: terrarium-git
+      type: git
+  tasks:
+    - name: test
+      taskRef:
+        name: go-test
+      params:
+        - name: binary
+          value: $(params.binary)
+      resources:
+        inputs:
+          - name: source
+            resource: terrarium-git
+    - name: build
+      taskRef:
+        name: go-build
+      params:
+        - name: binary
+          value: $(params.binary)
+      resources:
+        inputs:
+          - name: source
+            resource: terrarium-git
