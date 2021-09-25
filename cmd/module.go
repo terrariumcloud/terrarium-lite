@@ -19,7 +19,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/dylanrhysscott/terrarium/pkg/storage/terrariumpsql"
+	"github.com/dylanrhysscott/terrarium/internal/terrariumpsql"
 	"github.com/spf13/cobra"
 )
 
