@@ -46,4 +46,4 @@ spec:
   - name: git-branch
     value: $(body.repository.master_branch)
   - name: binary
-    value: "$(body.respoitory.name)"
+    value: "$(body.repository.name)"
