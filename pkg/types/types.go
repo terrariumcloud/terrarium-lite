@@ -23,7 +23,7 @@ type Organization struct {
 }
 
 // TerrariumDriver is a generic database interface to allow further database implementations for Terrarium
-// if you would like to implement a new database support this interface should be implemented
+// if you would like to implement a different database beyond the core drivers this interface should be implemented
 type TerrariumDriver interface {
 	Connect(ctx context.Context) error
 	Organizations() OrganizationStore
