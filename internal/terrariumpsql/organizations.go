@@ -4,13 +4,15 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/dylanrhysscott/terrarium/pkg/storage/types"
+	"github.com/dylanrhysscott/terrarium/pkg/types"
 )
 
+// OrganizationBackend is a struct that implements Postgres database operations for organizations
 type OrganizationBackend struct {
 	db *sql.DB
 }
 
+// Init initializes the Organizations table
 func (o *OrganizationBackend) Init() error {
 	query := `CREATE TABLE IF NOT EXISTS organizations (
 		id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -26,6 +28,7 @@ func (o *OrganizationBackend) Init() error {
 	return nil
 }
 
+// Create Adds a new organization to the organizations table
 func (o *OrganizationBackend) Create(name string, email string) error {
 	query := `INSERT INTO organizations (name, email, created_on) VALUES ($1, $2, $3)`
 	stmt, err := o.db.Prepare(query)
@@ -39,6 +42,7 @@ func (o *OrganizationBackend) Create(name string, email string) error {
 	return nil
 }
 
+// ReadAll Returns all organizations from the organizations table
 func (o *OrganizationBackend) ReadAll() ([]*types.Organization, error) {
 	query := `SELECT * FROM organizations;`
 	result, err := o.db.Query(query)
@@ -57,6 +61,7 @@ func (o *OrganizationBackend) ReadAll() ([]*types.Organization, error) {
 	return organizations, nil
 }
 
+// ReadOne Returns a single organization from the organizations table
 func (o *OrganizationBackend) ReadOne(id string) (*types.Organization, error) {
 	query := `SELECT * FROM organizations WHERE id = $1;`
 	stmt, err := o.db.Prepare(query)
@@ -78,6 +83,7 @@ func (o *OrganizationBackend) ReadOne(id string) (*types.Organization, error) {
 	return nil, nil
 }
 
+// Update Updates an organization in the organization table
 func (o *OrganizationBackend) Update(id string, name string, email string) (*types.Organization, error) {
 	query := `UPDATE organizations 
 		SET name = $1,
@@ -108,6 +114,7 @@ func (o *OrganizationBackend) Update(id string, name string, email string) (*typ
 	return org, nil
 }
 
+// Delete Removes an organization from the organization table
 func (o *OrganizationBackend) Delete(id string) error {
 	query := `DELETE FROM organizations WHERE id = $1`
 	stmt, err := o.db.Prepare(query)

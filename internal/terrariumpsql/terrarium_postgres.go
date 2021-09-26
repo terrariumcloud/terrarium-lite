@@ -1,3 +1,4 @@
+// Package terrariumsql provides Postgres support for Terrarium by implementing the TerrariumDriver interface
 package terrariumpsql
 
 import (
@@ -6,9 +7,11 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/dylanrhysscott/terrarium/pkg/types"
 	_ "github.com/lib/pq"
 )
 
+// TerrariumPostgres implements Postgres support for Terrarium for all API's
 type TerrariumPostgres struct {
 	Host       string
 	User       string
@@ -19,6 +22,7 @@ type TerrariumPostgres struct {
 	database   *sql.DB
 }
 
+// Connect iniitialises a database connection to Postgres
 func (p *TerrariumPostgres) Connect(ctx context.Context) error {
 	connectionString := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", p.User, p.Password, p.Host, p.Database, p.SSLMode)
 	db, err := sql.Open("postgres", connectionString)
@@ -34,12 +38,14 @@ func (p *TerrariumPostgres) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (p *TerrariumPostgres) Organizations() *OrganizationBackend {
+// Organizations returns a Postgres compatible organization store which implements the OrganizationStore interface
+func (p *TerrariumPostgres) Organizations() types.OrganizationStore {
 	return &OrganizationBackend{
 		db: p.database,
 	}
 }
 
+// New creates a TerrariumPostgres driver
 func New(host string, user string, password string, database string, sslmode string) (*TerrariumPostgres, error) {
 	if sslmode == "" {
 		sslmode = "disable"

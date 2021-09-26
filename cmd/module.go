@@ -18,7 +18,9 @@ package cmd
 import (
 	"log"
 
+	"github.com/dylanrhysscott/terrarium/api"
 	"github.com/dylanrhysscott/terrarium/internal/terrariumpsql"
+	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/spf13/cobra"
 )
 
@@ -35,40 +37,19 @@ var moduleCmd = &cobra.Command{
 	Short: "Starts the Terrarium Module API",
 	Long:  `The Terrarium Module API allows users to manage Terraform modules in a private registry using Terrarium`,
 	Run: func(cmd *cobra.Command, args []string) {
-		driver, err := terrariumpsql.New(postgresHost, postgresUser, postgresPassword, postgresDatabase, postgresSSLMode)
+		var driver types.TerrariumDriver
+		var err error
+		if storageBackend == "postgres" {
+			driver, err = terrariumpsql.New(postgresHost, postgresUser, postgresPassword, postgresDatabase, postgresSSLMode)
+		}
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Error initialising database - %s", err.Error())
 		}
-		err = driver.Organizations().Create("Test Org", "dylanrhysscott@gmail.com")
-		if err != nil {
-			log.Fatal(err)
+		if driver == nil {
+			log.Fatalf("Unsupported database driver: %s", storageBackend)
 		}
-		err = driver.Organizations().Create("Test Org2", "dylanrhysscott@gmail.com")
-		if err != nil {
-			log.Fatal(err)
-		}
-		orgs, err := driver.Organizations().ReadAll()
-		if err != nil {
-			log.Fatal(err)
-		}
-		for _, org := range orgs {
-			log.Printf("%v", *org)
-		}
-		org, err := driver.Organizations().ReadOne(orgs[0].ID)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("%v", *org)
-		org, err = driver.Organizations().Update(org.ID, "Updated Org", "")
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("%v", *org)
-		err = driver.Organizations().Delete(orgs[0].ID)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = driver.Organizations().Delete(orgs[1].ID)
+		terrarium := api.NewTerrarium(3000, driver)
+		err = terrarium.Serve()
 		if err != nil {
 			log.Fatal(err)
 		}
