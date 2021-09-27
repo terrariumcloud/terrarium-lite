@@ -48,7 +48,7 @@ var moduleCmd = &cobra.Command{
 		if driver == nil {
 			log.Fatalf("Unsupported database driver: %s", storageBackend)
 		}
-		terrarium := api.NewTerrarium(3000, driver)
+		terrarium := api.NewTerrarium(3000, driver, &types.TerrariumAPIResponseWriter{}, &types.TerrariumAPIErrorHandler{})
 		err = terrarium.Serve()
 		if err != nil {
 			log.Fatal(err)

@@ -4,7 +4,29 @@ package types
 
 import (
 	"context"
+	"net/http"
 )
+
+const BadRequestPrefix string = "Bad Request"
+const InternalServerErrorPrefix string = "Internal Server Error"
+
+type APIErrorWriter interface {
+	Write(rw http.ResponseWriter, err error, statusCode int)
+}
+
+type APIResponseWriter interface {
+	Write(rw http.ResponseWriter, data interface{}, statusCode int)
+}
+
+type TerrariumDataResponse struct {
+	Code int         `json:"code"`
+	Data interface{} `json:"data"`
+}
+
+type TerrariumServerResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
 
 // OrganizationStore is a generic data interface for implementaing database operations relating to organizations
 type OrganizationStore interface {

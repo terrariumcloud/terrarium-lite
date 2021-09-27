@@ -1,13 +1,34 @@
 package organization
 
 import (
-	"log"
+	"errors"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
-	"gopkg.in/errgo.v2/errors"
 )
+
+func extractLimitAndOffset(qs url.Values) (int, int, error) {
+	var limit int = 0
+	var offset int = 0
+	if qs.Has("limit") {
+		// If we have a limit value set in QS attempt to convert to int
+		i, err := strconv.Atoi(qs.Get("limit"))
+		if err != nil {
+			return 0, 0, errors.New("limit is not an integer")
+		}
+		limit = i
+	}
+	if qs.Has("offset") {
+		i, err := strconv.Atoi(qs.Get("offset"))
+		if err != nil {
+			return 0, 0, errors.New("offset is not an integer")
+		}
+		offset = i
+	}
+	return limit, offset, nil
+}
 
 // OrganizationAPIInterface specifies the required HTTP handlers for a Terrarium Organizations API
 type OrganizationAPIInterface interface {
@@ -22,12 +43,25 @@ type OrganizationAPIInterface interface {
 type OrganizationAPI struct {
 	Path              string
 	OrganziationStore types.OrganizationStore
+	ErrorHandler      types.APIErrorWriter
+	ResponseHandler   types.APIResponseWriter
 }
 
 // CreateOrganizationHandler is a handler for creating an organization (POST)
 func (o *OrganizationAPI) CreateOrganizationHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		// body, err := ioutil.ReadAll(r.Body)
+		// if err != nil {
+		// 	jsonData, err := types.NewTerrariumBadRequest(err.Error())
+		// 	if err != nil {
+		// 		log.Println(err.Error())
+		// 		rw.WriteHeader(http.StatusInternalServerError)
+		// 		return
+		// 	}
+		// 	rw.WriteHeader(http.StatusBadRequest)
+		// 	rw.Write(jsonData)
+		// 	return
+		// }
 	})
 }
 
@@ -48,73 +82,19 @@ func (o *OrganizationAPI) GetOrganizationHandler() http.Handler {
 // ListOrganizationsHandler is a handler for listing all organizations (GET)
 func (o *OrganizationAPI) ListOrganizationsHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		qs := r.URL.Query()
-		limit := 0
-		offset := 0
-		if qs.Has("limit") {
-			// If we have a limit value set in QS attempt to convert to int
-			i, err := strconv.Atoi(qs.Get("limit"))
-			if err != nil {
-				// limit is not an int generate a bad quest error
-				jsonData, err := types.NewTerrariumBadRequest("limit query parameter must be a whole number")
-				if err != nil {
-					// Something went wrong with generating response - return a server error and log stack trace
-					log.Println(err.Error())
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				// Responded with 400 bad request
-				rw.WriteHeader(http.StatusBadRequest)
-				rw.Write(jsonData)
-				return
-			}
-			limit = i
-		}
-		if qs.Has("offset") {
-			i, err := strconv.Atoi(qs.Get("offset"))
-			if err != nil {
-				jsonData, err := types.NewTerrariumBadRequest("offset query parameter must be a whole number")
-				if err != nil {
-					log.Println(err.Error())
-					rw.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				rw.WriteHeader(http.StatusBadRequest)
-				rw.Write(jsonData)
-				return
-			}
-			offset = i
+		limit, offset, err := extractLimitAndOffset(r.URL.Query())
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusBadRequest)
+			return
 		}
 		// Query organization store for all orgs using limit and offset
 		orgs, err := o.OrganziationStore.ReadAll(limit, offset)
 		if err != nil {
-			// Something went wrong return a 500 to the user
-			data, err := types.NewTerrariumServerError(err.Error())
-			if err != nil {
-				// Something went wrong further return a 500 and stack trace
-				log.Printf("%+v", errors.Wrap(err))
-				rw.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			rw.WriteHeader(http.StatusInternalServerError)
-			rw.Write(data)
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
 		// We have the orgs now return a 200
-		data, err := types.NewTerrariumOK(orgs)
-		if err != nil {
-			data, err := types.NewTerrariumServerError(err.Error())
-			if err != nil {
-				log.Printf("%+v", errors.Wrap(err))
-				rw.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			rw.WriteHeader(http.StatusInternalServerError)
-			rw.Write(data)
-			return
-		}
-		rw.WriteHeader(http.StatusOK)
-		rw.Write(data)
+		o.ResponseHandler.Write(rw, orgs, http.StatusOK)
 	})
 }
 
@@ -127,8 +107,10 @@ func (o *OrganizationAPI) DeleteOrganizationHandler() http.Handler {
 
 // NewOrganizationAPI creates an instance of the organization API with the reqired database
 // driver support
-func NewOrganizationAPI(store types.OrganizationStore) *OrganizationAPI {
+func NewOrganizationAPI(store types.OrganizationStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OrganizationAPI {
 	return &OrganizationAPI{
 		OrganziationStore: store,
+		ResponseHandler:   responseHandler,
+		ErrorHandler:      errorHandler,
 	}
 }

@@ -15,9 +15,11 @@ import (
 
 // Terrarium is a struct which contains methods for initialising the private Terraform Registry
 type Terrarium struct {
-	Port   int
-	Store  types.TerrariumDriver
-	Router *mux.Router
+	Port      int
+	Store     types.TerrariumDriver
+	Router    *mux.Router
+	Responder types.APIResponseWriter
+	Errorer   types.APIErrorWriter
 }
 
 // Serve starts the Terrarium Registry
@@ -29,7 +31,7 @@ func (t *Terrarium) Serve() error {
 
 // setupOrganizationRoutes configures the organization API subrouter
 func (t *Terrarium) setupOrganizationRoutes(path string) {
-	apiHandlers := organization.NewOrganizationAPI(t.Store.Organizations())
+	apiHandlers := organization.NewOrganizationAPI(t.Store.Organizations(), t.Responder, t.Errorer)
 	s := t.Router.PathPrefix(path).Subrouter()
 	s.StrictSlash(true)
 	s.Handle("/", apiHandlers.ListOrganizationsHandler()).Methods(http.MethodGet)
@@ -40,11 +42,13 @@ func (t *Terrarium) setupOrganizationRoutes(path string) {
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes
-func NewTerrarium(port int, driver types.TerrariumDriver) *Terrarium {
+func NewTerrarium(port int, driver types.TerrariumDriver, responder types.APIResponseWriter, errorer types.APIErrorWriter) *Terrarium {
 	t := &Terrarium{
-		Port:   port,
-		Store:  driver,
-		Router: mux.NewRouter(),
+		Port:      port,
+		Store:     driver,
+		Router:    mux.NewRouter(),
+		Responder: responder,
+		Errorer:   errorer,
 	}
 	t.setupOrganizationRoutes("/v1/organizations")
 	return t
