@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"gopkg.in/errgo.v2/errors"
 )
 
 // OrganizationAPIInterface specifies the required HTTP handlers for a Terrarium Organizations API
@@ -51,14 +52,18 @@ func (o *OrganizationAPI) ListOrganizationsHandler() http.Handler {
 		limit := 0
 		offset := 0
 		if qs.Has("limit") {
+			// If we have a limit value set in QS attempt to convert to int
 			i, err := strconv.Atoi(qs.Get("limit"))
 			if err != nil {
+				// limit is not an int generate a bad quest error
 				jsonData, err := types.NewTerrariumBadRequest("limit query parameter must be a whole number")
 				if err != nil {
+					// Something went wrong with generating response - return a server error and log stack trace
 					log.Println(err.Error())
 					rw.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				// Responded with 400 bad request
 				rw.WriteHeader(http.StatusBadRequest)
 				rw.Write(jsonData)
 				return
@@ -80,11 +85,14 @@ func (o *OrganizationAPI) ListOrganizationsHandler() http.Handler {
 			}
 			offset = i
 		}
+		// Query organization store for all orgs using limit and offset
 		orgs, err := o.OrganziationStore.ReadAll(limit, offset)
 		if err != nil {
+			// Something went wrong return a 500 to the user
 			data, err := types.NewTerrariumServerError(err.Error())
 			if err != nil {
-				log.Printf("Error generating a server response - %s", err.Error())
+				// Something went wrong further return a 500 and stack trace
+				log.Printf("%+v", errors.Wrap(err))
 				rw.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -92,11 +100,12 @@ func (o *OrganizationAPI) ListOrganizationsHandler() http.Handler {
 			rw.Write(data)
 			return
 		}
+		// We have the orgs now return a 200
 		data, err := types.NewTerrariumOK(orgs)
 		if err != nil {
 			data, err := types.NewTerrariumServerError(err.Error())
 			if err != nil {
-				log.Printf("Error generating a server response - %s", err.Error())
+				log.Printf("%+v", errors.Wrap(err))
 				rw.WriteHeader(http.StatusInternalServerError)
 				return
 			}
