@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/dylanrhysscott/terrarium/api/organization"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -22,13 +24,14 @@ type Terrarium struct {
 func (t *Terrarium) Serve() error {
 	bindAddress := fmt.Sprintf(":%d", t.Port)
 	log.Println(fmt.Sprintf("Listening on %s", bindAddress))
-	return http.ListenAndServe(bindAddress, t.Router)
+	return http.ListenAndServe(bindAddress, handlers.CombinedLoggingHandler(os.Stdout, t.Router))
 }
 
 // setupOrganizationRoutes configures the organization API subrouter
 func (t *Terrarium) setupOrganizationRoutes(path string) {
 	apiHandlers := organization.NewOrganizationAPI(t.Store.Organizations())
 	s := t.Router.PathPrefix(path).Subrouter()
+	s.StrictSlash(true)
 	s.Handle("/", apiHandlers.ListOrganizationsHandler()).Methods(http.MethodGet)
 	s.Handle("/", apiHandlers.CreateOrganizationHandler()).Methods(http.MethodPost)
 	s.Handle("/{id}", apiHandlers.GetOrganizationHandler()).Methods(http.MethodGet)

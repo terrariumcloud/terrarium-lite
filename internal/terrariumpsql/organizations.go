@@ -43,9 +43,16 @@ func (o *OrganizationBackend) Create(name string, email string) error {
 }
 
 // ReadAll Returns all organizations from the organizations table
-func (o *OrganizationBackend) ReadAll() ([]*types.Organization, error) {
-	query := `SELECT * FROM organizations;`
-	result, err := o.db.Query(query)
+func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organization, error) {
+	if limit == 0 {
+		limit = 10
+	}
+	query := `SELECT * FROM organizations LIMIT $1 OFFSET $2;`
+	stmt, err := o.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	result, err := stmt.Query(limit, offset)
 	if err != nil {
 		return nil, err
 	}
