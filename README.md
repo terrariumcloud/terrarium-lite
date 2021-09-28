@@ -1,4 +1,4 @@
 # terrarium
 
-A Terraform Registry Implementation
+A Terraform Registry Implementation / Clone
 
