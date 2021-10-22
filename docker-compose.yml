@@ -1,0 +1,15 @@
+---
+version: "3.9"
+services:
+  postgres:
+    image: postgres:14
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: terrarium
+      POSTGRES_PASSWORD: terrarium
+      POSTGRES_DB: terrarium
+    volumes:
+      - data:/var/lib/postgresql/data.
+volumes:
+  data:
