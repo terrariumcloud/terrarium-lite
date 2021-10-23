@@ -12,11 +12,11 @@ import (
 
 // TerrariumPostgres implements Postgres support for Terrarium for all API's
 type TerrariumMongo struct {
-	Host       string
-	User       string
-	Password   string
-	Collection string
-	client     *mongo.Client
+	Host     string
+	User     string
+	Password string
+	Database string
+	client   *mongo.Client
 }
 
 // Connect iniitialises a database connection to mongo
@@ -35,7 +35,10 @@ func (m *TerrariumMongo) Connect(ctx context.Context) error {
 
 // Organizations returns a Mongo compatible organization store which implements the OrganizationStore interface
 func (m *TerrariumMongo) Organizations() types.OrganizationStore {
-	return &OrganizationBackend{}
+	return &OrganizationBackend{
+		client:   m.client,
+		Database: m.Database,
+	}
 }
 
 // New creates a TerrariumMongo driver
@@ -44,10 +47,10 @@ func New(host string, user string, password string, database string) (*Terrarium
 		return nil, errors.New("mongo host cannot be empty")
 	}
 	driver := &TerrariumMongo{
-		Host:       host,
-		User:       user,
-		Password:   password,
-		Collection: database,
+		Host:     host,
+		User:     user,
+		Password: password,
+		Database: database,
 	}
 	err := driver.Connect(context.TODO())
 	if err != nil {
