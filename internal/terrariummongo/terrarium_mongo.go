@@ -56,9 +56,5 @@ func New(host string, user string, password string, database string) (*Terrarium
 	if err != nil {
 		return nil, err
 	}
-	err = driver.Organizations().Init()
-	if err != nil {
-		return nil, err
-	}
 	return driver, nil
 }
