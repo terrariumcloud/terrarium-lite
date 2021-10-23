@@ -2,9 +2,11 @@ package terrariummongo
 
 import (
 	"context"
+	"time"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -19,11 +21,33 @@ type OrganizationBackend struct {
 
 // Init initializes the Organizations table
 func (o *OrganizationBackend) Init() error {
+	collection := o.client.Database(o.Database).Collection(collectionName)
+	// Ensures unique email and name combination
+	_, err := collection.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys: bson.D{
+			{"name", 1},
+			{"email", 1},
+		},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // Create Adds a new organization to the organizations table
 func (o *OrganizationBackend) Create(name string, email string) error {
+	org := &types.Organization{
+		Name:      name,
+		Email:     email,
+		CreatedOn: time.Now().UTC().String(),
+	}
+	ctx := context.TODO()
+	_, err := o.client.Database(o.Database).Collection(collectionName).InsertOne(ctx, org, options.InsertOne())
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -51,15 +75,56 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 
 // ReadOne Returns a single organization from the organizations table
 func (o *OrganizationBackend) ReadOne(id string) (*types.Organization, error) {
-	return nil, nil
+	ctx := context.TODO()
+	org := &types.Organization{}
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	result := o.client.Database(o.Database).Collection(collectionName).FindOne(ctx, bson.M{"_id": oid}, options.FindOne())
+	err = result.Decode(org)
+	if err != nil {
+		return nil, err
+	}
+	return org, nil
 }
 
 // Update Updates an organization in the organization table
 func (o *OrganizationBackend) Update(id string, name string, email string) (*types.Organization, error) {
-	return nil, nil
+	ctx := context.TODO()
+	update := bson.M{}
+	if name != "" {
+		update["name"] = name
+	}
+	if email != "" {
+		update["email"] = email
+	}
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	upsert := options.Update().SetUpsert(true)
+	_, err = o.client.Database(o.Database).Collection(collectionName).UpdateByID(ctx, oid, bson.M{"$set": update}, upsert)
+	if err != nil {
+		return nil, err
+	}
+	updatedOrg, err := o.ReadOne(id)
+	if err != nil {
+		return nil, err
+	}
+	return updatedOrg, nil
 }
 
 // Delete Removes an organization from the organization table
 func (o *OrganizationBackend) Delete(id string) error {
+	ctx := context.TODO()
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	_, err = o.client.Database(o.Database).Collection(collectionName).DeleteOne(ctx, bson.M{"_id": oid}, options.Delete())
+	if err != nil {
+		return err
+	}
 	return nil
 }

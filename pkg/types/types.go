@@ -40,10 +40,10 @@ type OrganizationStore interface {
 
 // Organization represents the organization data structure stored in the database
 type Organization struct {
-	ID        string
-	Name      string
-	Email     string
-	CreatedOn string
+	ID        string `json:"id" bson:"_id"`
+	Name      string `json:"name" bson:"name"`
+	Email     string `json:"email" bson:"email"`
+	CreatedOn string `json:"created_on" bson:"createdon"`
 }
 
 // TerrariumDriver is a generic database interface to allow further database implementations for Terrarium
