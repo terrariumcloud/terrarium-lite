@@ -19,17 +19,18 @@ import (
 	"log"
 
 	"github.com/dylanrhysscott/terrarium/api"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo"
 	"github.com/dylanrhysscott/terrarium/internal/terrariumpsql"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/spf13/cobra"
 )
 
 var storageBackend string
-var postgresHost string
-var postgresUser string
-var postgresPassword string
-var postgresDatabase string
-var postgresSSLMode string
+var databaseHost string
+var databaseUser string
+var databasePassword string
+var databaseName string
+var databaseSSLMode string
 
 // moduleCmd represents the module command
 var moduleCmd = &cobra.Command{
@@ -40,7 +41,10 @@ var moduleCmd = &cobra.Command{
 		var driver types.TerrariumDriver
 		var err error
 		if storageBackend == "postgres" {
-			driver, err = terrariumpsql.New(postgresHost, postgresUser, postgresPassword, postgresDatabase, postgresSSLMode)
+			driver, err = terrariumpsql.New(databaseHost, databaseUser, databasePassword, databaseName, databaseSSLMode)
+		}
+		if storageBackend == "mongo" {
+			driver, err = terrariummongo.New(databaseHost, databaseUser, databasePassword, databaseName)
 		}
 		if err != nil {
 			log.Fatalf("Error initialising database - %s", err.Error())
@@ -58,10 +62,10 @@ var moduleCmd = &cobra.Command{
 
 func init() {
 	serveCmd.AddCommand(moduleCmd)
-	moduleCmd.Flags().StringVarP(&storageBackend, "storage-backend", "s", "postgres", "Controls the database storage backend. Available backends: 'postgres'")
-	moduleCmd.Flags().StringVarP(&postgresHost, "postgres-host", "", "", "Postgres Host")
-	moduleCmd.Flags().StringVarP(&postgresDatabase, "postgres-database", "", "terrarium", "Postgres Database")
-	moduleCmd.Flags().StringVarP(&postgresUser, "postgres-user", "", "terrarium", "Postgres User")
-	moduleCmd.Flags().StringVarP(&postgresPassword, "postgres-password", "", "", "Postgres Password")
-	moduleCmd.Flags().StringVarP(&postgresSSLMode, "postgres-sslmode", "", "require", "Postgres SSL Mode")
+	moduleCmd.Flags().StringVarP(&storageBackend, "storage-backend", "s", "mongo", "Controls the database storage backend. Available backends: 'postgres', 'mongo'")
+	moduleCmd.Flags().StringVarP(&databaseHost, "database-host", "", "", "Database Host")
+	moduleCmd.Flags().StringVarP(&databaseName, "database", "", "terrarium", "Database Name")
+	moduleCmd.Flags().StringVarP(&databaseUser, "database-user", "", "terrarium", "Database User")
+	moduleCmd.Flags().StringVarP(&databasePassword, "database-password", "", "", "Database Password")
+	moduleCmd.Flags().StringVarP(&databaseSSLMode, "database-sslmode", "", "require", "Database SSL Mode")
 }

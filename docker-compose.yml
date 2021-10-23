@@ -1,15 +1,11 @@
 ---
 version: "3.9"
 services:
-  postgres:
-    image: postgres:14
+  mongo:
+    image: mongo:5.0.3
     ports:
-      - 5432:5432
-    environment:
-      POSTGRES_USER: terrarium
-      POSTGRES_PASSWORD: terrarium
-      POSTGRES_DB: terrarium
+      - 27017:27017
     volumes:
-      - data:/var/lib/postgresql/data.
+      - data:/data/db
 volumes:
   data:
