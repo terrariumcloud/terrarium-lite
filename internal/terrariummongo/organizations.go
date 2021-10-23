@@ -9,6 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const collectionName string = "organizations"
+
 // OrganizationBackend is a struct that implements Mongo operations for organizations
 type OrganizationBackend struct {
 	Database string
@@ -30,7 +32,7 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 	ctx := context.TODO()
 	limitOpt := options.Find().SetLimit(int64(limit))
 	skipOpt := options.Find().SetSkip(int64(offset))
-	cur, err := o.client.Database(o.Database).Collection("organizations").Find(ctx, bson.D{}, limitOpt, skipOpt)
+	cur, err := o.client.Database(o.Database).Collection(collectionName).Find(ctx, bson.D{}, limitOpt, skipOpt)
 	if err != nil {
 		return nil, err
 	}

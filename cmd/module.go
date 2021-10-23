@@ -20,7 +20,6 @@ import (
 
 	"github.com/dylanrhysscott/terrarium/api"
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo"
-	"github.com/dylanrhysscott/terrarium/internal/terrariumpsql"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/spf13/cobra"
 )
@@ -40,9 +39,6 @@ var moduleCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var driver types.TerrariumDriver
 		var err error
-		if storageBackend == "postgres" {
-			driver, err = terrariumpsql.New(databaseHost, databaseUser, databasePassword, databaseName, databaseSSLMode)
-		}
 		if storageBackend == "mongo" {
 			driver, err = terrariummongo.New(databaseHost, databaseUser, databasePassword, databaseName)
 		}
@@ -62,7 +58,7 @@ var moduleCmd = &cobra.Command{
 
 func init() {
 	serveCmd.AddCommand(moduleCmd)
-	moduleCmd.Flags().StringVarP(&storageBackend, "storage-backend", "s", "mongo", "Controls the database storage backend. Available backends: 'postgres', 'mongo'")
+	moduleCmd.Flags().StringVarP(&storageBackend, "storage-backend", "s", "mongo", "Controls the database storage backend. Available backends: 'mongo'")
 	moduleCmd.Flags().StringVarP(&databaseHost, "database-host", "", "", "Database Host")
 	moduleCmd.Flags().StringVarP(&databaseName, "database", "", "terrarium", "Database Name")
 	moduleCmd.Flags().StringVarP(&databaseUser, "database-user", "", "terrarium", "Database User")
