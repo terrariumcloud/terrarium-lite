@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// TerrariumPostgres implements Postgres support for Terrarium for all API's
+// TerrariumMongo implements Mongo support for Terrarium for all API's
 type TerrariumMongo struct {
 	Host     string
 	User     string
