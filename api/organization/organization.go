@@ -44,7 +44,6 @@ type OrganizationAPIInterface interface {
 
 // OrganizationAPI is a struct implementing the handlers for the Organization API in Terrarium
 type OrganizationAPI struct {
-	Path              string
 	OrganziationStore types.OrganizationStore
 	ErrorHandler      types.APIErrorWriter
 	ResponseHandler   types.APIResponseWriter

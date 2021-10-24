@@ -8,6 +8,10 @@ import (
 	"gopkg.in/errgo.v2/errors"
 )
 
+type APIResponseWriter interface {
+	Write(rw http.ResponseWriter, data interface{}, statusCode int)
+}
+
 type TerrariumAPIResponseWriter struct{}
 
 func (t *TerrariumAPIResponseWriter) Write(rw http.ResponseWriter, data interface{}, statusCode int) {
