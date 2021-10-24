@@ -9,6 +9,7 @@ import (
 
 const BadRequestPrefix string = "Bad Request"
 const InternalServerErrorPrefix string = "Internal Server Error"
+const NotFoundPrefix string = "404 Not Found"
 
 type APIErrorWriter interface {
 	Write(rw http.ResponseWriter, err error, statusCode int)

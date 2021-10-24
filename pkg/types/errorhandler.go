@@ -18,6 +18,8 @@ func (t *TerrariumAPIErrorHandler) Write(rw http.ResponseWriter, err error, stat
 		prefix = InternalServerErrorPrefix
 	case http.StatusBadRequest:
 		prefix = BadRequestPrefix
+	case http.StatusNotFound:
+		prefix = NotFoundPrefix
 	default:
 
 	}

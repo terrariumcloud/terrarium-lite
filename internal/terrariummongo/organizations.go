@@ -75,15 +75,11 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 }
 
 // ReadOne Returns a single organization from the organizations table
-func (o *OrganizationBackend) ReadOne(id string) (*types.Organization, error) {
+func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, error) {
 	ctx := context.TODO()
 	org := &types.Organization{}
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-	result := o.client.Database(o.Database).Collection(collectionName).FindOne(ctx, bson.M{"_id": oid}, options.FindOne())
-	err = result.Decode(org)
+	result := o.client.Database(o.Database).Collection(collectionName).FindOne(ctx, bson.M{"name": orgName}, options.FindOne())
+	err := result.Decode(org)
 	if err != nil {
 		return nil, err
 	}

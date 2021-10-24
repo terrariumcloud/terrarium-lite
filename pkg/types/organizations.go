@@ -11,7 +11,7 @@ type Organization struct {
 	ID        primitive.ObjectID `json:"id" bson:"_id"`
 	Name      string             `json:"name" bson:"name"`
 	Email     string             `json:"email" bson:"email"`
-	CreatedOn string             `json:"created_on" bson:"createdon"`
+	CreatedOn string             `json:"created_on" bson:"created_on"`
 }
 
 func (o *Organization) Validate() error {

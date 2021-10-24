@@ -36,7 +36,7 @@ func (t *Terrarium) setupOrganizationRoutes(path string) {
 	s.StrictSlash(true)
 	s.Handle("/", apiHandlers.ListOrganizationsHandler()).Methods(http.MethodGet)
 	s.Handle("/", apiHandlers.CreateOrganizationHandler()).Methods(http.MethodPost)
-	s.Handle("/{id}", apiHandlers.GetOrganizationHandler()).Methods(http.MethodGet)
+	s.Handle("/{organization_name}", apiHandlers.GetOrganizationHandler()).Methods(http.MethodGet)
 	s.Handle("/{id}", apiHandlers.UpdateOrganizationHandler()).Methods(http.MethodPatch)
 	s.Handle("/{id}", apiHandlers.DeleteOrganizationHandler()).Methods(http.MethodDelete)
 }

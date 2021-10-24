@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/gorilla/mux"
 )
 
 func extractLimitAndOffset(qs url.Values) (int, int, error) {
@@ -87,7 +88,18 @@ func (o *OrganizationAPI) UpdateOrganizationHandler() http.Handler {
 // GetOrganizationHandler is a handler for getting a single organization (GET)
 func (o *OrganizationAPI) GetOrganizationHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		params := mux.Vars(r)
+		orgName := params["organization_name"]
+		org, err := o.OrganziationStore.ReadOne(orgName)
+		if err != nil {
+			if err.Error() == "mongo: no documents in result" {
+				o.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
+				return
+			}
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		o.ResponseHandler.Write(rw, org, http.StatusOK)
 	})
 }
 
