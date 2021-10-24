@@ -10,7 +10,7 @@ type VCSAPIInterface interface {
 	CreateVCSHandler() http.Handler
 	GetVCSHandler() http.Handler
 	UpdateVCSHandler() http.Handler
-	ListVCSsHandler() http.Handler
+	ListVCSHandler() http.Handler
 	DeleteVCSHandler() http.Handler
 }
 
@@ -43,7 +43,7 @@ func (v *VCSAPI) GetVCSHandler() http.Handler {
 }
 
 // ListVCSHandler is a handler for listing all organization VCS connections (GET)
-func (v *VCSAPI) ListVCSsHandler() http.Handler {
+func (v *VCSAPI) ListVCSHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 
 	})

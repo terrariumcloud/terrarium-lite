@@ -41,7 +41,7 @@ func (t *Terrarium) setupOrganizationRoutes(path string) {
 	s.Handle("/{organization_name}", apiHandlers.GetOrganizationHandler()).Methods(http.MethodGet)
 	s.Handle("/{organization_name}", apiHandlers.UpdateOrganizationHandler()).Methods(http.MethodPatch)
 	s.Handle("/{organization_name}", apiHandlers.DeleteOrganizationHandler()).Methods(http.MethodDelete)
-	s.Handle("/{organization_name}/oauth-clients", vcsHandlers.ListVCSsHandler()).Methods(http.MethodGet)
+	s.Handle("/{organization_name}/oauth-clients", vcsHandlers.ListVCSHandler()).Methods(http.MethodGet)
 	s.Handle("/{organization_name}/oauth-clients", vcsHandlers.CreateVCSHandler()).Methods(http.MethodPost)
 }
 
