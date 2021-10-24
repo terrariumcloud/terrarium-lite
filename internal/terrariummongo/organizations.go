@@ -87,25 +87,18 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 }
 
 // Update Updates an organization in the organization table
-func (o *OrganizationBackend) Update(id string, name string, email string) (*types.Organization, error) {
+func (o *OrganizationBackend) Update(name string, email string) (*types.Organization, error) {
 	ctx := context.TODO()
 	update := bson.M{}
-	if name != "" {
-		update["name"] = name
-	}
 	if email != "" {
 		update["email"] = email
 	}
-	oid, err := primitive.ObjectIDFromHex(id)
+	upsert := options.Update().SetUpsert(false)
+	_, err := o.client.Database(o.Database).Collection(collectionName).UpdateOne(ctx, bson.M{"name": name}, bson.M{"$set": update}, upsert)
 	if err != nil {
 		return nil, err
 	}
-	upsert := options.Update().SetUpsert(true)
-	_, err = o.client.Database(o.Database).Collection(collectionName).UpdateByID(ctx, oid, bson.M{"$set": update}, upsert)
-	if err != nil {
-		return nil, err
-	}
-	updatedOrg, err := o.ReadOne(id)
+	updatedOrg, err := o.ReadOne(name)
 	if err != nil {
 		return nil, err
 	}

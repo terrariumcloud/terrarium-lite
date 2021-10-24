@@ -9,6 +9,11 @@ import (
 	"gopkg.in/errgo.v2/errors"
 )
 
+const BadRequestPrefix string = "Bad Request"
+const InternalServerErrorPrefix string = "Internal Server Error"
+const NotFoundPrefix string = "404 Not Found"
+const UnprocessablePrefix string = "Unprocessable Entity"
+
 type TerrariumAPIErrorHandler struct{}
 
 func (t *TerrariumAPIErrorHandler) Write(rw http.ResponseWriter, err error, statusCode int) {
@@ -20,6 +25,8 @@ func (t *TerrariumAPIErrorHandler) Write(rw http.ResponseWriter, err error, stat
 		prefix = BadRequestPrefix
 	case http.StatusNotFound:
 		prefix = NotFoundPrefix
+	case http.StatusUnprocessableEntity:
+		prefix = UnprocessablePrefix
 	default:
 
 	}

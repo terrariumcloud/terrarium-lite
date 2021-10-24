@@ -66,7 +66,7 @@ func (o *OrganizationAPI) CreateOrganizationHandler() http.Handler {
 		}
 		err = org.Validate()
 		if err != nil {
-			o.ErrorHandler.Write(rw, err, http.StatusBadRequest)
+			o.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
 		org, err = o.OrganziationStore.Create(org.Name, org.Email)
@@ -81,7 +81,34 @@ func (o *OrganizationAPI) CreateOrganizationHandler() http.Handler {
 // UpdateOrganizationHandler is a handler for updating an organization (PUT)
 func (o *OrganizationAPI) UpdateOrganizationHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		params := mux.Vars(r)
+		orgName := params["organization_name"]
+		_, err := o.OrganziationStore.ReadOne(orgName)
+		if err != nil {
+			if err.Error() == "mongo: no documents in result" {
+				o.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
+				return
+			}
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
+			return
+		}
+		org := &types.Organization{}
+		err = json.Unmarshal(body, org)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		updatedOrg, err := o.OrganziationStore.Update(orgName, org.Email)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		o.ResponseHandler.Write(rw, updatedOrg, http.StatusOK)
 	})
 }
 

@@ -7,10 +7,6 @@ import (
 	"net/http"
 )
 
-const BadRequestPrefix string = "Bad Request"
-const InternalServerErrorPrefix string = "Internal Server Error"
-const NotFoundPrefix string = "404 Not Found"
-
 type APIErrorWriter interface {
 	Write(rw http.ResponseWriter, err error, statusCode int)
 }
@@ -34,9 +30,9 @@ type OrganizationStore interface {
 	Init() error
 	Create(name string, email string) (*Organization, error)
 	ReadAll(limit int, offset int) ([]*Organization, error)
-	ReadOne(id string) (*Organization, error)
-	Update(id string, name string, email string) (*Organization, error)
-	Delete(id string) error
+	ReadOne(name string) (*Organization, error)
+	Update(name string, email string) (*Organization, error)
+	Delete(name string) error
 }
 
 // TerrariumDriver is a generic database interface to allow further database implementations for Terrarium

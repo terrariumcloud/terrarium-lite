@@ -6,7 +6,7 @@ build:
 	go build
 
 test:
-	go test ./...
+	go test -cover ./...
 
 run:
 	docker-compose up -d

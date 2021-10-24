@@ -37,8 +37,8 @@ func (t *Terrarium) setupOrganizationRoutes(path string) {
 	s.Handle("/", apiHandlers.ListOrganizationsHandler()).Methods(http.MethodGet)
 	s.Handle("/", apiHandlers.CreateOrganizationHandler()).Methods(http.MethodPost)
 	s.Handle("/{organization_name}", apiHandlers.GetOrganizationHandler()).Methods(http.MethodGet)
-	s.Handle("/{id}", apiHandlers.UpdateOrganizationHandler()).Methods(http.MethodPatch)
-	s.Handle("/{id}", apiHandlers.DeleteOrganizationHandler()).Methods(http.MethodDelete)
+	s.Handle("/{organization_name}", apiHandlers.UpdateOrganizationHandler()).Methods(http.MethodPatch)
+	s.Handle("/{organization_name}", apiHandlers.DeleteOrganizationHandler()).Methods(http.MethodDelete)
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes

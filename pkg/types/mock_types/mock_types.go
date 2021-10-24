@@ -165,24 +165,24 @@ func (mr *MockOrganizationStoreMockRecorder) ReadAll(limit, offset interface{}) 
 }
 
 // ReadOne mocks base method.
-func (m *MockOrganizationStore) ReadOne(id string) (*types.Organization, error) {
+func (m *MockOrganizationStore) ReadOne(name string) (*types.Organization, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReadOne", id)
+	ret := m.ctrl.Call(m, "ReadOne", name)
 	ret0, _ := ret[0].(*types.Organization)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ReadOne indicates an expected call of ReadOne.
-func (mr *MockOrganizationStoreMockRecorder) ReadOne(id interface{}) *gomock.Call {
+func (mr *MockOrganizationStoreMockRecorder) ReadOne(name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadOne", reflect.TypeOf((*MockOrganizationStore)(nil).ReadOne), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadOne", reflect.TypeOf((*MockOrganizationStore)(nil).ReadOne), name)
 }
 
 // Update mocks base method.
-func (m *MockOrganizationStore) Update(id, name, email string) (*types.Organization, error) {
+func (m *MockOrganizationStore) Update(name, email string) (*types.Organization, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", id, name, email)
+	ret := m.ctrl.Call(m, "Update", name, email)
 	ret0, _ := ret[0].(*types.Organization)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
