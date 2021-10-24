@@ -1,23 +1,25 @@
 package types
 
 import (
+	"errors"
+	"log"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // VCSStore is a generic data interface for implementaing database operations relating to VCS OAuth Connections
 type VCSStore interface {
 	Init() error
-	Create(name string, orgID string, serviceProvider string, httpURI string, apiURI string, clientID string, clientSecret string, callback string) (*VCS, error)
+	Create(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error)
 	ReadAll(limit int, offset int) ([]*VCS, error)
 	ReadOne(name string) (*VCS, error)
-	Update(name string, orgID string, serviceProvider string, httpURI string, apiURI string, clientID string, clientSecret string, callback string) (*VCS, error)
+	Update(name string, orgName string, serviceProvider string, httpURI string, apiURI string, clientID string, clientSecret string, callback string) (*VCS, error)
 	Delete(name string) error
 }
 
 // VCS represents the VCS data structure stored in the database
 type VCS struct {
 	ID           primitive.ObjectID   `json:"id" bson:"_id"`
-	Name         string               `json:"name" bson:"name"`
 	Organization *VCSOrganizationLink `json:"organization" bson:"organization"`
 	OAuth        *VCSOAuthClientLink  `json:"oauth" bson:"oauth"`
 }
@@ -34,4 +36,27 @@ type VCSOAuthClientLink struct {
 	ClientID        string `json:"client_id" bson:"client_id"`
 	ClientSecret    string `json:"client_secret" bson:"client_secret"`
 	CallbackURI     string `json:"callback_uri" bson:"callback_uri"`
+}
+
+func (v *VCSOAuthClientLink) Validate() error {
+	log.Printf("%v", v)
+	if v.ServiceProvider == "" {
+		return errors.New("service_provider missing. Supported values are: 'github'")
+	}
+	if v.HTTPURI == "" {
+		return errors.New("http_uri missing")
+	}
+	if v.APIURI == "" {
+		return errors.New("api_uri missing")
+	}
+	if v.ClientID == "" {
+		return errors.New("client_id missing")
+	}
+	if v.ClientSecret == "" {
+		return errors.New("client_secret missing")
+	}
+	if v.CallbackURI == "" {
+		return errors.New("callback_uri missing")
+	}
+	return nil
 }

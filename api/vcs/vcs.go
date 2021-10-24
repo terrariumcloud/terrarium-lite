@@ -1,9 +1,13 @@
 package vcs
 
 import (
+	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/gorilla/mux"
 )
 
 type VCSAPIInterface interface {
@@ -24,7 +28,39 @@ type VCSAPI struct {
 // CreateVCSHandler is a handler for creating an organization VCS connection (POST)
 func (v *VCSAPI) CreateVCSHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		params := mux.Vars(r)
+		orgName := params["organization_name"]
+		org, err := v.OrganziationStore.ReadOne(orgName)
+		if err != nil {
+			if err.Error() == "mongo: no documents in result" {
+				v.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
+				return
+			}
+			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		link := &types.VCSOAuthClientLink{}
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		err = json.Unmarshal(body, link)
+		if err != nil {
+			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		err = link.Validate()
+		if err != nil {
+			v.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
+			return
+		}
+		vcsConnection, err := v.VCSStore.Create(org.ID.Hex(), orgName, link)
+		if err != nil {
+			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		v.ResponseHandler.Write(rw, vcsConnection, http.StatusCreated)
 	})
 }
 
