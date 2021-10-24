@@ -37,8 +37,9 @@ func (o *OrganizationBackend) Init() error {
 }
 
 // Create Adds a new organization to the organizations table
-func (o *OrganizationBackend) Create(name string, email string) error {
+func (o *OrganizationBackend) Create(name string, email string) (*types.Organization, error) {
 	org := &types.Organization{
+		ID:        primitive.NewObjectID(),
 		Name:      name,
 		Email:     email,
 		CreatedOn: time.Now().UTC().String(),
@@ -46,9 +47,9 @@ func (o *OrganizationBackend) Create(name string, email string) error {
 	ctx := context.TODO()
 	_, err := o.client.Database(o.Database).Collection(collectionName).InsertOne(ctx, org, options.InsertOne())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return org, nil
 }
 
 // ReadAll Returns all organizations from the organizations table

@@ -107,11 +107,12 @@ func (m *MockOrganizationStore) EXPECT() *MockOrganizationStoreMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockOrganizationStore) Create(name, email string) error {
+func (m *MockOrganizationStore) Create(name, email string) (*types.Organization, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", name, email)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*types.Organization)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
