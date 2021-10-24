@@ -23,5 +23,7 @@ func (t *TerrariumAPIResponseWriter) Write(rw http.ResponseWriter, data interfac
 	}
 	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(statusCode)
-	rw.Write(jsonData)
+	if statusCode != http.StatusNoContent {
+		rw.Write(jsonData)
+	}
 }

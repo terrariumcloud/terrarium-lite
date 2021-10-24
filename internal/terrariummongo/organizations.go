@@ -106,13 +106,9 @@ func (o *OrganizationBackend) Update(name string, email string) (*types.Organiza
 }
 
 // Delete Removes an organization from the organization table
-func (o *OrganizationBackend) Delete(id string) error {
+func (o *OrganizationBackend) Delete(name string) error {
 	ctx := context.TODO()
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	_, err = o.client.Database(o.Database).Collection(collectionName).DeleteOne(ctx, bson.M{"_id": oid}, options.Delete())
+	_, err := o.client.Database(o.Database).Collection(collectionName).DeleteOne(ctx, bson.M{"name": name}, options.Delete())
 	if err != nil {
 		return err
 	}

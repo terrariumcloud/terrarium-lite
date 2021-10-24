@@ -152,7 +152,14 @@ func (o *OrganizationAPI) ListOrganizationsHandler() http.Handler {
 // DeleteOrganizationHandler is a handler for deleting an organization (DELETE)
 func (o *OrganizationAPI) DeleteOrganizationHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		params := mux.Vars(r)
+		orgName := params["organization_name"]
+		err := o.OrganziationStore.Delete(orgName)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		o.ResponseHandler.Write(rw, nil, http.StatusNoContent)
 	})
 }
 
