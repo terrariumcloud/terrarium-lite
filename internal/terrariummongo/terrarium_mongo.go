@@ -36,8 +36,18 @@ func (m *TerrariumMongo) Connect(ctx context.Context) error {
 // Organizations returns a Mongo compatible organization store which implements the OrganizationStore interface
 func (m *TerrariumMongo) Organizations() types.OrganizationStore {
 	return &OrganizationBackend{
-		client:   m.client,
-		Database: m.Database,
+		CollectionName: "organizations",
+		client:         m.client,
+		Database:       m.Database,
+	}
+}
+
+// VCS returns a Mongo compatible VCS store which implements the VCSStore interface
+func (m *TerrariumMongo) VCS() types.VCSStore {
+	return &VCSBackend{
+		CollectionName: "vcs",
+		client:         m.client,
+		Database:       m.Database,
 	}
 }
 

@@ -11,17 +11,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const collectionName string = "organizations"
-
 // OrganizationBackend is a struct that implements Mongo operations for organizations
 type OrganizationBackend struct {
-	Database string
-	client   *mongo.Client
+	CollectionName string
+	Database       string
+	client         *mongo.Client
 }
 
 // Init initializes the Organizations table
 func (o *OrganizationBackend) Init() error {
-	collection := o.client.Database(o.Database).Collection(collectionName)
+	collection := o.client.Database(o.Database).Collection(o.CollectionName)
 	// Ensures unique email and name combination
 	_, err := collection.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 		Keys: bson.D{
@@ -45,7 +44,7 @@ func (o *OrganizationBackend) Create(name string, email string) (*types.Organiza
 		CreatedOn: time.Now().UTC().String(),
 	}
 	ctx := context.TODO()
-	_, err := o.client.Database(o.Database).Collection(collectionName).InsertOne(ctx, org, options.InsertOne())
+	_, err := o.client.Database(o.Database).Collection(o.CollectionName).InsertOne(ctx, org, options.InsertOne())
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +56,7 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 	ctx := context.TODO()
 	limitOpt := options.Find().SetLimit(int64(limit))
 	skipOpt := options.Find().SetSkip(int64(offset))
-	cur, err := o.client.Database(o.Database).Collection(collectionName).Find(ctx, bson.D{}, limitOpt, skipOpt)
+	cur, err := o.client.Database(o.Database).Collection(o.CollectionName).Find(ctx, bson.D{}, limitOpt, skipOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +77,7 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, error) {
 	ctx := context.TODO()
 	org := &types.Organization{}
-	result := o.client.Database(o.Database).Collection(collectionName).FindOne(ctx, bson.M{"name": orgName}, options.FindOne())
+	result := o.client.Database(o.Database).Collection(o.CollectionName).FindOne(ctx, bson.M{"name": orgName}, options.FindOne())
 	err := result.Decode(org)
 	if err != nil {
 		return nil, err
@@ -94,7 +93,7 @@ func (o *OrganizationBackend) Update(name string, email string) (*types.Organiza
 		update["email"] = email
 	}
 	upsert := options.Update().SetUpsert(false)
-	_, err := o.client.Database(o.Database).Collection(collectionName).UpdateOne(ctx, bson.M{"name": name}, bson.M{"$set": update}, upsert)
+	_, err := o.client.Database(o.Database).Collection(o.CollectionName).UpdateOne(ctx, bson.M{"name": name}, bson.M{"$set": update}, upsert)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +107,7 @@ func (o *OrganizationBackend) Update(name string, email string) (*types.Organiza
 // Delete Removes an organization from the organization table
 func (o *OrganizationBackend) Delete(name string) error {
 	ctx := context.TODO()
-	_, err := o.client.Database(o.Database).Collection(collectionName).DeleteOne(ctx, bson.M{"name": name}, options.Delete())
+	_, err := o.client.Database(o.Database).Collection(o.CollectionName).DeleteOne(ctx, bson.M{"name": name}, options.Delete())
 	if err != nil {
 		return err
 	}
