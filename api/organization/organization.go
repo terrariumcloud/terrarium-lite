@@ -1,7 +1,9 @@
 package organization
 
 import (
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -50,18 +52,28 @@ type OrganizationAPI struct {
 // CreateOrganizationHandler is a handler for creating an organization (POST)
 func (o *OrganizationAPI) CreateOrganizationHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		// body, err := ioutil.ReadAll(r.Body)
-		// if err != nil {
-		// 	jsonData, err := types.NewTerrariumBadRequest(err.Error())
-		// 	if err != nil {
-		// 		log.Println(err.Error())
-		// 		rw.WriteHeader(http.StatusInternalServerError)
-		// 		return
-		// 	}
-		// 	rw.WriteHeader(http.StatusBadRequest)
-		// 	rw.Write(jsonData)
-		// 	return
-		// }
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		org := &types.Organization{}
+		err = json.Unmarshal(body, org)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		err = org.Validate()
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusBadRequest)
+			return
+		}
+		org, err = o.OrganziationStore.Create(org.Name, org.Email)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		o.ResponseHandler.Write(rw, org, http.StatusCreated)
 	})
 }
 

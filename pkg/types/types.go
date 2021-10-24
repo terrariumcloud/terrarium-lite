@@ -31,19 +31,11 @@ type TerrariumServerResponse struct {
 // OrganizationStore is a generic data interface for implementaing database operations relating to organizations
 type OrganizationStore interface {
 	Init() error
-	Create(name string, email string) error
+	Create(name string, email string) (*Organization, error)
 	ReadAll(limit int, offset int) ([]*Organization, error)
 	ReadOne(id string) (*Organization, error)
 	Update(id string, name string, email string) (*Organization, error)
 	Delete(id string) error
-}
-
-// Organization represents the organization data structure stored in the database
-type Organization struct {
-	ID        string `json:"id" bson:"_id"`
-	Name      string `json:"name" bson:"name"`
-	Email     string `json:"email" bson:"email"`
-	CreatedOn string `json:"created_on" bson:"createdon"`
 }
 
 // TerrariumDriver is a generic database interface to allow further database implementations for Terrarium

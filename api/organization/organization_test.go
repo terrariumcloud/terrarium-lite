@@ -13,6 +13,7 @@ import (
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/dylanrhysscott/terrarium/pkg/types/mock_types"
 	"github.com/golang/mock/gomock"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var orgs []*types.Organization
@@ -102,7 +103,7 @@ func TestListOrganizationsSuccessHandler(t *testing.T) {
 		t.Fatalf("Expected 2 organization to be in response body")
 	}
 	testOrg := orgs[0]
-	if testOrg.ID != "1" {
+	if testOrg.ID != orgs[0].ID {
 		t.Fatal("Expected ID for org to be 1")
 	}
 	if testOrg.Name != "Test Org" {
@@ -119,13 +120,13 @@ func TestListOrganizationsSuccessHandler(t *testing.T) {
 func TestMain(m *testing.M) {
 	orgs = []*types.Organization{
 		{
-			ID:        "1",
+			ID:        primitive.NewObjectID(),
 			Name:      "Test Org",
 			Email:     "test@test.com",
 			CreatedOn: "2020-01-01T00:00:00Z",
 		},
 		{
-			ID:        "2",
+			ID:        primitive.NewObjectID(),
 			Name:      "Test Org2",
 			Email:     "test@test.com",
 			CreatedOn: "2020-01-01T00:00:00Z",
