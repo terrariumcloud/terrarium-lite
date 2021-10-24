@@ -2,7 +2,6 @@ package types
 
 import (
 	"errors"
-	"log"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -13,6 +12,7 @@ type VCSStore interface {
 	Create(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error)
 	ReadAll(limit int, offset int) ([]*VCS, error)
 	ReadOne(name string) (*VCS, error)
+	ReadOneByClientID(id string) (*VCS, error)
 	Update(name string, orgName string, serviceProvider string, httpURI string, apiURI string, clientID string, clientSecret string, callback string) (*VCS, error)
 	Delete(name string) error
 }
@@ -30,16 +30,22 @@ type VCSOrganizationLink struct {
 }
 
 type VCSOAuthClientLink struct {
-	ServiceProvider string `json:"service_provider" bson:"service_provider"`
-	HTTPURI         string `json:"http_uri" bson:"http_uri"`
-	APIURI          string `json:"api_uri" bson:"api_uri"`
-	ClientID        string `json:"client_id" bson:"client_id"`
-	ClientSecret    string `json:"client_secret" bson:"client_secret"`
-	CallbackURI     string `json:"callback_uri" bson:"callback_uri"`
+	ServiceProvider string    `json:"service_provider" bson:"service_provider"`
+	HTTPURI         string    `json:"http_uri" bson:"http_uri"`
+	APIURI          string    `json:"api_uri" bson:"api_uri"`
+	ClientID        string    `json:"client_id" bson:"client_id"`
+	ClientSecret    string    `json:"client_secret" bson:"client_secret"`
+	CallbackURI     string    `json:"callback_uri" bson:"callback_uri"`
+	Token           *VCSToken `json:"token" bson:"token"`
+}
+
+type VCSToken struct {
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+	Scope       string `json:"scope"`
 }
 
 func (v *VCSOAuthClientLink) Validate() error {
-	log.Printf("%v", v)
 	if v.ServiceProvider == "" {
 		return errors.New("service_provider missing. Supported values are: 'github'")
 	}

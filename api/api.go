@@ -53,6 +53,7 @@ func (t *Terrarium) setupOAuthClientRoutes(path string) {
 	s.Handle("/{id}", vcsHandlers.GetVCSHandler()).Methods(http.MethodGet)
 	s.Handle("/{id}", vcsHandlers.UpdateVCSHandler()).Methods(http.MethodPatch)
 	s.Handle("/{id}", vcsHandlers.DeleteVCSHandler()).Methods(http.MethodDelete)
+	s.Handle("/{id}/github/callback", vcsHandlers.GithubCallbackHander()).Methods(http.MethodGet)
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes

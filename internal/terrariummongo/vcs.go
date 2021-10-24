@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -59,6 +60,18 @@ func (v *VCSBackend) ReadAll(limit int, offset int) ([]*types.VCS, error) {
 // ReadOne Returns a single VCS from the VCSs table
 func (v *VCSBackend) ReadOne(orgName string) (*types.VCS, error) {
 	return nil, nil
+}
+
+// ReadOneByClientID Returns a single VCS using client ID
+func (v *VCSBackend) ReadOneByClientID(id string) (*types.VCS, error) {
+	ctx := context.TODO()
+	vcs := &types.VCS{}
+	result := v.client.Database(v.Database).Collection(v.CollectionName).FindOne(ctx, bson.M{"oauth.client_id": id}, options.FindOne())
+	err := result.Decode(vcs)
+	if err != nil {
+		return nil, err
+	}
+	return vcs, nil
 }
 
 // Update Updates an VCS in the VCS table
