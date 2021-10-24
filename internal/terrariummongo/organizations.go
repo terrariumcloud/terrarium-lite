@@ -25,8 +25,8 @@ func (o *OrganizationBackend) Init() error {
 	// Ensures unique email and name combination
 	_, err := collection.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 		Keys: bson.D{
-			{"name", 1},
-			{"email", 1},
+			{Key: "name", Value: 1},
+			{Key: "email", Value: 1},
 		},
 		Options: options.Index().SetUnique(true),
 	})
