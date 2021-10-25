@@ -60,8 +60,5 @@ func (v *VCSOAuthClientLink) Validate() error {
 	if v.ClientSecret == "" {
 		return errors.New("client_secret missing")
 	}
-	if v.CallbackURI == "" {
-		return errors.New("callback_uri missing")
-	}
 	return nil
 }

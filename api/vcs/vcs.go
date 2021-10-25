@@ -3,7 +3,6 @@ package vcs
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -51,7 +50,6 @@ func (v *VCSAPI) CreateVCSHandler() http.Handler {
 			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		link.CallbackURI = fmt.Sprintf("/v1/oauth-clients/%s/github/callback", link.ClientID)
 		err = link.Validate()
 		if err != nil {
 			v.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
