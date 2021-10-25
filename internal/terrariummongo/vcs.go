@@ -58,16 +58,15 @@ func (v *VCSBackend) ReadAll(limit int, offset int) ([]*types.VCS, error) {
 }
 
 // ReadOne Returns a single VCS from the VCSs table
-func (v *VCSBackend) ReadOne(orgName string) (*types.VCS, error) {
-	return nil, nil
-}
-
-// ReadOneByClientID Returns a single VCS using client ID
-func (v *VCSBackend) ReadOneByClientID(id string) (*types.VCS, error) {
+func (v *VCSBackend) ReadOne(id string) (*types.VCS, error) {
 	ctx := context.TODO()
 	vcs := &types.VCS{}
-	result := v.client.Database(v.Database).Collection(v.CollectionName).FindOne(ctx, bson.M{"oauth.client_id": id}, options.FindOne())
-	err := result.Decode(vcs)
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	result := v.client.Database(v.Database).Collection(v.CollectionName).FindOne(ctx, bson.M{"_id": oid}, options.FindOne())
+	err = result.Decode(vcs)
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,6 @@ type VCSAPIInterface interface {
 	UpdateVCSHandler() http.Handler
 	ListVCSHandler() http.Handler
 	DeleteVCSHandler() http.Handler
-	GithubCallbackHander() http.Handler
 }
 
 type VCSAPI struct {
@@ -92,57 +91,6 @@ func (v *VCSAPI) ListVCSHandler() http.Handler {
 func (v *VCSAPI) DeleteVCSHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 
-	})
-}
-
-// GithubCallbackHandler is a handler for handling callback redirection from Github
-func (v *VCSAPI) GithubCallbackHander() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		code := r.URL.Query().Get("code")
-		params := mux.Vars(r)
-		clientID := params["id"]
-		if code == "" {
-			v.ErrorHandler.Write(rw, errors.New("invalid code"), http.StatusBadRequest)
-			return
-		}
-		vcs, err := v.VCSStore.ReadOneByClientID(clientID)
-		if err != nil {
-			if err.Error() == "mongo: no documents in result" {
-				v.ErrorHandler.Write(rw, errors.New("vcs connection does not exist"), http.StatusNotFound)
-				return
-			}
-			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
-		req, err := http.NewRequest(http.MethodPost, "https://github.com/login/oauth/access_token", nil)
-		if err != nil {
-			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
-		req.Header.Add("Accept", "application/json")
-		q := req.URL.Query()
-		q.Add("client_id", vcs.OAuth.ClientID)
-		q.Add("client_secret", vcs.OAuth.ClientSecret)
-		q.Add("code", code)
-		req.URL.RawQuery = q.Encode()
-		client := http.DefaultClient
-		resp, err := client.Do(req)
-		if err != nil {
-			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
-		data, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
-		ghToken := &types.VCSToken{}
-		err = json.Unmarshal(data, ghToken)
-		if err != nil {
-			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
-		v.ResponseHandler.Write(rw, ghToken, http.StatusOK)
 	})
 }
 

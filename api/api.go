@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/dylanrhysscott/terrarium/api/oauth"
 	"github.com/dylanrhysscott/terrarium/api/organization"
 	"github.com/dylanrhysscott/terrarium/api/vcs"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
@@ -53,7 +54,13 @@ func (t *Terrarium) setupOAuthClientRoutes(path string) {
 	s.Handle("/{id}", vcsHandlers.GetVCSHandler()).Methods(http.MethodGet)
 	s.Handle("/{id}", vcsHandlers.UpdateVCSHandler()).Methods(http.MethodPatch)
 	s.Handle("/{id}", vcsHandlers.DeleteVCSHandler()).Methods(http.MethodDelete)
-	s.Handle("/{id}/github/callback", vcsHandlers.GithubCallbackHander()).Methods(http.MethodGet)
+}
+
+func (t *Terrarium) setupAuthorizeRoutes(path string) {
+	oauthHandlers := oauth.NewOAuthAPI(t.Store.VCS(), t.Responder, t.Errorer)
+	s := t.Router.PathPrefix(path).Subrouter()
+	s.StrictSlash(true)
+	s.Handle("/github/{id}/callback", oauthHandlers.GithubCallbackHander()).Methods(http.MethodGet)
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes
@@ -67,5 +74,6 @@ func NewTerrarium(port int, driver types.TerrariumDriver, responder types.APIRes
 	}
 	t.setupOrganizationRoutes("/v1/organizations")
 	t.setupOAuthClientRoutes("/v1/oauth-clients")
+	t.setupAuthorizeRoutes("/oauth")
 	return t
 }
