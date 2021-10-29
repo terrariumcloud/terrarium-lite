@@ -78,8 +78,7 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-
-		genericStore.FetchVCSSources(vcs.OAuth.Token.AccessToken)
+		genericStore.FetchVCSSource(vcs.OAuth.Token.AccessToken, sourceData.Repo)
 	})
 }
 
@@ -88,10 +87,10 @@ func (s *SourceAPI) SetupRoutes() {
 	s.Router.Handle("/{provider}/{id}", s.CreateVCSModule()).Methods(http.MethodPost)
 }
 
-func NewSourceAPI(router *mux.Router, path string, vcsstore types.VCSStore, vcsProviders *SourcesMap, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *SourceAPI {
+func NewSourceAPI(router *mux.Router, path string, vcsconnstore types.VCSSConnectionStore, vcsProviders *SourcesMap, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *SourceAPI {
 	s := &SourceAPI{
 		Router:          router.PathPrefix(path).Subrouter(),
-		VCSStore:        vcsstore,
+		VCSStore:        vcsconnstore,
 		SourceStores:    vcsProviders,
 		ResponseHandler: responseHandler,
 		ErrorHandler:    errorHandler,

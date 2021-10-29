@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type VCSAPIInterface interface {
+type VCSConnAPIInterface interface {
 	CreateVCSHandler() http.Handler
 	GetVCSHandler() http.Handler
 	UpdateVCSHandler() http.Handler

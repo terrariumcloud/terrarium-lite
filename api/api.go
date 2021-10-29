@@ -10,7 +10,7 @@ import (
 	"github.com/dylanrhysscott/terrarium/api/oauth"
 	"github.com/dylanrhysscott/terrarium/api/organization"
 	"github.com/dylanrhysscott/terrarium/api/sources"
-	"github.com/dylanrhysscott/terrarium/api/vcs"
+	"github.com/dylanrhysscott/terrarium/api/vcsconn"
 	"github.com/dylanrhysscott/terrarium/internal/terrariumvcs/github"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/handlers"
@@ -22,7 +22,7 @@ type Terrarium struct {
 	Port            int
 	Store           types.TerrariumDriver
 	OrganizationAPI organization.OrganizationAPIInterface
-	VCSAPI          vcs.VCSAPIInterface
+	VCSAPI          vcsconn.VCSConnAPIInterface
 	VCSProviders    *sources.SourcesMap
 	OAuthAPI        oauth.OAuthAPIInterface
 	SourceAPI       sources.SourceAPIInterface
@@ -41,7 +41,7 @@ func (t *Terrarium) Serve() error {
 
 // Init calls the various API sub packages to setup routers for endpoints
 func (t *Terrarium) Init() {
-	t.VCSAPI = vcs.NewVCSAPI(t.Router, "/v1/oauth-clients", t.Store.VCSConnections(), t.Store.Organizations(), t.Responder, t.Errorer)
+	t.VCSAPI = vcsconn.NewVCSAPI(t.Router, "/v1/oauth-clients", t.Store.VCSConnections(), t.Store.Organizations(), t.Responder, t.Errorer)
 	t.OAuthAPI = oauth.NewOAuthAPI(t.Router, "/oauth", t.Store.VCSConnections(), t.Responder, t.Errorer)
 	t.SourceAPI = sources.NewSourceAPI(t.Router, "/v1/sources", t.Store.VCSConnections(), t.VCSProviders, t.Responder, t.Errorer)
 	t.OrganizationAPI = organization.NewOrganizationAPI(t.Router, "/v1/organizations", t.Store.Organizations(), t.VCSAPI, t.Responder, t.Errorer)
