@@ -3,6 +3,7 @@ package oauth
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -27,7 +28,7 @@ func (o *OAuthAPI) LoginHandler() http.Handler {
 	})
 }
 
-func (o *OAuthAPI) GithubCallbackHander() http.Handler {
+func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		code := r.URL.Query().Get("code")
 		params := mux.Vars(r)
@@ -55,6 +56,7 @@ func (o *OAuthAPI) GithubCallbackHander() http.Handler {
 		q.Add("client_id", vcs.OAuth.ClientID)
 		q.Add("client_secret", vcs.OAuth.ClientSecret)
 		q.Add("code", code)
+		q.Add("redirect_uri", "http://localhost:3000")
 		req.URL.RawQuery = q.Encode()
 		client := http.DefaultClient
 		resp, err := client.Do(req)
@@ -67,13 +69,24 @@ func (o *OAuthAPI) GithubCallbackHander() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
+		for name, values := range resp.Header {
+			// Loop over all values for the name.
+			for _, value := range values {
+				fmt.Println(name, value)
+			}
+		}
 		ghToken := &types.VCSToken{}
 		err = json.Unmarshal(data, ghToken)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		o.ResponseHandler.Write(rw, ghToken, http.StatusOK)
+		err = o.VCSStore.UpdateVCSToken(vcs.OAuth.ClientID, ghToken)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		o.ResponseHandler.Redirect(rw, r, "http://localhost:3000")
 	})
 }
 

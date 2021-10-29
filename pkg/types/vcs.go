@@ -12,20 +12,16 @@ type VCSStore interface {
 	Create(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error)
 	ReadAll(limit int, offset int) ([]*VCS, error)
 	ReadOne(id string) (*VCS, error)
-	Update(name string, orgName string, serviceProvider string, httpURI string, apiURI string, clientID string, clientSecret string, callback string) (*VCS, error)
+	Update(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error)
+	UpdateVCSToken(clientID string, token *VCSToken) error
 	Delete(name string) error
 }
 
 // VCS represents the VCS data structure stored in the database
 type VCS struct {
-	ID           primitive.ObjectID   `json:"id" bson:"_id"`
-	Organization *VCSOrganizationLink `json:"organization" bson:"organization"`
-	OAuth        *VCSOAuthClientLink  `json:"oauth" bson:"oauth"`
-}
-
-type VCSOrganizationLink struct {
-	ID   primitive.ObjectID `json:"id" bson:"_id"`
-	Link string             `json:"link" bson:"link"`
+	ID           primitive.ObjectID  `json:"id" bson:"_id"`
+	Organization *ResourceLink       `json:"organization" bson:"organization"`
+	OAuth        *VCSOAuthClientLink `json:"oauth" bson:"oauth"`
 }
 
 type VCSOAuthClientLink struct {
@@ -39,9 +35,12 @@ type VCSOAuthClientLink struct {
 }
 
 type VCSToken struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	Scope       string `json:"scope"`
+	AccessToken           string `json:"access_token"`
+	ExpiresIn             int    `json:"expires_in"`
+	RefreshToken          string `json:"refresh_token"`
+	RefreshTokenExpiresIn int    `json:"refresh_token_expires_in"`
+	TokenType             string `json:"token_type"`
+	Scope                 string `json:"scope"`
 }
 
 func (v *VCSOAuthClientLink) Validate() error {
