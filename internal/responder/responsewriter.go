@@ -1,4 +1,4 @@
-package types
+package responder
 
 import (
 	"encoding/json"
@@ -7,11 +7,6 @@ import (
 
 	"gopkg.in/errgo.v2/errors"
 )
-
-type APIResponseWriter interface {
-	Write(rw http.ResponseWriter, data interface{}, statusCode int)
-	Redirect(rw http.ResponseWriter, r *http.Request, uri string)
-}
 
 type TerrariumAPIResponseWriter struct{}
 

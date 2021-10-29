@@ -1,4 +1,4 @@
-package types
+package responder
 
 import (
 	"encoding/json"
@@ -13,10 +13,6 @@ const BadRequestPrefix string = "Bad Request"
 const InternalServerErrorPrefix string = "Internal Server Error"
 const NotFoundPrefix string = "404 Not Found"
 const UnprocessablePrefix string = "Unprocessable Entity"
-
-type APIErrorWriter interface {
-	Write(rw http.ResponseWriter, err error, statusCode int)
-}
 
 type TerrariumAPIErrorHandler struct{}
 

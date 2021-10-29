@@ -7,7 +7,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcs"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
+
 	"github.com/gorilla/mux"
 )
 
@@ -39,7 +41,7 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 			o.ErrorHandler.Write(rw, errors.New("invalid code"), http.StatusBadRequest)
 			return
 		}
-		vcs, err := o.VCSStore.ReadOne(vcsID)
+		vcsItem, err := o.VCSStore.ReadOne(vcsID)
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
 				o.ErrorHandler.Write(rw, errors.New("vcs connection does not exist"), http.StatusNotFound)
@@ -55,8 +57,8 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 		}
 		req.Header.Add("Accept", "application/json")
 		q := req.URL.Query()
-		q.Add("client_id", vcs.OAuth.ClientID)
-		q.Add("client_secret", vcs.OAuth.ClientSecret)
+		q.Add("client_id", vcsItem.OAuth.ClientID)
+		q.Add("client_secret", vcsItem.OAuth.ClientSecret)
 		q.Add("code", code)
 		q.Add("redirect_uri", "http://localhost:3000")
 		req.URL.RawQuery = q.Encode()
@@ -77,13 +79,13 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 				fmt.Println(name, value)
 			}
 		}
-		ghToken := &types.VCSToken{}
+		ghToken := &vcs.VCSToken{}
 		err = json.Unmarshal(data, ghToken)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		err = o.VCSStore.UpdateVCSToken(vcs.OAuth.ClientID, ghToken)
+		err = o.VCSStore.UpdateVCSToken(vcsItem.OAuth.ClientID, ghToken)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return

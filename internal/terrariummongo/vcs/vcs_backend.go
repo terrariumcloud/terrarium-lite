@@ -1,10 +1,9 @@
-package terrariummongo
+package vcs
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +14,7 @@ import (
 type VCSBackend struct {
 	CollectionName string
 	Database       string
-	client         *mongo.Client
+	Client         *mongo.Client
 }
 
 // Init initializes the VCS table
@@ -24,7 +23,7 @@ func (v *VCSBackend) Init() error {
 }
 
 // Create Adds a new VCS to the VCS table
-func (v *VCSBackend) Create(orgID string, orgName string, link *types.VCSOAuthClientLink) (*types.VCS, error) {
+func (v *VCSBackend) Create(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error) {
 	ctx := context.TODO()
 	oid, err := primitive.ObjectIDFromHex(orgID)
 	if err != nil {
@@ -32,15 +31,15 @@ func (v *VCSBackend) Create(orgID string, orgName string, link *types.VCSOAuthCl
 	}
 	vcsID := primitive.NewObjectID()
 	link.CallbackURI = fmt.Sprintf("/oauth/github/%s/callback", vcsID.Hex())
-	vcsConnection := &types.VCS{
+	vcsConnection := &VCS{
 		ID: vcsID,
-		Organization: &types.ResourceLink{
+		Organization: &ResourceLink{
 			ID:   oid,
 			Link: fmt.Sprintf("/v1/organizations/%s", orgName),
 		},
 		OAuth: link,
 	}
-	_, err = v.client.Database(v.Database).Collection(v.CollectionName).InsertOne(ctx, vcsConnection, options.InsertOne())
+	_, err = v.Client.Database(v.Database).Collection(v.CollectionName).InsertOne(ctx, vcsConnection, options.InsertOne())
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +47,11 @@ func (v *VCSBackend) Create(orgID string, orgName string, link *types.VCSOAuthCl
 }
 
 // ReadAll Returns all VCSs from the VCS table
-func (v *VCSBackend) ReadAll(limit int, offset int) ([]*types.VCS, error) {
+func (v *VCSBackend) ReadAll(limit int, offset int) ([]*VCS, error) {
 	// ctx := context.TODO()
 	// limitOpt := options.Find().SetLimit(int64(limit))
 	// skipOpt := options.Find().SetSkip(int64(offset))
-	// cur, err := v.client.Database(v.Database).Collection(v.CollectionName).Find(ctx, bson.D{}, limitOpt, skipOpt)
+	// cur, err := v.Client.Database(v.Database).Collection(v.CollectionName).Find(ctx, bson.D{}, limitOpt, skipOpt)
 	// if err != nil {
 	// 	return nil, err
 	// }
@@ -60,14 +59,14 @@ func (v *VCSBackend) ReadAll(limit int, offset int) ([]*types.VCS, error) {
 }
 
 // ReadOne Returns a single VCS from the VCSs table
-func (v *VCSBackend) ReadOne(id string) (*types.VCS, error) {
+func (v *VCSBackend) ReadOne(id string) (*VCS, error) {
 	ctx := context.TODO()
-	vcs := &types.VCS{}
+	vcs := &VCS{}
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
-	result := v.client.Database(v.Database).Collection(v.CollectionName).FindOne(ctx, bson.M{"_id": oid}, options.FindOne())
+	result := v.Client.Database(v.Database).Collection(v.CollectionName).FindOne(ctx, bson.M{"_id": oid}, options.FindOne())
 	err = result.Decode(vcs)
 	if err != nil {
 		return nil, err
@@ -76,12 +75,12 @@ func (v *VCSBackend) ReadOne(id string) (*types.VCS, error) {
 }
 
 // Update Updates an VCS in the VCS table
-func (v *VCSBackend) Update(orgID string, orgName string, link *types.VCSOAuthClientLink) (*types.VCS, error) {
+func (v *VCSBackend) Update(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error) {
 	return nil, nil
 }
 
 // UpdateVCSToken Updates the VCS OAuth Token in the database
-func (v *VCSBackend) UpdateVCSToken(clientID string, token *types.VCSToken) error {
+func (v *VCSBackend) UpdateVCSToken(clientID string, token *VCSToken) error {
 	ctx := context.TODO()
 	update := bson.M{
 		"$set": bson.M{
@@ -99,7 +98,7 @@ func (v *VCSBackend) UpdateVCSToken(clientID string, token *types.VCSToken) erro
 		"oauth.client_id": clientID,
 	}
 	upsert := options.Update().SetUpsert(false)
-	_, err := v.client.Database(v.Database).Collection(v.CollectionName).UpdateOne(ctx, query, update, upsert)
+	_, err := v.Client.Database(v.Database).Collection(v.CollectionName).UpdateOne(ctx, query, update, upsert)
 	if err != nil {
 		return err
 	}

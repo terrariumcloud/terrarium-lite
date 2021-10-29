@@ -5,6 +5,10 @@ import (
 	"errors"
 	"fmt"
 
+	orgs "github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/sources"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcs"
+
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,25 +39,25 @@ func (m *TerrariumMongo) Connect(ctx context.Context) error {
 
 // Organizations returns a Mongo compatible organization store which implements the OrganizationStore interface
 func (m *TerrariumMongo) Organizations() types.OrganizationStore {
-	return &OrganizationBackend{
+	return &orgs.OrganizationBackend{
 		CollectionName: "organizations",
-		client:         m.client,
+		Client:         m.client,
 		Database:       m.Database,
 	}
 }
 
 // VCS returns a Mongo compatible VCS store which implements the VCSStore interface
 func (m *TerrariumMongo) VCS() types.VCSStore {
-	return &VCSBackend{
+	return &vcs.VCSBackend{
 		CollectionName: "vcs",
-		client:         m.client,
+		Client:         m.client,
 		Database:       m.Database,
 	}
 }
 
 // Sources returns a Sources struct which implements the SourceStore interface
 func (m *TerrariumMongo) Sources() types.SourceStore {
-	return &SourceBackend{}
+	return &sources.SourceBackend{}
 }
 
 // New creates a TerrariumMongo driver
