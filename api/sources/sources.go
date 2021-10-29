@@ -25,11 +25,11 @@ type SourceAPI struct {
 }
 
 type SourcesMap struct {
-	Github types.SourceStore
+	Github types.SourceProvider
 }
 
-func (s *SourceAPI) detectStoreType(t string) (types.SourceStore, error) {
-	var genericStore types.SourceStore = nil
+func (s *SourceAPI) detectStoreType(t string) (types.SourceProvider, error) {
+	var genericStore types.SourceProvider = nil
 	switch t {
 	case "github":
 		genericStore = s.SourceStore.GithubSources()

@@ -7,7 +7,7 @@ import (
 
 type TerrariumSourceDriver struct{}
 
-func (t *TerrariumSourceDriver) GithubSources() types.SourceStore {
+func (t *TerrariumSourceDriver) GithubSources() types.SourceProvider {
 	return github.NewGithubBackend()
 }
 
