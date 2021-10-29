@@ -13,6 +13,7 @@ const BadRequestPrefix string = "Bad Request"
 const InternalServerErrorPrefix string = "Internal Server Error"
 const NotFoundPrefix string = "404 Not Found"
 const UnprocessablePrefix string = "Unprocessable Entity"
+const NotImplementedPrefix string = "Not Implemented"
 
 type TerrariumAPIErrorHandler struct{}
 
@@ -27,6 +28,8 @@ func (t *TerrariumAPIErrorHandler) Write(rw http.ResponseWriter, err error, stat
 		prefix = NotFoundPrefix
 	case http.StatusUnprocessableEntity:
 		prefix = UnprocessablePrefix
+	case http.StatusNotImplemented:
+		prefix = NotImplementedPrefix
 	default:
 
 	}
