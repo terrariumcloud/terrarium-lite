@@ -11,19 +11,19 @@ import (
 )
 
 // VCSBackend is a struct that implements Mongo operations for organizations
-type VCSBackend struct {
+type VCSConnectionBackend struct {
 	CollectionName string
 	Database       string
 	Client         *mongo.Client
 }
 
 // Init initializes the VCS table
-func (v *VCSBackend) Init() error {
+func (v *VCSConnectionBackend) Init() error {
 	return nil
 }
 
 // Create Adds a new VCS to the VCS table
-func (v *VCSBackend) Create(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error) {
+func (v *VCSConnectionBackend) Create(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error) {
 	ctx := context.TODO()
 	oid, err := primitive.ObjectIDFromHex(orgID)
 	if err != nil {
@@ -47,7 +47,7 @@ func (v *VCSBackend) Create(orgID string, orgName string, link *VCSOAuthClientLi
 }
 
 // ReadAll Returns all VCSs from the VCS table
-func (v *VCSBackend) ReadAll(limit int, offset int) ([]*VCS, error) {
+func (v *VCSConnectionBackend) ReadAll(limit int, offset int) ([]*VCS, error) {
 	// ctx := context.TODO()
 	// limitOpt := options.Find().SetLimit(int64(limit))
 	// skipOpt := options.Find().SetSkip(int64(offset))
@@ -59,7 +59,7 @@ func (v *VCSBackend) ReadAll(limit int, offset int) ([]*VCS, error) {
 }
 
 // ReadOne Returns a single VCS from the VCSs table
-func (v *VCSBackend) ReadOne(id string) (*VCS, error) {
+func (v *VCSConnectionBackend) ReadOne(id string) (*VCS, error) {
 	ctx := context.TODO()
 	vcs := &VCS{}
 	oid, err := primitive.ObjectIDFromHex(id)
@@ -75,12 +75,12 @@ func (v *VCSBackend) ReadOne(id string) (*VCS, error) {
 }
 
 // Update Updates an VCS in the VCS table
-func (v *VCSBackend) Update(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error) {
+func (v *VCSConnectionBackend) Update(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error) {
 	return nil, nil
 }
 
 // UpdateVCSToken Updates the VCS OAuth Token in the database
-func (v *VCSBackend) UpdateVCSToken(clientID string, token *VCSToken) error {
+func (v *VCSConnectionBackend) UpdateVCSToken(clientID string, token *VCSToken) error {
 	ctx := context.TODO()
 	update := bson.M{
 		"$set": bson.M{
@@ -106,6 +106,6 @@ func (v *VCSBackend) UpdateVCSToken(clientID string, token *VCSToken) error {
 }
 
 // Delete Removes an VCS from the VCS table
-func (v *VCSBackend) Delete(name string) error {
+func (v *VCSConnectionBackend) Delete(name string) error {
 	return nil
 }

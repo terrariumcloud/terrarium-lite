@@ -14,6 +14,10 @@ type GithubBackend struct {
 	client *ghlib.Client
 }
 
+func (g *GithubBackend) FetchVCSSource(token string, vcsRepoName string) {
+
+}
+
 func (g *GithubBackend) FetchVCSSources(token string) {
 	ctx := context.TODO()
 	log.Println("Token:", token)

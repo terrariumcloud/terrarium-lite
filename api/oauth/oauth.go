@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcs"
+	vcs "github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 
 	"github.com/gorilla/mux"
@@ -23,7 +23,7 @@ type OAuthAPI struct {
 	Router          *mux.Router
 	ErrorHandler    types.APIErrorWriter
 	ResponseHandler types.APIResponseWriter
-	VCSStore        types.VCSStore
+	VCSStore        types.VCSSConnectionStore
 }
 
 func (o *OAuthAPI) LoginHandler() http.Handler {
@@ -93,10 +93,10 @@ func (o *OAuthAPI) SetupRoutes() {
 	o.Router.Handle("/github/{id}/callback", o.GithubCallbackHandler()).Methods(http.MethodGet)
 }
 
-func NewOAuthAPI(router *mux.Router, path string, vcsstore types.VCSStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OAuthAPI {
+func NewOAuthAPI(router *mux.Router, path string, vcsconnstore types.VCSSConnectionStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OAuthAPI {
 	a := &OAuthAPI{
 		Router:          router.PathPrefix(path).Subrouter(),
-		VCSStore:        vcsstore,
+		VCSStore:        vcsconnstore,
 		ResponseHandler: responseHandler,
 		ErrorHandler:    errorHandler,
 	}

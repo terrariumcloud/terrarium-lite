@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcs"
+	vcsconn "github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 	"github.com/dylanrhysscott/terrarium/internal/terrariumvcs/github"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
@@ -46,9 +46,9 @@ func (m *TerrariumMongo) Organizations() types.OrganizationStore {
 	}
 }
 
-// VCS returns a Mongo compatible VCS store which implements the VCSStore interface
-func (m *TerrariumMongo) VCS() types.VCSStore {
-	return &vcs.VCSBackend{
+// VCSConnections returns a Mongo compatible VCSConnection store which implements the VCSConnectionsStore interface
+func (m *TerrariumMongo) VCSConnections() types.VCSSConnectionStore {
+	return &vcsconn.VCSConnectionBackend{
 		CollectionName: "vcs",
 		Client:         m.client,
 		Database:       m.Database,
