@@ -41,9 +41,12 @@ type VCSOAuthClientLink struct {
 }
 
 type VCSToken struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	Scope       string `json:"scope"`
+	AccessToken           string `json:"access_token"`
+	ExpiresIn             int    `json:"expires_in"`
+	RefreshToken          string `json:"refresh_token"`
+	RefreshTokenExpiresIn int    `json:"refresh_token_expires_in"`
+	TokenType             string `json:"token_type"`
+	Scope                 string `json:"scope"`
 }
 
 func (v *VCSOAuthClientLink) Validate() error {

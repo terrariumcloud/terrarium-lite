@@ -98,9 +98,12 @@ func (v *VCSBackend) UpdateVCSToken(clientID string, token *types.VCSToken) erro
 	update := bson.M{
 		"$set": bson.M{
 			"oauth.token": bson.M{
-				"access_token": token.AccessToken,
-				"token_type":   token.TokenType,
-				"scope":        token.Scope,
+				"access_token":             token.AccessToken,
+				"expires_in":               token.ExpiresIn,
+				"token_type":               token.TokenType,
+				"scope":                    token.Scope,
+				"refresh_token_expires_in": token.RefreshTokenExpiresIn,
+				"refresh_token":            token.RefreshToken,
 			},
 		},
 	}
