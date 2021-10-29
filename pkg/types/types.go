@@ -16,7 +16,7 @@ type TerrariumDriver interface {
 	Connect(ctx context.Context) error
 	Organizations() OrganizationStore
 	VCS() VCSStore
-	Sources() SourceStore
+	GithubSources() SourceStore
 }
 
 // OrganizationStore is a generic data interface for implementaing database operations relating to organizations
