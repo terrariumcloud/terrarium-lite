@@ -34,7 +34,7 @@ func (v *VCSBackend) Create(orgID string, orgName string, link *types.VCSOAuthCl
 	link.CallbackURI = fmt.Sprintf("/oauth/github/%s/callback", vcsID.Hex())
 	vcsConnection := &types.VCS{
 		ID: vcsID,
-		Organization: &types.VCSOrganizationLink{
+		Organization: &types.ResourceLink{
 			ID:   oid,
 			Link: fmt.Sprintf("/v1/organizations/%s", orgName),
 		},

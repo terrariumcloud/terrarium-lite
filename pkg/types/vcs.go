@@ -19,14 +19,9 @@ type VCSStore interface {
 
 // VCS represents the VCS data structure stored in the database
 type VCS struct {
-	ID           primitive.ObjectID   `json:"id" bson:"_id"`
-	Organization *VCSOrganizationLink `json:"organization" bson:"organization"`
-	OAuth        *VCSOAuthClientLink  `json:"oauth" bson:"oauth"`
-}
-
-type VCSOrganizationLink struct {
-	ID   primitive.ObjectID `json:"id" bson:"_id"`
-	Link string             `json:"link" bson:"link"`
+	ID           primitive.ObjectID  `json:"id" bson:"_id"`
+	Organization *ResourceLink       `json:"organization" bson:"organization"`
+	OAuth        *VCSOAuthClientLink `json:"oauth" bson:"oauth"`
 }
 
 type VCSOAuthClientLink struct {

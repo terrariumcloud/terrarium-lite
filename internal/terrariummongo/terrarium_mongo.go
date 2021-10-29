@@ -51,6 +51,15 @@ func (m *TerrariumMongo) VCS() types.VCSStore {
 	}
 }
 
+// VCS returns a Mongo compatible VCS store which implements the ModuleStore interface
+func (m *TerrariumMongo) Modules() types.ModuleStore {
+	return &ModuleBackend{
+		CollectionName: "modules",
+		client:         m.client,
+		Database:       m.Database,
+	}
+}
+
 // New creates a TerrariumMongo driver
 func New(host string, user string, password string, database string) (*TerrariumMongo, error) {
 	if host == "" {
@@ -67,6 +76,10 @@ func New(host string, user string, password string, database string) (*Terrarium
 		return nil, err
 	}
 	err = driver.Organizations().Init()
+	if err != nil {
+		return nil, err
+	}
+	err = driver.Modules().Init()
 	if err != nil {
 		return nil, err
 	}

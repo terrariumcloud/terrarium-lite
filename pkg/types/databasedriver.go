@@ -12,4 +12,5 @@ type TerrariumDriver interface {
 	Connect(ctx context.Context) error
 	Organizations() OrganizationStore
 	VCS() VCSStore
+	Modules() ModuleStore
 }
