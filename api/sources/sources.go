@@ -67,18 +67,23 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		sourceData := &SourceVCSRepoBody{}
-		err = json.Unmarshal(body, sourceData)
+		reqBody := &SourceVCSRepoBody{}
+		err = json.Unmarshal(body, reqBody)
 		if err != nil {
 			s.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		err = sourceData.Validate()
+		err = reqBody.Validate()
 		if err != nil {
 			s.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		genericStore.FetchVCSSource(vcs.OAuth.Token.AccessToken, sourceData.Repo)
+		sourceRepo, err := genericStore.FetchVCSSource(vcs.OAuth.Token.AccessToken, reqBody.Repo, reqBody.Owner)
+		if err != nil {
+			s.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		s.ResponseHandler.Write(rw, sourceRepo, http.StatusOK)
 	})
 }
 
