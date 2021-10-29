@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcs"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 )
 
 // TerrariumDriver is a generic database interface to allow further database implementations for Terrarium
@@ -15,7 +15,7 @@ import (
 type TerrariumDriver interface {
 	Connect(ctx context.Context) error
 	Organizations() OrganizationStore
-	VCS() VCSStore
+	VCSConnections() VCSSConnectionStore
 	GithubSources() SourceStore
 }
 
@@ -40,17 +40,23 @@ type APIErrorWriter interface {
 }
 
 // VCSStore is a generic data interface for implementaing database operations relating to VCS OAuth Connections
-type VCSStore interface {
+type VCSSConnectionStore interface {
 	Init() error
-	Create(orgID string, orgName string, link *vcs.VCSOAuthClientLink) (*vcs.VCS, error)
-	ReadAll(limit int, offset int) ([]*vcs.VCS, error)
-	ReadOne(id string) (*vcs.VCS, error)
-	Update(orgID string, orgName string, link *vcs.VCSOAuthClientLink) (*vcs.VCS, error)
-	UpdateVCSToken(clientID string, token *vcs.VCSToken) error
+	Create(orgID string, orgName string, link *vcsconn.VCSOAuthClientLink) (*vcsconn.VCS, error)
+	ReadAll(limit int, offset int) ([]*vcsconn.VCS, error)
+	ReadOne(id string) (*vcsconn.VCS, error)
+	Update(orgID string, orgName string, link *vcsconn.VCSOAuthClientLink) (*vcsconn.VCS, error)
+	UpdateVCSToken(clientID string, token *vcsconn.VCSToken) error
 	Delete(name string) error
 }
 
 // SourceStore is a generic data interface for implementaing database operations relating to modules
 type SourceStore interface {
 	FetchVCSSources(token string)
+	FetchVCSSource(token string, vcsRepoName string, vcsRepoOwner string) (SourceData, error)
+}
+
+type SourceData interface {
+	ToModuleDocument() *Module
+	GetVersionList() *ModuleVersion
 }

@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/dylanrhysscott/terrarium/api/vcs"
+	"github.com/dylanrhysscott/terrarium/api/vcsconn"
 	orgdata "github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/mux"
@@ -166,7 +166,7 @@ func (o *OrganizationAPI) DeleteOrganizationHandler() http.Handler {
 }
 
 // setupOrganizationRoutes configures the organization API subrouter
-func (o *OrganizationAPI) SetupRoutes(vcsAPI vcs.VCSAPIInterface) {
+func (o *OrganizationAPI) SetupRoutes(vcsAPI vcsconn.VCSConnAPIInterface) {
 	o.Router.StrictSlash(true)
 	o.Router.Handle("/", o.ListOrganizationsHandler()).Methods(http.MethodGet)
 	o.Router.Handle("/", o.CreateOrganizationHandler()).Methods(http.MethodPost)
@@ -179,7 +179,7 @@ func (o *OrganizationAPI) SetupRoutes(vcsAPI vcs.VCSAPIInterface) {
 
 // NewOrganizationAPI creates an instance of the organization API with the reqired database
 // driver support
-func NewOrganizationAPI(router *mux.Router, path string, store types.OrganizationStore, vcsAPI vcs.VCSAPIInterface, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OrganizationAPI {
+func NewOrganizationAPI(router *mux.Router, path string, store types.OrganizationStore, vcsAPI vcsconn.VCSConnAPIInterface, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OrganizationAPI {
 	o := &OrganizationAPI{
 		Router:            router.PathPrefix(path).Subrouter(),
 		OrganziationStore: store,
