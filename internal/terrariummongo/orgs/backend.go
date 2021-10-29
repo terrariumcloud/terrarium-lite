@@ -112,3 +112,8 @@ func (o *OrganizationBackend) Delete(name string) error {
 	}
 	return nil
 }
+
+// GetBackendType Returns the type of backend used
+func (o *OrganizationBackend) GetBackendType() string {
+	return "mongo"
+}

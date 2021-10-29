@@ -1,19 +1,15 @@
 package vcs
 
-import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
-
 // VCS represents the VCS data structure stored in the database
 type VCS struct {
-	ID           primitive.ObjectID  `json:"id" bson:"_id"`
+	ID           interface{}         `json:"id" bson:"_id"`
 	Organization *ResourceLink       `json:"organization" bson:"organization"`
 	OAuth        *VCSOAuthClientLink `json:"oauth" bson:"oauth"`
 }
 
 type ResourceLink struct {
-	ID   primitive.ObjectID `json:"id" bson:"_id"`
-	Link string             `json:"link" bson:"link"`
+	ID   interface{} `json:"id" bson:"_id"`
+	Link string      `json:"link" bson:"link"`
 }
 
 type VCSToken struct {

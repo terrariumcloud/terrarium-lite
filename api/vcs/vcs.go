@@ -9,6 +9,7 @@ import (
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcs"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type VCSAPIInterface interface {
@@ -57,7 +58,11 @@ func (v *VCSAPI) CreateVCSHandler() http.Handler {
 			v.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		vcsConnection, err := v.VCSStore.Create(org.ID.Hex(), orgName, link)
+		var id string
+		if v.OrganziationStore.GetBackendType() == "mongo" {
+			id = org.ID.(primitive.ObjectID).Hex()
+		}
+		vcsConnection, err := v.VCSStore.Create(id, orgName, link)
 		if err != nil {
 			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return

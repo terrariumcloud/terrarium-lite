@@ -2,16 +2,14 @@ package orgs
 
 import (
 	"errors"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Organization represents the organization data structure stored in the database
 type Organization struct {
-	ID        primitive.ObjectID `json:"id" bson:"_id"`
-	Name      string             `json:"name" bson:"name"`
-	Email     string             `json:"email" bson:"email"`
-	CreatedOn string             `json:"created_on" bson:"created_on"`
+	ID        interface{} `json:"id" bson:"_id"`
+	Name      string      `json:"name" bson:"name"`
+	Email     string      `json:"email" bson:"email"`
+	CreatedOn string      `json:"created_on" bson:"created_on"`
 }
 
 func (o *Organization) Validate() error {

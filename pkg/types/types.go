@@ -27,6 +27,7 @@ type OrganizationStore interface {
 	ReadOne(name string) (*orgs.Organization, error)
 	Update(name string, email string) (*orgs.Organization, error)
 	Delete(name string) error
+	GetBackendType() string
 }
 
 type APIResponseWriter interface {
