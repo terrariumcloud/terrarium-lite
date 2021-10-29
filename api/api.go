@@ -42,7 +42,6 @@ func (t *Terrarium) Serve() error {
 
 // Init calls the various API sub packages to setup routers for endpoints
 func (t *Terrarium) Init() {
-	t.Source = terrariumsorce.NewTerrariumSourceDriver()
 	t.VCSConnectionAPI = vcsconn.NewVCSAPI(t.Router, "/v1/oauth-clients", t.Store.VCSConnections(), t.Store.Organizations(), t.Responder, t.Errorer)
 	t.OAuthAPI = oauth.NewOAuthAPI(t.Router, "/oauth", t.Store.VCSConnections(), t.Responder, t.Errorer)
 	t.SourceAPI = sources.NewSourceAPI(t.Router, "/v1/sources", t.Store.VCSConnections(), t.Source, t.Responder, t.Errorer)
@@ -54,6 +53,7 @@ func NewTerrarium(port int, driver types.TerrariumDatabaseDriver, responder type
 	return &Terrarium{
 		Port:      port,
 		Store:     driver,
+		Source:    terrariumsorce.NewTerrariumSourceDriver(),
 		Router:    mux.NewRouter(),
 		Responder: responder,
 		Errorer:   errorer,
