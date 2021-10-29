@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"log"
+	"net/http"
 
 	ghlib "github.com/google/go-github/v39/github"
 	"golang.org/x/oauth2"
@@ -25,15 +26,27 @@ func (g *GithubBackend) FetchVCSSources(token string) {
 		tc := oauth2.NewClient(ctx, ts)
 		ghc := ghlib.NewClient(tc)
 		g.client = ghc
-		repos, _, err := g.client.Repositories.List(ctx, "", &ghlib.RepositoryListOptions{
-			Visibility: "all",
-		})
-		if err != nil {
-			log.Println(err.Error())
-			return
+	}
+	repos, _, err := g.client.Repositories.List(ctx, "", &ghlib.RepositoryListOptions{})
+
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for _, repo := range repos {
+		log.Println(repo.GetName())
+		tags, resp, err := g.client.Repositories.ListTags(ctx, "", *repo.Name, &ghlib.ListOptions{})
+		if resp.StatusCode != http.StatusNotFound {
+			if err != nil {
+				log.Println(err.Error())
+			}
 		}
-		for _, repo := range repos {
-			log.Println(repo.GetName())
+
+		if len(tags) == 0 {
+			log.Println("No tags")
+		} else {
+			for _, tag := range tags {
+				log.Print(tag.GetName())
+			}
 		}
 	}
 }

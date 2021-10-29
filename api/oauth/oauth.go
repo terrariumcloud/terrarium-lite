@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcs"
@@ -59,7 +60,6 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 		q.Add("client_id", vcsItem.OAuth.ClientID)
 		q.Add("client_secret", vcsItem.OAuth.ClientSecret)
 		q.Add("code", code)
-		q.Add("redirect_uri", "http://localhost:3000")
 		req.URL.RawQuery = q.Encode()
 		client := http.DefaultClient
 		resp, err := client.Do(req)
@@ -72,6 +72,7 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
+		log.Println(string(data))
 		ghToken := &vcs.VCSToken{}
 		err = json.Unmarshal(data, ghToken)
 		if err != nil {
