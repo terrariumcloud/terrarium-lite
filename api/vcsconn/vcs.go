@@ -1,4 +1,4 @@
-package vcs
+package vcsconn
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	vcsconn "github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"

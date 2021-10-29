@@ -2,7 +2,7 @@ package types
 
 import (
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/sources"
-	vcsconn "github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 )
 
 // Module represents the module data structure stored in the database

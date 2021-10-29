@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
-	vcsconn "github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 	"github.com/dylanrhysscott/terrarium/internal/terrariumvcs/github"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"

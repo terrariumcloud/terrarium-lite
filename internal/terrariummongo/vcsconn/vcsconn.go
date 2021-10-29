@@ -1,4 +1,4 @@
-package vcs
+package vcsconn
 
 // VCS represents the VCS data structure stored in the database
 type VCS struct {
