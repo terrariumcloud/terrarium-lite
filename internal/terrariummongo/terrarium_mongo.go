@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	orgs "github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/sources"
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcs"
 
