@@ -51,13 +51,9 @@ func (m *TerrariumMongo) VCS() types.VCSStore {
 	}
 }
 
-// VCS returns a Mongo compatible VCS store which implements the ModuleStore interface
-func (m *TerrariumMongo) Modules() types.ModuleStore {
-	return &ModuleBackend{
-		CollectionName: "modules",
-		client:         m.client,
-		Database:       m.Database,
-	}
+// Sources returns a Sources struct which implements the SourceStore interface
+func (m *TerrariumMongo) Sources() types.SourceStore {
+	return &SourceBackend{}
 }
 
 // New creates a TerrariumMongo driver
@@ -76,10 +72,6 @@ func New(host string, user string, password string, database string) (*Terrarium
 		return nil, err
 	}
 	err = driver.Organizations().Init()
-	if err != nil {
-		return nil, err
-	}
-	err = driver.Modules().Init()
 	if err != nil {
 		return nil, err
 	}
