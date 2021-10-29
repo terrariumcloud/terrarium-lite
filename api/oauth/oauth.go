@@ -12,11 +12,13 @@ import (
 )
 
 type OAuthAPIInterface interface {
+	SetupRoutes()
 	LoginHandler() http.Handler
 	GithubCallbackHandler() http.Handler
 }
 
 type OAuthAPI struct {
+	Router          *mux.Router
 	ErrorHandler    types.APIErrorWriter
 	ResponseHandler types.APIResponseWriter
 	VCSStore        types.VCSStore
@@ -90,10 +92,18 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 	})
 }
 
-func NewOAuthAPI(vcsstore types.VCSStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OAuthAPI {
-	return &OAuthAPI{
+func (o *OAuthAPI) SetupRoutes() {
+	o.Router.StrictSlash(true)
+	o.Router.Handle("/github/{id}/callback", o.GithubCallbackHandler()).Methods(http.MethodGet)
+}
+
+func NewOAuthAPI(router *mux.Router, path string, vcsstore types.VCSStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OAuthAPI {
+	a := &OAuthAPI{
+		Router:          router.PathPrefix(path).Subrouter(),
 		VCSStore:        vcsstore,
 		ResponseHandler: responseHandler,
 		ErrorHandler:    errorHandler,
 	}
+	a.SetupRoutes()
+	return a
 }

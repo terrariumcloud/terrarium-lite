@@ -21,7 +21,8 @@ var orgs []*types.Organization
 func mockHandlerWithOrgStore(mockStore *mock_types.MockOrganizationStore, method string, path string) (*httptest.ResponseRecorder, *http.Request, http.Handler) {
 	rr := httptest.NewRecorder()
 	req := httptest.NewRequest(method, path, nil)
-	api := NewOrganizationAPI(mockStore, &types.TerrariumAPIResponseWriter{}, &types.TerrariumAPIErrorHandler{})
+	// TODO: Fix nill mocks for tests
+	api := NewOrganizationAPI(nil, "", mockStore, nil, &types.TerrariumAPIResponseWriter{}, &types.TerrariumAPIErrorHandler{})
 	return rr, req, api.ListOrganizationsHandler()
 }
 

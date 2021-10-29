@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/dylanrhysscott/terrarium/api/vcs"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/mux"
 )
@@ -44,6 +45,7 @@ type OrganizationAPIInterface interface {
 
 // OrganizationAPI is a struct implementing the handlers for the Organization API in Terrarium
 type OrganizationAPI struct {
+	Router            *mux.Router
 	OrganziationStore types.OrganizationStore
 	ErrorHandler      types.APIErrorWriter
 	ResponseHandler   types.APIResponseWriter
@@ -162,12 +164,27 @@ func (o *OrganizationAPI) DeleteOrganizationHandler() http.Handler {
 	})
 }
 
+// setupOrganizationRoutes configures the organization API subrouter
+func (o *OrganizationAPI) SetupRoutes(vcsAPI vcs.VCSAPIInterface) {
+	o.Router.StrictSlash(true)
+	o.Router.Handle("/", o.ListOrganizationsHandler()).Methods(http.MethodGet)
+	o.Router.Handle("/", o.CreateOrganizationHandler()).Methods(http.MethodPost)
+	o.Router.Handle("/{organization_name}", o.GetOrganizationHandler()).Methods(http.MethodGet)
+	o.Router.Handle("/{organization_name}", o.UpdateOrganizationHandler()).Methods(http.MethodPatch)
+	o.Router.Handle("/{organization_name}", o.DeleteOrganizationHandler()).Methods(http.MethodDelete)
+	o.Router.Handle("/{organization_name}/oauth-clients", vcsAPI.ListVCSHandler()).Methods(http.MethodGet)
+	o.Router.Handle("/{organization_name}/oauth-clients", vcsAPI.CreateVCSHandler()).Methods(http.MethodPost)
+}
+
 // NewOrganizationAPI creates an instance of the organization API with the reqired database
 // driver support
-func NewOrganizationAPI(store types.OrganizationStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OrganizationAPI {
-	return &OrganizationAPI{
+func NewOrganizationAPI(router *mux.Router, path string, store types.OrganizationStore, vcsAPI vcs.VCSAPIInterface, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OrganizationAPI {
+	o := &OrganizationAPI{
+		Router:            router.PathPrefix(path).Subrouter(),
 		OrganziationStore: store,
 		ResponseHandler:   responseHandler,
 		ErrorHandler:      errorHandler,
 	}
+	o.SetupRoutes(vcsAPI)
+	return o
 }
