@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
-	vcs "github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 )
 
 // TerrariumDriver is a generic database interface to allow further database implementations for Terrarium
@@ -42,11 +42,11 @@ type APIErrorWriter interface {
 // VCSStore is a generic data interface for implementaing database operations relating to VCS OAuth Connections
 type VCSSConnectionStore interface {
 	Init() error
-	Create(orgID string, orgName string, link *vcs.VCSOAuthClientLink) (*vcs.VCS, error)
-	ReadAll(limit int, offset int) ([]*vcs.VCS, error)
-	ReadOne(id string) (*vcs.VCS, error)
-	Update(orgID string, orgName string, link *vcs.VCSOAuthClientLink) (*vcs.VCS, error)
-	UpdateVCSToken(clientID string, token *vcs.VCSToken) error
+	Create(orgID string, orgName string, link *vcsconn.VCSOAuthClientLink) (*vcsconn.VCS, error)
+	ReadAll(limit int, offset int) ([]*vcsconn.VCS, error)
+	ReadOne(id string) (*vcsconn.VCS, error)
+	Update(orgID string, orgName string, link *vcsconn.VCSOAuthClientLink) (*vcsconn.VCS, error)
+	UpdateVCSToken(clientID string, token *vcsconn.VCSToken) error
 	Delete(name string) error
 }
 
