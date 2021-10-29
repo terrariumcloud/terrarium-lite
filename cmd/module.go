@@ -19,6 +19,7 @@ import (
 	"log"
 
 	"github.com/dylanrhysscott/terrarium/api"
+	"github.com/dylanrhysscott/terrarium/internal/responder"
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/spf13/cobra"
@@ -48,7 +49,7 @@ var moduleCmd = &cobra.Command{
 		if driver == nil {
 			log.Fatalf("Unsupported database driver: %s", storageBackend)
 		}
-		terrarium := api.NewTerrarium(3000, driver, &types.TerrariumAPIResponseWriter{}, &types.TerrariumAPIErrorHandler{})
+		terrarium := api.NewTerrarium(3000, driver, &responder.TerrariumAPIResponseWriter{}, &responder.TerrariumAPIErrorHandler{})
 		err = terrarium.Serve()
 		if err != nil {
 			log.Fatal(err)

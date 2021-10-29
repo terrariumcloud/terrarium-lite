@@ -1,4 +1,4 @@
-package types
+package responder
 
 type TerrariumDataResponse struct {
 	Code int         `json:"code"`

@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/dylanrhysscott/terrarium/api/vcs"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/mux"
 )
@@ -59,7 +60,7 @@ func (o *OrganizationAPI) CreateOrganizationHandler() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		org := &types.Organization{}
+		org := &orgs.Organization{}
 		err = json.Unmarshal(body, org)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
@@ -98,7 +99,7 @@ func (o *OrganizationAPI) UpdateOrganizationHandler() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		org := &types.Organization{}
+		org := &orgs.Organization{}
 		err = json.Unmarshal(body, org)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)

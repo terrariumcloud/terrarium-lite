@@ -1,10 +1,9 @@
-package terrariummongo
+package orgs
 
 import (
 	"context"
 	"time"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,12 +14,12 @@ import (
 type OrganizationBackend struct {
 	CollectionName string
 	Database       string
-	client         *mongo.Client
+	Client         *mongo.Client
 }
 
 // Init initializes the Organizations table
 func (o *OrganizationBackend) Init() error {
-	collection := o.client.Database(o.Database).Collection(o.CollectionName)
+	collection := o.Client.Database(o.Database).Collection(o.CollectionName)
 	// Ensures unique email and name combination
 	_, err := collection.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 		Keys: bson.D{
@@ -36,15 +35,15 @@ func (o *OrganizationBackend) Init() error {
 }
 
 // Create Adds a new organization to the organizations table
-func (o *OrganizationBackend) Create(name string, email string) (*types.Organization, error) {
-	org := &types.Organization{
+func (o *OrganizationBackend) Create(name string, email string) (*Organization, error) {
+	org := &Organization{
 		ID:        primitive.NewObjectID(),
 		Name:      name,
 		Email:     email,
 		CreatedOn: time.Now().UTC().String(),
 	}
 	ctx := context.TODO()
-	_, err := o.client.Database(o.Database).Collection(o.CollectionName).InsertOne(ctx, org, options.InsertOne())
+	_, err := o.Client.Database(o.Database).Collection(o.CollectionName).InsertOne(ctx, org, options.InsertOne())
 	if err != nil {
 		return nil, err
 	}
@@ -52,18 +51,18 @@ func (o *OrganizationBackend) Create(name string, email string) (*types.Organiza
 }
 
 // ReadAll Returns all organizations from the organizations table
-func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organization, error) {
+func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*Organization, error) {
 	ctx := context.TODO()
 	limitOpt := options.Find().SetLimit(int64(limit))
 	skipOpt := options.Find().SetSkip(int64(offset))
-	cur, err := o.client.Database(o.Database).Collection(o.CollectionName).Find(ctx, bson.D{}, limitOpt, skipOpt)
+	cur, err := o.Client.Database(o.Database).Collection(o.CollectionName).Find(ctx, bson.D{}, limitOpt, skipOpt)
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(ctx)
-	var organizationList []*types.Organization = []*types.Organization{}
+	var organizationList []*Organization = []*Organization{}
 	for cur.Next(ctx) {
-		result := &types.Organization{}
+		result := &Organization{}
 		err := cur.Decode(result)
 		if err != nil {
 			return nil, err
@@ -74,10 +73,10 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 }
 
 // ReadOne Returns a single organization from the organizations table
-func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, error) {
+func (o *OrganizationBackend) ReadOne(orgName string) (*Organization, error) {
 	ctx := context.TODO()
-	org := &types.Organization{}
-	result := o.client.Database(o.Database).Collection(o.CollectionName).FindOne(ctx, bson.M{"name": orgName}, options.FindOne())
+	org := &Organization{}
+	result := o.Client.Database(o.Database).Collection(o.CollectionName).FindOne(ctx, bson.M{"name": orgName}, options.FindOne())
 	err := result.Decode(org)
 	if err != nil {
 		return nil, err
@@ -86,14 +85,14 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 }
 
 // Update Updates an organization in the organization table
-func (o *OrganizationBackend) Update(name string, email string) (*types.Organization, error) {
+func (o *OrganizationBackend) Update(name string, email string) (*Organization, error) {
 	ctx := context.TODO()
 	update := bson.M{}
 	if email != "" {
 		update["email"] = email
 	}
 	upsert := options.Update().SetUpsert(false)
-	_, err := o.client.Database(o.Database).Collection(o.CollectionName).UpdateOne(ctx, bson.M{"name": name}, bson.M{"$set": update}, upsert)
+	_, err := o.Client.Database(o.Database).Collection(o.CollectionName).UpdateOne(ctx, bson.M{"name": name}, bson.M{"$set": update}, upsert)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +106,7 @@ func (o *OrganizationBackend) Update(name string, email string) (*types.Organiza
 // Delete Removes an organization from the organization table
 func (o *OrganizationBackend) Delete(name string) error {
 	ctx := context.TODO()
-	_, err := o.client.Database(o.Database).Collection(o.CollectionName).DeleteOne(ctx, bson.M{"name": name}, options.Delete())
+	_, err := o.Client.Database(o.Database).Collection(o.CollectionName).DeleteOne(ctx, bson.M{"name": name}, options.Delete())
 	if err != nil {
 		return err
 	}
