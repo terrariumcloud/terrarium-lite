@@ -9,6 +9,7 @@ import (
 
 	"github.com/dylanrhysscott/terrarium/api/oauth"
 	"github.com/dylanrhysscott/terrarium/api/organization"
+	"github.com/dylanrhysscott/terrarium/api/sources"
 	"github.com/dylanrhysscott/terrarium/api/vcs"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/handlers"
@@ -22,6 +23,7 @@ type Terrarium struct {
 	OrganizationAPI organization.OrganizationAPIInterface
 	VCSAPI          vcs.VCSAPIInterface
 	OAuthAPI        oauth.OAuthAPIInterface
+	SourceAPI       sources.SourceAPIInterface
 	Router          *mux.Router
 	Responder       types.APIResponseWriter
 	Errorer         types.APIErrorWriter
@@ -30,53 +32,26 @@ type Terrarium struct {
 // Serve starts the Terrarium Registry
 func (t *Terrarium) Serve() error {
 	bindAddress := fmt.Sprintf(":%d", t.Port)
+	t.Init()
 	log.Println(fmt.Sprintf("Listening on %s", bindAddress))
 	return http.ListenAndServe(bindAddress, handlers.CombinedLoggingHandler(os.Stdout, t.Router))
 }
 
-// setupOrganizationRoutes configures the organization API subrouter
-func (t *Terrarium) setupOrganizationRoutes(path string) {
-	s := t.Router.PathPrefix(path).Subrouter()
-	s.StrictSlash(true)
-	s.Handle("/", t.OrganizationAPI.ListOrganizationsHandler()).Methods(http.MethodGet)
-	s.Handle("/", t.OrganizationAPI.CreateOrganizationHandler()).Methods(http.MethodPost)
-	s.Handle("/{organization_name}", t.OrganizationAPI.GetOrganizationHandler()).Methods(http.MethodGet)
-	s.Handle("/{organization_name}", t.OrganizationAPI.UpdateOrganizationHandler()).Methods(http.MethodPatch)
-	s.Handle("/{organization_name}", t.OrganizationAPI.DeleteOrganizationHandler()).Methods(http.MethodDelete)
-	s.Handle("/{organization_name}/oauth-clients", t.VCSAPI.ListVCSHandler()).Methods(http.MethodGet)
-	s.Handle("/{organization_name}/oauth-clients", t.VCSAPI.CreateVCSHandler()).Methods(http.MethodPost)
-}
-
-// setupOAuthClientRoutes configures the VCS API subrouter
-func (t *Terrarium) setupOAuthClientRoutes(path string) {
-	s := t.Router.PathPrefix(path).Subrouter()
-	s.StrictSlash(true)
-	s.Handle("/{id}", t.VCSAPI.GetVCSHandler()).Methods(http.MethodGet)
-	s.Handle("/{id}", t.VCSAPI.UpdateVCSHandler()).Methods(http.MethodPatch)
-	s.Handle("/{id}", t.VCSAPI.DeleteVCSHandler()).Methods(http.MethodDelete)
-}
-
-func (t *Terrarium) setupAuthorizeRoutes(path string) {
-	oauthHandlers := oauth.NewOAuthAPI(t.Store.VCS(), t.Responder, t.Errorer)
-	s := t.Router.PathPrefix(path).Subrouter()
-	s.StrictSlash(true)
-	s.Handle("/github/{id}/callback", oauthHandlers.GithubCallbackHandler()).Methods(http.MethodGet)
+// Init calls the various API sub packages to setup routers for endpoints
+func (t *Terrarium) Init() {
+	t.VCSAPI = vcs.NewVCSAPI(t.Router, "/v1/oauth-clients", t.Store.VCS(), t.Store.Organizations(), t.Responder, t.Errorer)
+	t.OAuthAPI = oauth.NewOAuthAPI(t.Router, "/oauth", t.Store.VCS(), t.Responder, t.Errorer)
+	t.SourceAPI = sources.NewSourceAPI(t.Router, "/v1/sources", t.Store.VCS(), t.Responder, t.Errorer)
+	t.OrganizationAPI = organization.NewOrganizationAPI(t.Router, "/v1/organizations", t.Store.Organizations(), t.VCSAPI, t.Responder, t.Errorer)
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes
 func NewTerrarium(port int, driver types.TerrariumDriver, responder types.APIResponseWriter, errorer types.APIErrorWriter) *Terrarium {
-	t := &Terrarium{
+	return &Terrarium{
 		Port:      port,
 		Store:     driver,
 		Router:    mux.NewRouter(),
 		Responder: responder,
 		Errorer:   errorer,
 	}
-	t.OrganizationAPI = organization.NewOrganizationAPI(t.Store.Organizations(), t.Responder, t.Errorer)
-	t.VCSAPI = vcs.NewVCSAPI(t.Store.VCS(), t.Store.Organizations(), t.Responder, t.Errorer)
-	t.OAuthAPI = oauth.NewOAuthAPI(t.Store.VCS(), t.Responder, t.Errorer)
-	t.setupOrganizationRoutes("/v1/organizations")
-	t.setupOAuthClientRoutes("/v1/oauth-clients")
-	t.setupAuthorizeRoutes("/oauth")
-	return t
 }

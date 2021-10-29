@@ -19,6 +19,7 @@ type VCSAPIInterface interface {
 }
 
 type VCSAPI struct {
+	Router            *mux.Router
 	OrganziationStore types.OrganizationStore
 	ErrorHandler      types.APIErrorWriter
 	ResponseHandler   types.APIResponseWriter
@@ -92,13 +93,23 @@ func (v *VCSAPI) DeleteVCSHandler() http.Handler {
 	})
 }
 
+func (v *VCSAPI) SetupRoutes() {
+	v.Router.StrictSlash(true)
+	v.Router.Handle("/{id}", v.GetVCSHandler()).Methods(http.MethodGet)
+	v.Router.Handle("/{id}", v.UpdateVCSHandler()).Methods(http.MethodPatch)
+	v.Router.Handle("/{id}", v.DeleteVCSHandler()).Methods(http.MethodDelete)
+}
+
 // NewVCSAPI creates an instance of the VCS API with the reqired database
 // driver support
-func NewVCSAPI(vcsstore types.VCSStore, orgstore types.OrganizationStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *VCSAPI {
-	return &VCSAPI{
+func NewVCSAPI(router *mux.Router, path string, vcsstore types.VCSStore, orgstore types.OrganizationStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *VCSAPI {
+	v := &VCSAPI{
+		Router:            router.PathPrefix(path).Subrouter(),
 		OrganziationStore: orgstore,
 		VCSStore:          vcsstore,
 		ResponseHandler:   responseHandler,
 		ErrorHandler:      errorHandler,
 	}
+	v.SetupRoutes()
+	return v
 }
