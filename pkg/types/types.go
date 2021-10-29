@@ -52,5 +52,5 @@ type VCSStore interface {
 
 // SourceStore is a generic data interface for implementaing database operations relating to modules
 type SourceStore interface {
-	FetchVCSSources()
+	FetchVCSSources(token string)
 }

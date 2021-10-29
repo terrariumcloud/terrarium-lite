@@ -3,7 +3,6 @@ package oauth
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -72,12 +71,6 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
-		}
-		for name, values := range resp.Header {
-			// Loop over all values for the name.
-			for _, value := range values {
-				fmt.Println(name, value)
-			}
 		}
 		ghToken := &vcs.VCSToken{}
 		err = json.Unmarshal(data, ghToken)

@@ -3,6 +3,7 @@ package sources
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
@@ -40,6 +41,7 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			return
 		}
 		vcs, err := s.VCSStore.ReadOne(vcsID)
+
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
 				s.ErrorHandler.Write(rw, errors.New("vcs provider does not exist"), http.StatusNotFound)
@@ -52,7 +54,8 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, errors.New("vcs provider mismatch"), http.StatusBadRequest)
 			return
 		}
-		genericStore.FetchVCSSources()
+		log.Printf("%v", vcs.OAuth.Token)
+		genericStore.FetchVCSSources(vcs.OAuth.Token.AccessToken)
 	})
 }
 
