@@ -27,7 +27,7 @@ func (o *OAuthAPI) LoginHandler() http.Handler {
 	})
 }
 
-func (o *OAuthAPI) GithubCallbackHander() http.Handler {
+func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		code := r.URL.Query().Get("code")
 		params := mux.Vars(r)
