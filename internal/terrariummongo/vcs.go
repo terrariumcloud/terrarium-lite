@@ -75,9 +75,44 @@ func (v *VCSBackend) ReadOne(id string) (*types.VCS, error) {
 	return vcs, nil
 }
 
+// ReadOneByClientID Returns a single VCS from the VCSs table based on VCS Client ID
+func (v *VCSBackend) ReadOneByClientID(clientID string) (*types.VCS, error) {
+	ctx := context.TODO()
+	vcs := &types.VCS{}
+	result := v.client.Database(v.Database).Collection(v.CollectionName).FindOne(ctx, bson.M{"oauth.client_id": clientID}, options.FindOne())
+	err := result.Decode(vcs)
+	if err != nil {
+		return nil, err
+	}
+	return vcs, nil
+}
+
 // Update Updates an VCS in the VCS table
-func (v *VCSBackend) Update(name string, orgName string, serviceProvider string, httpURI string, apiURI string, clientID string, clientSecret string, callback string) (*types.VCS, error) {
+func (v *VCSBackend) Update(orgID string, orgName string, link *types.VCSOAuthClientLink) (*types.VCS, error) {
 	return nil, nil
+}
+
+// UpdateVCSToken Updates the VCS OAuth Token in the database
+func (v *VCSBackend) UpdateVCSToken(clientID string, token *types.VCSToken) error {
+	ctx := context.TODO()
+	update := bson.M{
+		"$set": bson.M{
+			"oauth.token": bson.M{
+				"access_token": token.AccessToken,
+				"token_type":   token.TokenType,
+				"scope":        token.Scope,
+			},
+		},
+	}
+	query := bson.M{
+		"oauth.client_id": clientID,
+	}
+	upsert := options.Update().SetUpsert(false)
+	_, err := v.client.Database(v.Database).Collection(v.CollectionName).UpdateOne(ctx, query, update, upsert)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Delete Removes an VCS from the VCS table

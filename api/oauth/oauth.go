@@ -73,6 +73,11 @@ func (o *OAuthAPI) GithubCallbackHander() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
+		err = o.VCSStore.UpdateVCSToken(vcs.OAuth.ClientID, ghToken)
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
 		o.ResponseHandler.Write(rw, ghToken, http.StatusOK)
 	})
 }

@@ -12,7 +12,9 @@ type VCSStore interface {
 	Create(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error)
 	ReadAll(limit int, offset int) ([]*VCS, error)
 	ReadOne(id string) (*VCS, error)
-	Update(name string, orgName string, serviceProvider string, httpURI string, apiURI string, clientID string, clientSecret string, callback string) (*VCS, error)
+	ReadOneByClientID(clientID string) (*VCS, error)
+	Update(orgID string, orgName string, link *VCSOAuthClientLink) (*VCS, error)
+	UpdateVCSToken(clientID string, token *VCSToken) error
 	Delete(name string) error
 }
 
