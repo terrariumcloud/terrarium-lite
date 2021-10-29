@@ -12,10 +12,13 @@ import (
 
 // TerrariumDriver is a generic database interface to allow further database implementations for Terrarium
 // if you would like to implement a different database beyond the core drivers this interface should be implemented
-type TerrariumDriver interface {
+type TerrariumDatabaseDriver interface {
 	Connect(ctx context.Context) error
 	Organizations() OrganizationStore
 	VCSConnections() VCSSConnectionStore
+}
+
+type TerrariumSourceDriver interface {
 	GithubSources() SourceStore
 }
 

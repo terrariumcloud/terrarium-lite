@@ -21,7 +21,7 @@ type SourceAPI struct {
 	ErrorHandler    types.APIErrorWriter
 	ResponseHandler types.APIResponseWriter
 	VCSStore        types.VCSSConnectionStore
-	SourceStores    *SourcesMap
+	SourceStore     types.TerrariumSourceDriver
 }
 
 type SourcesMap struct {
@@ -32,7 +32,7 @@ func (s *SourceAPI) detectStoreType(t string) (types.SourceStore, error) {
 	var genericStore types.SourceStore = nil
 	switch t {
 	case "github":
-		genericStore = s.SourceStores.Github
+		genericStore = s.SourceStore.GithubSources()
 	default:
 		return nil, fmt.Errorf("vcs provider: %s is not supported", t)
 	}
@@ -93,11 +93,11 @@ func (s *SourceAPI) SetupRoutes() {
 	s.Router.Handle("/{provider}/{id}", s.CreateVCSModule()).Methods(http.MethodPost)
 }
 
-func NewSourceAPI(router *mux.Router, path string, vcsconnstore types.VCSSConnectionStore, vcsProviders *SourcesMap, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *SourceAPI {
+func NewSourceAPI(router *mux.Router, path string, vcsconnstore types.VCSSConnectionStore, sourceProviders types.TerrariumSourceDriver, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *SourceAPI {
 	s := &SourceAPI{
 		Router:          router.PathPrefix(path).Subrouter(),
 		VCSStore:        vcsconnstore,
-		SourceStores:    vcsProviders,
+		SourceStore:     sourceProviders,
 		ResponseHandler: responseHandler,
 		ErrorHandler:    errorHandler,
 	}

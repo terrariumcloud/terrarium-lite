@@ -7,7 +7,6 @@ import (
 
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
-	"github.com/dylanrhysscott/terrarium/internal/terrariumvcs/github"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -53,11 +52,6 @@ func (m *TerrariumMongo) VCSConnections() types.VCSSConnectionStore {
 		Client:         m.client,
 		Database:       m.Database,
 	}
-}
-
-// Sources returns a Sources struct which implements the SourceStore interface
-func (m *TerrariumMongo) GithubSources() types.SourceStore {
-	return &github.GithubBackend{}
 }
 
 // New creates a TerrariumMongo driver

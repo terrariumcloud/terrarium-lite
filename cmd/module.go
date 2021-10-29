@@ -38,7 +38,7 @@ var moduleCmd = &cobra.Command{
 	Short: "Starts the Terrarium Module API",
 	Long:  `The Terrarium Module API allows users to manage Terraform modules in a private registry using Terrarium`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var driver types.TerrariumDriver
+		var driver types.TerrariumDatabaseDriver
 		var err error
 		if storageBackend == "mongo" {
 			driver, err = terrariummongo.New(databaseHost, databaseUser, databasePassword, databaseName)
