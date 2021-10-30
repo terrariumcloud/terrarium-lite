@@ -53,10 +53,10 @@ func (g *GithubBackend) FetchVCSSource(token string, vcsRepoName string) (types.
 	var finalTags []*GithubTagDownloadPair = []*GithubTagDownloadPair{}
 	for _, tag := range tags {
 		pair := &GithubTagDownloadPair{
-			Tag:            tag.GetName(),
-			TarDownloadURI: fmt.Sprintf("%s/%s", tag.GetTarballURL(), "/*?archive=tar.gz"),
-			ZipDownloadURI: fmt.Sprintf("%s/%s", tag.GetZipballURL(), "/*?archive=zip"),
-			Commit:         tag.Commit.GetSHA(),
+			Tag:           tag.GetName(),
+			SSHCloneURI:   fmt.Sprintf("git::%s?ref=%s", repo.GetSSHURL(), tag.GetName()),
+			HTTPSCloneURI: fmt.Sprintf("git::%s?ref=%s", repo.GetCloneURL(), tag.GetName()),
+			Commit:        tag.Commit.GetSHA(),
 		}
 		finalTags = append(finalTags, pair)
 	}
