@@ -7,5 +7,9 @@ services:
       - 27017:27017
     volumes:
       - data:/data/db
+  swagger-editor:
+    image: swaggerapi/swagger-editor
+    ports:
+      - 8080:8080
 volumes:
   data:

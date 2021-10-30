@@ -1,0 +1,143 @@
+openapi: 3.0.1
+info:
+  title: Terrarium Registry
+  description: An open source Terraform Registry for everyone!
+  contact:
+    email: dylanrhysscott@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://registry.dylanscott.me/v1
+- url: http://registry.dylanscott.me/v1
+tags:
+- name: organizations
+  description: API for managing organizations within the registry
+paths:
+  /organizations:
+    post:
+      tags:
+      - organizations
+      summary: Add a new organization to the registry
+      description: Adds a new organization to the registry that modules can be parented
+        to for friendly registry paths for Terraform modules
+      operationId: addOrg
+      requestBody:
+        description: Organization definition
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Org'
+        required: true
+      responses:
+        201:
+          description: Organization created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int64
+                    example: 201
+                  data:
+                    $ref: '#/components/schemas/Org'
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+        500:
+           $ref: '#/components/responses/InternalServerError'
+      x-codegen-request-body-name: organization
+    get:
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Limits the number of organizations returned
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Offsets where to start when returning organizations
+      tags:
+        - organizations
+      summary: List all organizations
+      description: Lists all organizations currently in the registry
+      operationId: listOrgs
+      responses:
+        200:
+          description: List of organizations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int64
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Org'
+        500:
+           $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    InternalServerError:
+      description: Internal Server Error - Check server logs
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int64
+                example: 500
+              message:
+                type: string
+                example: Internal Server Error - Some Error
+    UnprocessableEntity:
+      description: Unprocessable Organization - Check request body
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int64
+                example: 422
+              message:
+                type: string
+                example: Unprocessable Entity - Some Validation Error
+  schemas:
+    Org:
+      required:
+      - email
+      - name
+      type: object
+      properties:
+        _id:
+          type: integer
+          format: int64
+          example: "6175c716642c08c2a5c33d5b"
+        name:
+          type: string
+          example: Terrarium
+        email:
+          type: string
+          example: hello@terrarium
+        created_on:
+          type: string
+          example: 2021-10-24 20:50:30.103537 +0000 UTC
