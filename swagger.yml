@@ -91,6 +91,36 @@ paths:
                       $ref: '#/components/schemas/Org'
         500:
            $ref: '#/components/responses/InternalServerError'
+  /organizations/{orgID}:
+    get:
+      summary: Returns a single organization
+      description: Returns a single organization in the registry
+      tags:
+        - organizations
+      parameters:
+        - in: path
+          name: orgID
+          required: true
+          schema:
+            type: string
+            example: "6175c716642c08c2a5c33d5b"
+          description: The organization ID
+      responses: 
+        200:
+          description: An organization
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int64
+                    example: 200
+                  data:
+                    $ref: '#/components/schemas/Org'
+        500:
+           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
     InternalServerError:
