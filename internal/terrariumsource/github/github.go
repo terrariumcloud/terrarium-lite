@@ -3,7 +3,6 @@ package github
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
@@ -11,11 +10,15 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Github is a struct that implements source interactions for module documents
+// GithubBackend implements the types.SourceProvider and provides source interactions via the Github API.
+// It is an abstraction over various API calls required by Terrarium to populate a VCS backed module
+// into the registry
 type GithubBackend struct {
 	client *ghlib.Client
 }
 
+// init Accepts a context and token arguments to create an authenticated OAuth 2 client. This is then
+// passed into the Github client to ensure any API calls are correctly authenticated
 func (g *GithubBackend) init(ctx context.Context, token string) {
 	if g.client == nil {
 		ts := oauth2.StaticTokenSource(
@@ -29,6 +32,9 @@ func (g *GithubBackend) init(ctx context.Context, token string) {
 	}
 }
 
+// FetchVCSSource Accepts a Github OAuth token and a valid Github repo name. The Github API is queried
+// and a struct implementing the types.SourceData interface is returned. Typically this will then be
+// transformed into a Terraform compliant module document for storage in the database.
 func (g *GithubBackend) FetchVCSSource(token string, vcsRepoName string) (types.SourceData, error) {
 	ctx := context.TODO()
 	g.init(ctx, token)
@@ -63,33 +69,7 @@ func (g *GithubBackend) FetchVCSSource(token string, vcsRepoName string) (types.
 	}, nil
 }
 
-func (g *GithubBackend) FetchVCSSources(token string) {
-	ctx := context.TODO()
-	g.init(ctx, token)
-	repos, _, err := g.client.Repositories.List(ctx, "", &ghlib.RepositoryListOptions{})
-
-	if err != nil {
-		log.Println(err.Error())
-	}
-	for _, repo := range repos {
-		log.Println(repo.GetName())
-		tags, resp, err := g.client.Repositories.ListTags(ctx, "", *repo.Name, &ghlib.ListOptions{})
-		if resp.StatusCode != http.StatusNotFound {
-			if err != nil {
-				log.Println(err.Error())
-			}
-		}
-
-		if len(tags) == 0 {
-			log.Println("No tags")
-		} else {
-			for _, tag := range tags {
-				log.Print(tag.GetName())
-			}
-		}
-	}
-}
-
+// NewGithubBacked Creates a new Github backend struct implementing the types.SourceProvider interface
 func NewGithubBackend() *GithubBackend {
 	return &GithubBackend{}
 }

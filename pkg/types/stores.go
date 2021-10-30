@@ -6,6 +6,9 @@ import (
 )
 
 // VCSStore is a generic data interface for implementaing database operations relating to VCS OAuth Connections
+// A VCSOAuthConnection is used to implement OAuth operations when interacting with a source provider. This auth
+// information needs to be persisted in the database to allow Terrarium to interact with the source provider
+// on behalf of the user. This interface will provide CRUD related operations for interacting with the persisted data
 type VCSSConnectionStore interface {
 	Init() error
 	Create(orgID string, orgName string, link *vcsconn.VCSOAuthClientLink) (*vcsconn.VCS, error)
@@ -17,6 +20,8 @@ type VCSSConnectionStore interface {
 }
 
 // OrganizationStore is a generic data interface for implementaing database operations relating to organizations
+// An organization in Terrarium is a logical grouping or "namespace" under which modules can be stored.
+// This interface will provide CRUD related operations for interacting with the organization object
 type OrganizationStore interface {
 	Init() error
 	Create(name string, email string) (*orgs.Organization, error)

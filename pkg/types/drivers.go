@@ -1,4 +1,4 @@
-// Package types provides interfaces and structs to implement Terrarium and allow
+// Package types provides interfaces to implement Terrarium and allow
 // extensibility by 3rd parties
 package types
 
@@ -14,6 +14,8 @@ type TerrariumDatabaseDriver interface {
 	VCSConnections() VCSSConnectionStore
 }
 
+// TerrariumSourceDriver is a generic VCS source interface to allow further version control backend implementations for Terrarium
+// if you would like to implement a different version control beyond the core drivers this interface should be extended
 type TerrariumSourceDriver interface {
 	GithubSources() SourceProvider
 }
