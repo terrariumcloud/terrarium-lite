@@ -29,14 +29,18 @@ func (g *GithubBackend) init(ctx context.Context, token string) {
 	}
 }
 
-func (g *GithubBackend) FetchVCSSource(token string, vcsRepoName string, vcsRepoOwner string) (types.SourceData, error) {
+func (g *GithubBackend) FetchVCSSource(token string, vcsRepoName string) (types.SourceData, error) {
 	ctx := context.TODO()
 	g.init(ctx, token)
-	repo, _, err := g.client.Repositories.Get(ctx, vcsRepoOwner, vcsRepoName)
+	authenticated, _, err := g.client.Users.Get(ctx, "")
 	if err != nil {
 		return nil, err
 	}
-	tags, resp, err := g.client.Repositories.ListTags(ctx, vcsRepoOwner, vcsRepoName, &ghlib.ListOptions{})
+	repo, _, err := g.client.Repositories.Get(ctx, authenticated.GetLogin(), vcsRepoName)
+	if err != nil {
+		return nil, err
+	}
+	tags, resp, err := g.client.Repositories.ListTags(ctx, authenticated.GetLogin(), vcsRepoName, &ghlib.ListOptions{})
 	if resp.StatusCode != http.StatusNotFound && err != nil {
 		return nil, err
 	}

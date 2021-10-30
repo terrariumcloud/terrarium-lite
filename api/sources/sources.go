@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/modules"
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/relationships"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/mux"
 )
@@ -24,8 +26,18 @@ type SourceAPI struct {
 	SourceStore     types.TerrariumSourceDriver
 }
 
-type SourcesMap struct {
-	Github types.SourceProvider
+func sourceToModule(data types.SourceData, provider string, orgLink *relationships.ResourceLink, vcsConnectionID string) *modules.VCSModule {
+	return &modules.VCSModule{
+		Name:        data.GetRepoName(),
+		Provider:    provider,
+		Description: data.GetRepoDescription(),
+		VCSConnection: &relationships.ResourceLink{
+			ID:   vcsConnectionID,
+			Link: fmt.Sprintf("/v1/oauth-clients/%s", vcsConnectionID),
+		},
+		Organization: orgLink,
+		VCSRepo:      data,
+	}
 }
 
 func (s *SourceAPI) detectStoreType(t string) (types.SourceProvider, error) {
@@ -42,15 +54,15 @@ func (s *SourceAPI) detectStoreType(t string) (types.SourceProvider, error) {
 func (s *SourceAPI) CreateVCSModule() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
-		vcsID := params["id"]
-		provider := params["provider"]
-		genericStore, err := s.detectStoreType(provider)
+		vcsConnID := params["vcsconnid"]
+		vcsProvider := params["vcsprovider"]
+		repoName := params["reponame"]
+		genericStore, err := s.detectStoreType(vcsProvider)
 		if err != nil {
 			s.ErrorHandler.Write(rw, err, http.StatusNotImplemented)
 			return
 		}
-		vcs, err := s.VCSStore.ReadOne(vcsID)
-
+		vcs, err := s.VCSStore.ReadOne(vcsConnID)
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
 				s.ErrorHandler.Write(rw, errors.New("vcs provider does not exist"), http.StatusNotFound)
@@ -59,7 +71,7 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		if vcs.OAuth.ServiceProvider != provider {
+		if vcs.OAuth.ServiceProvider != vcsProvider {
 			s.ErrorHandler.Write(rw, errors.New("vcs provider mismatch"), http.StatusBadRequest)
 			return
 		}
@@ -79,18 +91,19 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		sourceRepo, err := genericStore.FetchVCSSource(vcs.OAuth.Token.AccessToken, reqBody.Repo, reqBody.Owner)
+		sourceRepo, err := genericStore.FetchVCSSource(vcs.OAuth.Token.AccessToken, repoName)
 		if err != nil {
 			s.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		s.ResponseHandler.Write(rw, sourceRepo, http.StatusOK)
+		module := sourceToModule(sourceRepo, reqBody.Provider, vcs.Organization, vcsConnID)
+		s.ResponseHandler.Write(rw, module, http.StatusOK)
 	})
 }
 
 func (s *SourceAPI) SetupRoutes() {
 	s.Router.StrictSlash(true)
-	s.Router.Handle("/{provider}/{id}", s.CreateVCSModule()).Methods(http.MethodPost)
+	s.Router.Handle("/{vcsprovider}/{vcsconnid}/{reponame}", s.CreateVCSModule()).Methods(http.MethodPost)
 }
 
 func NewSourceAPI(router *mux.Router, path string, vcsconnstore types.VCSSConnectionStore, sourceProviders types.TerrariumSourceDriver, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *SourceAPI {

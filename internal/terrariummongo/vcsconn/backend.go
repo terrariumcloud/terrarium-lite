@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/relationships"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -33,7 +34,7 @@ func (v *VCSConnectionBackend) Create(orgID string, orgName string, link *VCSOAu
 	link.CallbackURI = fmt.Sprintf("/oauth/github/%s/callback", vcsID.Hex())
 	vcsConnection := &VCS{
 		ID: vcsID,
-		Organization: &ResourceLink{
+		Organization: &relationships.ResourceLink{
 			ID:   oid,
 			Link: fmt.Sprintf("/v1/organizations/%s", orgName),
 		},

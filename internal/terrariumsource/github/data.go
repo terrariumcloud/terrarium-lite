@@ -1,7 +1,5 @@
 package github
 
-import "github.com/dylanrhysscott/terrarium/pkg/types"
-
 type GithubSource struct {
 	Name        string                   `json:"name"`
 	Description string                   `json:"description"`
@@ -17,10 +15,14 @@ type GithubTagDownloadPair struct {
 	Commit         string `json:"commit"`
 }
 
-func (g *GithubSource) ToModuleDocument() *types.Module {
-	return nil
+func (g *GithubSource) GetRepoName() string {
+	return g.Name
 }
 
-func (g *GithubSource) GetVersionList() *types.ModuleVersion {
-	return nil
+func (g *GithubSource) GetRepoDescription() string {
+	return g.Description
+}
+
+func (g *GithubSource) GetRepoOwner() string {
+	return g.Username
 }
