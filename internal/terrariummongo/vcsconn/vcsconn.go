@@ -10,10 +10,10 @@ type VCS struct {
 }
 
 type VCSToken struct {
-	AccessToken           string `json:"access_token" bson:"access_token"`
-	ExpiresIn             int    `json:"expires_in" bson:"expires_in"`
-	RefreshToken          string `json:"refresh_token" bson:"refresh_token"`
-	RefreshTokenExpiresIn int    `json:"refresh_token_expires_in" bson:"refresh_token_expires_in"`
+	AccessToken           string `json:"access_token,omitempty" bson:"access_token"`
+	ExpiresIn             int    `json:"expires_in,omitempty" bson:"expires_in,omitempty"`
+	RefreshToken          string `json:"refresh_token,omitempty" bson:"refresh_token,omitempty"`
+	RefreshTokenExpiresIn int    `json:"refresh_token_expires_in,omitempty" bson:"refresh_token_expires_in,omitempty"`
 	TokenType             string `json:"token_type" bson:"token_type"`
 	Scope                 string `json:"scope" scope:"scope"`
 }

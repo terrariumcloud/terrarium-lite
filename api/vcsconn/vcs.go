@@ -81,7 +81,18 @@ func (v *VCSAPI) UpdateVCSHandler() http.Handler {
 // GetVCSHandler is a handler for getting a single organization VCS connection (GET)
 func (v *VCSAPI) GetVCSHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		params := mux.Vars(r)
+		vcsconnID := params["id"]
+		vcsConnection, err := v.VCSStore.ReadOne(vcsconnID, false)
+		if err != nil {
+			if err.Error() == "mongo: no documents in result" {
+				v.ErrorHandler.Write(rw, errors.New("vcs connection does not exist"), http.StatusNotFound)
+				return
+			}
+			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		v.ResponseHandler.Write(rw, vcsConnection, http.StatusOK)
 	})
 }
 

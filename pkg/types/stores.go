@@ -13,7 +13,7 @@ type VCSSConnectionStore interface {
 	Init() error
 	Create(orgID string, orgName string, link *vcsconn.VCSOAuthClientLink) (*vcsconn.VCS, error)
 	ReadAll(limit int, offset int) ([]*vcsconn.VCS, error)
-	ReadOne(id string) (*vcsconn.VCS, error)
+	ReadOne(id string, showTokens bool) (*vcsconn.VCS, error)
 	Update(orgID string, orgName string, link *vcsconn.VCSOAuthClientLink) (*vcsconn.VCS, error)
 	UpdateVCSToken(clientID string, token *vcsconn.VCSToken) error
 	Delete(name string) error

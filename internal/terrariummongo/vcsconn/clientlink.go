@@ -7,9 +7,9 @@ type VCSOAuthClientLink struct {
 	HTTPURI         string    `json:"http_uri" bson:"http_uri"`
 	APIURI          string    `json:"api_uri" bson:"api_uri"`
 	ClientID        string    `json:"client_id" bson:"client_id"`
-	ClientSecret    string    `json:"client_secret" bson:"client_secret"`
+	ClientSecret    string    `json:"client_secret,omitempty" bson:"client_secret"`
 	CallbackURI     string    `json:"callback_uri" bson:"callback_uri"`
-	Token           *VCSToken `json:"token" bson:"token"`
+	Token           *VCSToken `json:"token,omitempty" bson:"token"`
 }
 
 func (v *VCSOAuthClientLink) Validate() error {

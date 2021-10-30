@@ -41,7 +41,7 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 			o.ErrorHandler.Write(rw, errors.New("invalid code"), http.StatusBadRequest)
 			return
 		}
-		vcsItem, err := o.VCSStore.ReadOne(vcsID)
+		vcsItem, err := o.VCSStore.ReadOne(vcsID, true)
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
 				o.ErrorHandler.Write(rw, errors.New("vcs connection does not exist"), http.StatusNotFound)

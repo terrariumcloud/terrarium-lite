@@ -18,6 +18,12 @@ type VCSConnectionBackend struct {
 	Client         *mongo.Client
 }
 
+func stripVCSSecrets(connection *VCS) *VCS {
+	connection.OAuth.ClientSecret = ""
+	connection.OAuth.Token = nil
+	return connection
+}
+
 // Init initializes the VCS table
 func (v *VCSConnectionBackend) Init() error {
 	return nil
@@ -44,7 +50,7 @@ func (v *VCSConnectionBackend) Create(orgID string, orgName string, link *VCSOAu
 	if err != nil {
 		return nil, err
 	}
-	return vcsConnection, nil
+	return stripVCSSecrets(vcsConnection), nil
 }
 
 // ReadAll Returns all VCSs from the VCS table
@@ -60,14 +66,22 @@ func (v *VCSConnectionBackend) ReadAll(limit int, offset int) ([]*VCS, error) {
 }
 
 // ReadOne Returns a single VCS from the VCSs table
-func (v *VCSConnectionBackend) ReadOne(id string) (*VCS, error) {
+func (v *VCSConnectionBackend) ReadOne(id string, showTokens bool) (*VCS, error) {
 	ctx := context.TODO()
 	vcs := &VCS{}
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
-	result := v.Client.Database(v.Database).Collection(v.CollectionName).FindOne(ctx, bson.M{"_id": oid}, options.FindOne())
+	opts := options.FindOne().SetProjection(bson.M{
+		"oauth.token.access_token": 0,
+		"oauth.token.refesh_token": 0,
+		"oauth.client_secret":      0,
+	})
+	if showTokens {
+		opts = options.FindOne()
+	}
+	result := v.Client.Database(v.Database).Collection(v.CollectionName).FindOne(ctx, bson.M{"_id": oid}, opts)
 	err = result.Decode(vcs)
 	if err != nil {
 		return nil, err

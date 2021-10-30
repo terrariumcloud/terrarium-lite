@@ -62,7 +62,7 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusNotImplemented)
 			return
 		}
-		vcs, err := s.VCSStore.ReadOne(vcsConnID)
+		vcs, err := s.VCSStore.ReadOne(vcsConnID, true)
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
 				s.ErrorHandler.Write(rw, errors.New("vcs provider does not exist"), http.StatusNotFound)
