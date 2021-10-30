@@ -121,6 +121,8 @@ paths:
                     $ref: '#/components/schemas/Org'
         500:
            $ref: '#/components/responses/InternalServerError'
+        404:
+          $ref: '#/components/responses/NotFound'
 components:
   responses:
     InternalServerError:
@@ -137,6 +139,20 @@ components:
               message:
                 type: string
                 example: Internal Server Error - Some Error
+    NotFound:
+      description: 404 Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int64
+                example: 404
+              message:
+                type: string
+                example: 404 Not Found
     UnprocessableEntity:
       description: Unprocessable Organization - Check request body
       content:
