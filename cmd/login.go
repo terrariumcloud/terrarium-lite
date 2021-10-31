@@ -16,11 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-
-	"github.com/dylanrhysscott/terrarium/api/login"
 	"github.com/spf13/cobra"
 )
 
@@ -38,12 +33,7 @@ var loginCmd = &cobra.Command{
 	Short: "Starts the Terrarium Login API",
 	Long:  `The Terrarium Login API allows users to use 'terraform login' with the Terrarium Registry`,
 	Run: func(cmd *cobra.Command, args []string) {
-		authEndpointWithAud := fmt.Sprintf("%s?audience=%s", authEndpoint, audience)
-		loginAPI := login.NewLoginAPI(authClientID, authEndpointWithAud, tokenEndpoint, ports)
-		http.HandleFunc("/.well-known/terraform.json", loginAPI.DiscoveryHandler())
-		port := ":8080"
-		log.Printf("Listening on %s", port)
-		log.Fatal(http.ListenAndServeTLS(port, certPath, certKeyPath, nil))
+
 	},
 }
 
@@ -56,7 +46,4 @@ func init() {
 	loginCmd.Flags().StringVarP(&tokenEndpoint, "token-endpoint", "t", "", "OAuth Token Endpoint")
 	loginCmd.Flags().StringVarP(&audience, "audience", "", "https://terrarium.dylanscott.me", "OAuth Token API Audience")
 	loginCmd.Flags().IntSliceVarP(&ports, "ports", "p", []int{10000, 10001}, "OAuth Ports array allow for callback URI")
-	loginCmd.MarkFlagRequired("client-id")
-	loginCmd.MarkFlagRequired("auth-endpoint")
-	loginCmd.MarkFlagRequired("token-endpoint")
 }
