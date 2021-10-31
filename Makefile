@@ -3,11 +3,10 @@ all:
 	make run
 
 build:
-	go build
-
-test:
-	go test -cover ./...
+	docker-compose build
 
 run:
-	docker-compose up -d
-	./terrarium serve module --database-host localhost:27017
+	docker-compose up
+
+mac:
+	lima nerdctl compose up --build

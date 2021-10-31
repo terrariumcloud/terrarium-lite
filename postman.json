@@ -1,0 +1,282 @@
+{
+	"info": {
+		"_postman_id": "ca097d13-2652-432c-8ef9-c06daab72c28",
+		"name": "Terrarium",
+		"description": "A collection for Terrarium Registry requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Organizations",
+			"item": [
+				{
+					"name": "Get Organizations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/v1/organizations",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Organization",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/v1/organizations/{{orgName}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"organizations",
+								"{{orgName}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Organization",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{orgName}}\",\n    \"email\": \"{{orgEmail}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/v1/organizations/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"organizations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Organization",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"helloupdated@terrarium\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/v1/organizations/{{orgName}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"organizations",
+								"{{orgName}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Organization",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/v1/organizations/{{orgName}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"organizations",
+								"{{orgName}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "VCS Connections",
+			"item": [
+				{
+					"name": "Create Organization VCS Connection",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"service_provider\": \"github\",\n    \"http_uri\": \"https://github.com\",\n    \"api_uri\": \"https://api.github.com\",\n    \"client_id\": \"{{clientID}}\",\n    \"client_secret\": \"{{clientSecret}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/v1/organizations/{{orgName}}/oauth-clients",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"organizations",
+								"{{orgName}}",
+								"oauth-clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Organization VCS Connections",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/v1/organizations/{{orgName}}/oauth-clients",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"organizations",
+								"{{orgName}}",
+								"oauth-clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get VCS Connection by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/v1/organizations/{{orgName}}/oauth-clients",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"organizations",
+								"{{orgName}}",
+								"oauth-clients"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sources",
+			"item": [
+				{
+					"name": "Create VCS Source Module",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"test-module\",\n    \"provider\": \"aws\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/v1/sources/github/{{vcsID}}/{{repoName}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"v1",
+								"sources",
+								"github",
+								"{{vcsID}}",
+								"{{repoName}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "orgID",
+			"value": "617e93f5639bb1278539ed3d"
+		},
+		{
+			"key": "orgName",
+			"value": "test"
+		},
+		{
+			"key": "orgEmail",
+			"value": "hello@terrarium"
+		},
+		{
+			"key": "vcsID",
+			"value": "617e99798eb3c06f30384593"
+		},
+		{
+			"key": "repoName",
+			"value": "terraform-buildpack"
+		}
+	]
+}
