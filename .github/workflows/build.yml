@@ -5,6 +5,9 @@ jobs:
     runs-on: "self-hosted"
     steps:
       - uses: google-github-actions/setup-gcloud@master
+        with:
+          credentials_file_path: /etc/gcloud/.dockerconfigjson
+          export_default_credentials: true
       - uses: actions/checkout@v2
         with:
           repository: ""
