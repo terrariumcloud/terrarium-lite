@@ -1,7 +1,7 @@
 name: "terrarium-build-push"
 on: ["push"]
-runs-on: "self-hosted"
 jobs:
   build:
+    runs-on: "self-hosted"
     steps:
       - run: echo "Hello from GKE!"
