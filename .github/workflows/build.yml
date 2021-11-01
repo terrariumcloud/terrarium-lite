@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: google-github-actions/setup-gcloud@master
         with:
-          credentials_file_path: /etc/gcloud/.dockerconfigjson
+          service_account_key: ${{ secrets.GCLOUD_SA_KEY }}
           export_default_credentials: true
       - uses: actions/checkout@v2
         with:
