@@ -1,4 +1,4 @@
-name: "terrarium-build-push"
+name: "terrarium"
 on: ["push"]
 jobs:
   build:
