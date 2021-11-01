@@ -1,17 +1,14 @@
 name: "terrarium-build-push"
 on: ["push"]
 jobs:
-  clone:
+  build:
     runs-on: "self-hosted"
     steps:
       - uses: actions/checkout@v2
         with:
           repository: ""
-  build:
-    runs-on: "self-hosted"
-    needs: clone
-    steps:
-        - run: ls -lah
-        - run: docker build -t terrarium:latest .
-        - run: docker images
+      - run: ls -lah
+      - run: docker build -t terrarium:latest .
+      - run: docker images
+        
      
