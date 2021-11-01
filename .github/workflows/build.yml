@@ -4,6 +4,7 @@ jobs:
   build:
     runs-on: "self-hosted"
     steps:
+      - uses: google-github-actions/setup-gcloud@master
       - uses: actions/checkout@v2
         with:
           repository: ""
