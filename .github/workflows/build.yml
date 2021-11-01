@@ -4,4 +4,4 @@ jobs:
   build:
     runs_on: "self-hosted"
     steps:
-      run: echo "Hello from GKE!"
+      - run: echo "Hello from GKE!"
