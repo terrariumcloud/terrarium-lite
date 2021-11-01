@@ -3,9 +3,10 @@ on: ["push"]
 jobs:
   clone:
     runs-on: "self-hosted"
-    uses: actions/checkout@v2
-    with:
-      repository: ""
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: ""
   build:
     runs-on: "self-hosted"
     steps:
