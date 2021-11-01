@@ -11,5 +11,6 @@ jobs:
     runs-on: "self-hosted"
     needs: clone
     steps:
-        - run: ls -lah
+        - run: docker build -t terrarium:latest
+        - run: docker images
      
