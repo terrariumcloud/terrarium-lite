@@ -10,5 +10,3 @@ jobs:
       - run: ls -lah
       - run: docker build -t europe-west2-docker.pkg.dev/terrarium-330719/terrarium:latest .
       - run: docker push europe-west2-docker.pkg.dev/terrarium-330719/terrarium:latest
-        
-     
