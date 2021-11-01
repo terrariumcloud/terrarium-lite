@@ -4,5 +4,5 @@ jobs:
   build:
     runs-on: "self-hosted"
     steps:
-      - run: echo "Hello from GKE!"
-      - run: ls -lah
+      - run: docker version
+      - run: docker pull helloworld
