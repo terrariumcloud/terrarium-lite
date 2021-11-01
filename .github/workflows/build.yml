@@ -12,5 +12,5 @@ jobs:
         with:
           repository: ""
       - run: gcloud auth configure-docker europe-west2-docker.pkg.dev
-      - run: docker build -t europe-west2-docker.pkg.dev/terrarium-330719/terrarium .
-      - run: docker push europe-west2-docker.pkg.dev/terrarium-330719/terrarium
+      - run: docker build -t europe-west2-docker.pkg.dev/terrarium-330719/terrarium/terrarium:latest .
+      - run: docker push europe-west2-docker.pkg.dev/terrarium-330719/terrarium/terrarium:latest
