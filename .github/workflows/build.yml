@@ -1,6 +1,6 @@
 name: "terrarium-build-push"
 on: ["push"]
-runs_on: "self-hosted"
+runs-on: "self-hosted"
 jobs:
   build:
     steps:
