@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -70,7 +71,9 @@ func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 				},
 			},
 		}
-		m.ResponseHandler.Write(rw, vr, http.StatusOK)
+		data, _ := json.Marshal(vr)
+		rw.Header().Add("Content-Type", "application/json")
+		rw.Write(data)
 	})
 }
 
