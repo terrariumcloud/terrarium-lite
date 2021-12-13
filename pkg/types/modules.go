@@ -20,3 +20,15 @@ type Module struct {
 	Source       string        `json:"source"`
 	Organization *ResourceLink `json:"organization"`
 }
+
+type ModuleVersionItem struct {
+	Version string `json:"version"`
+}
+
+type ModuleVersions struct {
+	Versions []*ModuleVersionItem `json:"versions"`
+}
+
+type ModuleVersionResponse struct {
+	Modules []*ModuleVersions `json:"modules"`
+}

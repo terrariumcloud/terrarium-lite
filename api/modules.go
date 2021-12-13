@@ -59,7 +59,18 @@ func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
 
 func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		vr := &types.ModuleVersionResponse{
+			Modules: []*types.ModuleVersions{
+				{
+					Versions: []*types.ModuleVersionItem{
+						{
+							Version: "0.0.1",
+						},
+					},
+				},
+			},
+		}
+		m.ResponseHandler.Write(rw, vr, http.StatusOK)
 	})
 }
 
