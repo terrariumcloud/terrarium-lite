@@ -1,8 +1,6 @@
-package orgs
+package types
 
-import (
-	"errors"
-)
+import "errors"
 
 // Organization represents the organization data structure stored in the database
 type Organization struct {

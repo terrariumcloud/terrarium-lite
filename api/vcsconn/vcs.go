@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -42,7 +41,7 @@ func (v *VCSAPI) CreateVCSHandler() http.Handler {
 			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		link := &vcsconn.VCSOAuthClientLink{}
+		link := &types.VCSOAuthClientLink{}
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)

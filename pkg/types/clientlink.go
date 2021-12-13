@@ -1,4 +1,4 @@
-package vcsconn
+package types
 
 import "errors"
 

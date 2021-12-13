@@ -1,12 +1,10 @@
-package vcsconn
-
-import "github.com/dylanrhysscott/terrarium/internal/terrariummongo/relationships"
+package types
 
 // VCS represents the VCS data structure stored in the database
 type VCS struct {
-	ID           interface{}                 `json:"id" bson:"_id"`
-	Organization *relationships.ResourceLink `json:"organization" bson:"organization"`
-	OAuth        *VCSOAuthClientLink         `json:"oauth" bson:"oauth"`
+	ID           interface{}         `json:"id" bson:"_id"`
+	Organization *ResourceLink       `json:"organization" bson:"organization"`
+	OAuth        *VCSOAuthClientLink `json:"oauth" bson:"oauth"`
 }
 
 type VCSToken struct {

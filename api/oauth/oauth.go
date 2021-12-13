@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	vcs "github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 
 	"github.com/gorilla/mux"
@@ -73,7 +72,7 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 			return
 		}
 		log.Println(string(data))
-		ghToken := &vcs.VCSToken{}
+		ghToken := &types.VCSToken{}
 		err = json.Unmarshal(data, ghToken)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)

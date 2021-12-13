@@ -5,9 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/orgs"
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/vcsconn"
-
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -38,7 +35,7 @@ func (m *TerrariumMongo) Connect(ctx context.Context) error {
 
 // Organizations returns a Mongo compatible organization store which implements the OrganizationStore interface
 func (m *TerrariumMongo) Organizations() types.OrganizationStore {
-	return &orgs.OrganizationBackend{
+	return &OrganizationBackend{
 		CollectionName: "organizations",
 		Client:         m.client,
 		Database:       m.Database,
@@ -47,7 +44,7 @@ func (m *TerrariumMongo) Organizations() types.OrganizationStore {
 
 // VCSConnections returns a Mongo compatible VCSConnection store which implements the VCSConnectionsStore interface
 func (m *TerrariumMongo) VCSConnections() types.VCSSConnectionStore {
-	return &vcsconn.VCSConnectionBackend{
+	return &VCSConnectionBackend{
 		CollectionName: "vcs",
 		Client:         m.client,
 		Database:       m.Database,

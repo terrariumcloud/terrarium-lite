@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/modules"
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo/relationships"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 	"github.com/gorilla/mux"
 )
@@ -26,12 +24,12 @@ type SourceAPI struct {
 	SourceStore     types.TerrariumSourceDriver
 }
 
-func sourceToModule(data types.SourceData, provider string, orgLink *relationships.ResourceLink, vcsConnectionID string) *modules.VCSModule {
-	return &modules.VCSModule{
+func sourceToModule(data types.SourceData, provider string, orgLink *types.ResourceLink, vcsConnectionID string) *types.VCSModule {
+	return &types.VCSModule{
 		Name:        data.GetRepoName(),
 		Provider:    provider,
 		Description: data.GetRepoDescription(),
-		VCSConnection: &relationships.ResourceLink{
+		VCSConnection: &types.ResourceLink{
 			ID:   vcsConnectionID,
 			Link: fmt.Sprintf("/v1/oauth-clients/%s", vcsConnectionID),
 		},
