@@ -19,3 +19,9 @@ type TerrariumDatabaseDriver interface {
 type TerrariumSourceDriver interface {
 	GithubSources() SourceProvider
 }
+
+// TerrariumStorageDriver is a generic interface for interacting with underlying module storage.
+type TerrariumStorageDriver interface {
+	Init() error
+	FetchModuleSource(ctx context.Context, bucket string, key string) error
+}

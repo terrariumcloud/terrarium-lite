@@ -1,6 +1,9 @@
 package api
 
 import (
+	"context"
+	"errors"
+	"log"
 	"net/http"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
@@ -24,6 +27,7 @@ type ModuleAPIInterface interface {
 type ModuleAPI struct {
 	Router          *mux.Router
 	ModuleStore     interface{}
+	FileStore       types.TerrariumStorageDriver
 	ErrorHandler    types.APIErrorWriter
 	ResponseHandler types.APIResponseWriter
 }
@@ -42,7 +46,12 @@ func (m *ModuleAPI) GetModuleHandler() http.Handler {
 
 func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		err := m.FileStore.FetchModuleSource(context.TODO(), "terrarium-dev", "test.zip")
+		if err != nil {
+			log.Printf("[FILE STORE] Error: %s", err.Error())
+			m.ErrorHandler.Write(rw, errors.New("failed fetching module source from file store"), http.StatusInternalServerError)
+			return
+		}
 	})
 }
 
@@ -88,10 +97,11 @@ func (m *ModuleAPI) SetupRoutes() {
 	m.Router.Handle("/{organization_name}/{name}/{provider}", m.DeleteModuleHandler()).Methods(http.MethodDelete)
 }
 
-func NewModuleAPI(router *mux.Router, path string, store interface{}, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *ModuleAPI {
+func NewModuleAPI(router *mux.Router, path string, store interface{}, fileStore types.TerrariumStorageDriver, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *ModuleAPI {
 	m := &ModuleAPI{
-		Router:          router,
+		Router:          router.PathPrefix(path).Subrouter(),
 		ModuleStore:     store,
+		FileStore:       fileStore,
 		ErrorHandler:    errorHandler,
 		ResponseHandler: responseHandler,
 	}
