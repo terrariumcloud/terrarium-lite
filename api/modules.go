@@ -46,12 +46,14 @@ func (m *ModuleAPI) GetModuleHandler() http.Handler {
 
 func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		err := m.FileStore.FetchModuleSource(context.TODO(), "terrarium-dev", "test.zip")
+		zipData, err := m.FileStore.FetchModuleSource(context.TODO(), "terrarium-dev", "test.zip")
 		if err != nil {
 			log.Printf("[FILE STORE] Error: %s", err.Error())
 			m.ErrorHandler.Write(rw, errors.New("failed fetching module source from file store"), http.StatusInternalServerError)
 			return
 		}
+		r.Header.Set("Content-Type", "application/zip")
+		rw.Write(zipData)
 	})
 }
 

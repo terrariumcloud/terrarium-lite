@@ -2,6 +2,8 @@
 version: "3.9"
 services:
   terrarium:
+    env_file:
+      - .env
     build:
       context: .
     ports:
@@ -11,9 +13,6 @@ services:
       - module
       - --database-host
       - mongo:27017
-    environment:
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
   mongo:
     image: mongo:5.0.3
     ports:

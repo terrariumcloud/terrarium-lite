@@ -2,7 +2,8 @@ package terrariums3
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"io/ioutil"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -25,17 +26,19 @@ func (s *TerrariumS3Storage) Init() error {
 	return nil
 }
 
-func (s *TerrariumS3Storage) FetchModuleSource(ctx context.Context, bucket string, key string) error {
+func (s *TerrariumS3Storage) FetchModuleSource(ctx context.Context, bucket string, key string) ([]byte, error) {
 	data, err := s.Service.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	log.Println(data.ContentType)
-	log.Println(data.ContentDisposition)
-	return nil
+	ct := aws.ToString(data.ContentType)
+	if ct != "application/zip" {
+		return nil, fmt.Errorf("module did not return a zip. Returned %s", ct)
+	}
+	return ioutil.ReadAll(data.Body)
 }
 
 func New(region string) (*TerrariumS3Storage, error) {
