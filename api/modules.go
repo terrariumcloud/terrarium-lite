@@ -47,13 +47,15 @@ func (m *ModuleAPI) GetModuleHandler() http.Handler {
 }
 
 func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
+	// TODO: Make this dynamic and ensure header handling is compliant
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Add("X-Terraform-Get", "../archive")
+		rw.Header().Add("X-Terraform-Get", "./archive?archive=zip")
 		m.ResponseHandler.Write(rw, nil, http.StatusNoContent)
 	})
 }
 
 func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
+	// TODO: Make this dynamic
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		vr := &types.ModuleVersionResponse{
 			Modules: []*types.ModuleVersions{
@@ -97,6 +99,7 @@ func (m *ModuleAPI) DeleteModuleHandler() http.Handler {
 }
 
 func (m *ModuleAPI) ArchiveHandler() http.Handler {
+	// TODO: Make this flexible to fetch archives dynamically
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		zipData, err := m.FileStore.FetchModuleSource(context.TODO(), "terrarium-dev", "test.zip")
 		if err != nil {
