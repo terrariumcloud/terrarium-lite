@@ -1,10 +1,4 @@
-package discovery
-
-import "net/http"
-
-type DiscoveryAPIInterface interface {
-	DiscoveryHandler() http.Handler
-}
+package types
 
 type ServiceDiscoveryResponse struct {
 	LoginV1  *LoginConfig `json:"login.v1,omitempty"`

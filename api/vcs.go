@@ -1,4 +1,4 @@
-package vcsconn
+package api
 
 import (
 	"encoding/json"

@@ -1,4 +1,4 @@
-package oauth
+package api
 
 import (
 	"encoding/json"

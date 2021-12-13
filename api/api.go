@@ -7,12 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/dylanrhysscott/terrarium/api/discovery"
-	"github.com/dylanrhysscott/terrarium/api/oauth"
-	"github.com/dylanrhysscott/terrarium/api/organization"
-	"github.com/dylanrhysscott/terrarium/api/sources"
-	"github.com/dylanrhysscott/terrarium/api/vcsconn"
-	terrariumsorce "github.com/dylanrhysscott/terrarium/internal/terrariumsource"
+	"github.com/dylanrhysscott/terrarium/internal/terrariumsource"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 
 	"github.com/gorilla/handlers"
@@ -24,11 +19,11 @@ type Terrarium struct {
 	Port             int
 	Store            types.TerrariumDatabaseDriver
 	Source           types.TerrariumSourceDriver
-	OrganizationAPI  organization.OrganizationAPIInterface
-	VCSConnectionAPI vcsconn.VCSConnAPIInterface
-	OAuthAPI         oauth.OAuthAPIInterface
-	SourceAPI        sources.SourceAPIInterface
-	DiscoveryAPI     discovery.DiscoveryAPIInterface
+	OrganizationAPI  OrganizationAPIInterface
+	VCSConnectionAPI VCSConnAPIInterface
+	OAuthAPI         OAuthAPIInterface
+	SourceAPI        SourceAPIInterface
+	DiscoveryAPI     DiscoveryAPIInterface
 	Router           *mux.Router
 	Responder        types.APIResponseWriter
 	Errorer          types.APIErrorWriter
@@ -44,12 +39,12 @@ func (t *Terrarium) Serve() error {
 
 // Init calls the various API sub packages to setup routers for endpoints
 func (t *Terrarium) Init() {
-	t.VCSConnectionAPI = vcsconn.NewVCSAPI(t.Router, "/v1/oauth-clients", t.Store.VCSConnections(), t.Store.Organizations(), t.Responder, t.Errorer)
-	t.OAuthAPI = oauth.NewOAuthAPI(t.Router, "/oauth", t.Store.VCSConnections(), t.Responder, t.Errorer)
-	t.SourceAPI = sources.NewSourceAPI(t.Router, "/v1/sources", t.Store.VCSConnections(), t.Source, t.Responder, t.Errorer)
-	t.OrganizationAPI = organization.NewOrganizationAPI(t.Router, "/v1/organizations", t.Store.Organizations(), t.VCSConnectionAPI, t.Responder, t.Errorer)
+	t.VCSConnectionAPI = NewVCSAPI(t.Router, "/v1/oauth-clients", t.Store.VCSConnections(), t.Store.Organizations(), t.Responder, t.Errorer)
+	t.OAuthAPI = NewOAuthAPI(t.Router, "/oauth", t.Store.VCSConnections(), t.Responder, t.Errorer)
+	t.SourceAPI = NewSourceAPI(t.Router, "/v1/sources", t.Store.VCSConnections(), t.Source, t.Responder, t.Errorer)
+	t.OrganizationAPI = NewOrganizationAPI(t.Router, "/v1/organizations", t.Store.Organizations(), t.VCSConnectionAPI, t.Responder, t.Errorer)
 	// TODO: Should this be it's own binary / sub command?
-	t.DiscoveryAPI = discovery.NewDiscoveryAPI(nil, "/v1/modules", t.Responder, t.Errorer)
+	t.DiscoveryAPI = NewDiscoveryAPI(nil, "/v1/modules", t.Responder, t.Errorer)
 	// Register discovery route for Terraform native discovery
 	t.Router.Handle("/.well-known/terraform.json", t.DiscoveryAPI.DiscoveryHandler())
 }
@@ -59,7 +54,7 @@ func NewTerrarium(port int, driver types.TerrariumDatabaseDriver, responder type
 	return &Terrarium{
 		Port:      port,
 		Store:     driver,
-		Source:    terrariumsorce.NewTerrariumSourceDriver(),
+		Source:    terrariumsource.NewTerrariumSourceDriver(),
 		Router:    mux.NewRouter(),
 		Responder: responder,
 		Errorer:   errorer,

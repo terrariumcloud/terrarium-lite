@@ -1,4 +1,4 @@
-package sources
+package api
 
 import (
 	"encoding/json"
@@ -78,7 +78,7 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		reqBody := &SourceVCSRepoBody{}
+		reqBody := &types.SourceVCSRepoBody{}
 		err = json.Unmarshal(body, reqBody)
 		if err != nil {
 			s.ErrorHandler.Write(rw, err, http.StatusInternalServerError)

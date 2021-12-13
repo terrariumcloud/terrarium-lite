@@ -1,4 +1,4 @@
-package discovery
+package api
 
 import (
 	"net/http"
@@ -9,13 +9,17 @@ import (
 type DiscoveryAPI struct {
 	ErrorHandler    types.APIErrorWriter
 	ResponseHandler types.APIResponseWriter
-	LoginConfig     *LoginConfig
+	LoginConfig     *types.LoginConfig
 	ModuleEndpoint  string
+}
+
+type DiscoveryAPIInterface interface {
+	DiscoveryHandler() http.Handler
 }
 
 func (d *DiscoveryAPI) DiscoveryHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		resp := &ServiceDiscoveryResponse{
+		resp := &types.ServiceDiscoveryResponse{
 			LoginV1:  d.LoginConfig,
 			ModuleV1: d.ModuleEndpoint,
 		}
@@ -23,7 +27,7 @@ func (d *DiscoveryAPI) DiscoveryHandler() http.Handler {
 	})
 }
 
-func NewDiscoveryAPI(loginConfig *LoginConfig, moduleEndpoint string, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *DiscoveryAPI {
+func NewDiscoveryAPI(loginConfig *types.LoginConfig, moduleEndpoint string, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *DiscoveryAPI {
 	return &DiscoveryAPI{
 		LoginConfig:     loginConfig,
 		ModuleEndpoint:  moduleEndpoint,

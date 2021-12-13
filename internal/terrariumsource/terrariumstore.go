@@ -2,7 +2,7 @@
 // providers such as Github. This is used to populate the registry with modules backed by version control
 // This package is internal and not intended for use outside of the core project. See the "types" package
 // for extending Terrarium
-package terrariumsorce
+package terrariumsource
 
 import (
 	"github.com/dylanrhysscott/terrarium/internal/terrariumsource/github"
