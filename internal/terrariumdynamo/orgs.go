@@ -30,6 +30,10 @@ func getTableSchema(table string) *dynamodb.CreateTableInput {
 				AttributeName: aws.String("_id"),
 				AttributeType: dynamodbtypes.ScalarAttributeTypeS,
 			},
+			{
+				AttributeName: aws.String("name"),
+				AttributeType: dynamodbtypes.ScalarAttributeTypeS,
+			},
 		},
 		KeySchema: []dynamodbtypes.KeySchemaElement{
 			{
