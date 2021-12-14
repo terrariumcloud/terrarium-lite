@@ -49,6 +49,10 @@ func getTableSchema(table string) *dynamodb.CreateTableInput {
 				Projection: &dynamodbtypes.Projection{
 					NonKeyAttributes: []string{"email", "created_at"},
 				},
+				ProvisionedThroughput: &dynamodbtypes.ProvisionedThroughput{
+					ReadCapacityUnits:  aws.Int64(1),
+					WriteCapacityUnits: aws.Int64(1),
+				},
 			},
 		},
 		TableName:   aws.String(table),
