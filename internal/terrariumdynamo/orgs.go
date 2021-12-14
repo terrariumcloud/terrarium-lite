@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/google/uuid"
 
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 )
@@ -73,6 +75,34 @@ func (o *OrganizationBackend) Init() error {
 
 // Create Adds a new organization to the organizations table
 func (o *OrganizationBackend) Create(name string, email string) (*types.Organization, error) {
+	id := uuid.NewString()
+	org := &types.Organization{
+		ID:        id,
+		Name:      name,
+		Email:     email,
+		CreatedOn: time.Now().UTC().String(),
+	}
+	ctx := context.TODO()
+	_, err := o.Client.PutItem(ctx, &dynamodb.PutItemInput{
+		Item: map[string]dynamodbtypes.AttributeValue{
+			"_id": &dynamodbtypes.AttributeValueMemberS{
+				Value: id,
+			},
+			"name": &dynamodbtypes.AttributeValueMemberS{
+				Value: org.Name,
+			},
+			"email": &dynamodbtypes.AttributeValueMemberS{
+				Value: org.Email,
+			},
+			"created_on": &dynamodbtypes.AttributeValueMemberS{
+				Value: org.CreatedOn,
+			},
+		},
+		TableName: aws.String(o.TableName),
+	})
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 
