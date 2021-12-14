@@ -140,11 +140,11 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, error) {
 	ctx := context.TODO()
 	org, err := o.Client.Query(ctx, &dynamodb.QueryInput{
-		KeyConditionExpression: aws.String(fmt.Sprintf("#n = %s", orgName)),
+		KeyConditionExpression: aws.String("#n"),
 		Limit:                  aws.Int32(int32(1)),
 		TableName:              &o.TableName,
 		ExpressionAttributeNames: map[string]string{
-			"#n": "name",
+			"#n": fmt.Sprintf("name = %s", orgName),
 		},
 	})
 	if err != nil {
