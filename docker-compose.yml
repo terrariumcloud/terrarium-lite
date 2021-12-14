@@ -11,14 +11,14 @@ services:
     command:
       - serve
       - module
-      - --database-host
-      - mongo:27017
-  mongo:
-    image: mongo:5.0.3
-    ports:
-      - 27017:27017
-    volumes:
-      - data:/data/db
+      - --database-driver
+      - dynamodb
+  # mongo:
+  #   image: mongo:5.0.3
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - data:/data/db
   # swagger-editor:
   #   image: swaggerapi/swagger-editor
   #   ports:

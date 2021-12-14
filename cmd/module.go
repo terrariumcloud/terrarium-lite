@@ -20,6 +20,7 @@ import (
 
 	"github.com/dylanrhysscott/terrarium/api"
 	"github.com/dylanrhysscott/terrarium/internal/responder"
+	"github.com/dylanrhysscott/terrarium/internal/terrariumdynamo"
 	"github.com/dylanrhysscott/terrarium/internal/terrariummongo"
 	"github.com/dylanrhysscott/terrarium/internal/terrariums3"
 	"github.com/dylanrhysscott/terrarium/pkg/types"
@@ -50,6 +51,15 @@ var moduleCmd = &cobra.Command{
 				log.Fatalf("Error initialising database - %s", err.Error())
 			}
 		}
+		if databaseBackend == "dynamodb" {
+			if awsRegion == "" {
+				log.Fatal("Error: No AWS Region Set")
+			}
+			driver, err = terrariumdynamo.New(awsRegion)
+			if err != nil {
+				log.Fatalf("Error initialising DynamoDB - %s", err.Error())
+			}
+		}
 		if storageBackend == "s3" {
 			if awsRegion == "" {
 				log.Fatal("Error: No AWS Region Set")
@@ -75,7 +85,7 @@ var moduleCmd = &cobra.Command{
 
 func init() {
 	serveCmd.AddCommand(moduleCmd)
-	moduleCmd.Flags().StringVarP(&databaseBackend, "database-backend", "d", "mongo", "Controls the database storage backend. Available backends: 'mongo'")
+	moduleCmd.Flags().StringVarP(&databaseBackend, "database-backend", "d", "mongo", "Controls the database storage backend. Available backends: 'mongo', 'dynamodb'")
 	moduleCmd.Flags().StringVarP(&storageBackend, "storage-backend", "s", "s3", "Controls the file storage backend. Available backends: 's3'")
 	moduleCmd.Flags().StringVarP(&awsRegion, "aws-region", "", "eu-west-2", "AWS Region (required if S3 backend is used")
 	moduleCmd.Flags().StringVarP(&databaseHost, "database-host", "", "", "Database Host")
