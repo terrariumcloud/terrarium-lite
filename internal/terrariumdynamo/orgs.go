@@ -60,8 +60,8 @@ func (o *OrganizationBackend) Init() error {
 		TableName: aws.String(o.TableName),
 	})
 	if err != nil {
-		var tableExistsErr *dynamodbtypes.TableNotFoundException
-		if errors.As(err, &tableExistsErr) {
+		var notFoundErr *dynamodbtypes.ResourceNotFoundException
+		if errors.As(err, &notFoundErr) {
 			log.Printf("Creating DynamoDB Table: %s", o.TableName)
 			_, err = o.Client.CreateTable(ctx, getTableSchema(o.TableName))
 			if err != nil {
