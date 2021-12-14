@@ -15,6 +15,8 @@ import (
 	"github.com/dylanrhysscott/terrarium/pkg/types"
 )
 
+const orgNameIndex = "organization_index"
+
 // OrganizationBackend is a struct that implements Mongo operations for organizations
 type OrganizationBackend struct {
 	TableName string
@@ -37,7 +39,7 @@ func getTableSchema(table string) *dynamodb.CreateTableInput {
 		},
 		GlobalSecondaryIndexes: []dynamodbtypes.GlobalSecondaryIndex{
 			{
-				IndexName: aws.String("organization_index"),
+				IndexName: aws.String(orgNameIndex),
 				KeySchema: []dynamodbtypes.KeySchemaElement{
 					{
 						AttributeName: aws.String("name"),
@@ -145,6 +147,7 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 		KeyConditionExpression: aws.String("#n = :o"),
 		Limit:                  aws.Int32(int32(1)),
 		TableName:              &o.TableName,
+		IndexName:              aws.String(orgName),
 		ExpressionAttributeNames: map[string]string{
 			"#n": "name",
 		},
