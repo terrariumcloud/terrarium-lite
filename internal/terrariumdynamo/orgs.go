@@ -144,6 +144,7 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 				Value: orgName,
 			},
 		},
+		TableName: &o.TableName,
 	})
 	if err != nil {
 		return nil, err
