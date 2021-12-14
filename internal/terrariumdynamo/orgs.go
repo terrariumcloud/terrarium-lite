@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
@@ -108,7 +109,27 @@ func (o *OrganizationBackend) Create(name string, email string) (*types.Organiza
 
 // ReadAll Returns all organizations from the organizations table
 func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organization, error) {
-	return nil, nil
+	// https://dynobase.dev/dynamodb-golang-query-examples/#pagination
+	ctx := context.TODO()
+	p := dynamodb.NewQueryPaginator(o.Client, &dynamodb.QueryInput{
+		TableName: aws.String(o.TableName),
+		Limit:     aws.Int32(int32(limit)),
+	})
+	var orgs []*types.Organization
+	for p.HasMorePages() {
+		out, err := p.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+		var orgList []*types.Organization
+
+		err = attributevalue.UnmarshalListOfMaps(out.Items, orgList)
+		if err != nil {
+			return nil, err
+		}
+		orgs = append(orgs, orgList...)
+	}
+	return orgs, nil
 }
 
 // ReadOne Returns a single organization from the organizations table
