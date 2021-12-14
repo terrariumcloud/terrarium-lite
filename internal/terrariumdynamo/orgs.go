@@ -195,6 +195,14 @@ func (o *OrganizationBackend) Delete(name string) error {
 	_, err := o.Client.DeleteItem(ctx, &dynamodb.DeleteItemInput{
 		TableName:           &o.TableName,
 		ConditionExpression: aws.String("#n = :o"),
+		ExpressionAttributeNames: map[string]string{
+			"#n": "name",
+		},
+		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
+			":o": &dynamodbtypes.AttributeValueMemberS{
+				Value: name,
+			},
+		},
 	})
 	if err != nil {
 		return err
