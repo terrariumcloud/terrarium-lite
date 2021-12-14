@@ -48,5 +48,9 @@ func New(region string) (*TerrariumDynamoDB, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = driver.Organizations().Init()
+	if err != nil {
+		return nil, err
+	}
 	return driver, nil
 }
