@@ -196,6 +196,9 @@ func (o *OrganizationBackend) Delete(name string) error {
 	if err != nil {
 		return err
 	}
+	if org == nil {
+		return nil
+	}
 	id := org.ID.(string)
 	_, err = o.Client.DeleteItem(ctx, &dynamodb.DeleteItemInput{
 		TableName: &o.TableName,
