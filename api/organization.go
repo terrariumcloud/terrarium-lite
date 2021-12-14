@@ -13,7 +13,7 @@ import (
 )
 
 func extractLimitAndOffset(qs url.Values) (int, int, error) {
-	var limit int = 0
+	var limit int = 10
 	var offset int = 0
 	if qs.Has("limit") {
 		// If we have a limit value set in QS attempt to convert to int
