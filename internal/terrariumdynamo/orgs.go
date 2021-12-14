@@ -158,7 +158,7 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 		KeyConditionExpression: aws.String("#n = :o"),
 		Limit:                  aws.Int32(int32(1)),
 		TableName:              &o.TableName,
-		IndexName:              aws.String(orgName),
+		IndexName:              aws.String(orgNameIndex),
 		ExpressionAttributeNames: map[string]string{
 			"#n": "name",
 		},
