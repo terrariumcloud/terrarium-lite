@@ -111,9 +111,8 @@ func (o *OrganizationBackend) Create(name string, email string) (*types.Organiza
 func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organization, error) {
 	// https://dynobase.dev/dynamodb-golang-query-examples/#pagination
 	ctx := context.TODO()
-	p := dynamodb.NewQueryPaginator(o.Client, &dynamodb.QueryInput{
+	p := dynamodb.NewScanPaginator(o.Client, &dynamodb.ScanInput{
 		TableName: aws.String(o.TableName),
-		Limit:     aws.Int32(int32(limit)),
 	})
 	var orgs []*types.Organization
 	for p.HasMorePages() {
@@ -129,7 +128,11 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 		}
 		orgs = append(orgs, orgList...)
 	}
-	return orgs, nil
+	var finalOrgList []*types.Organization = orgs
+	if offset+limit < len(orgs) {
+		finalOrgList = orgs[offset:limit]
+	}
+	return finalOrgList, nil
 }
 
 // ReadOne Returns a single organization from the organizations table
