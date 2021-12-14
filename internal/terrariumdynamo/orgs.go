@@ -203,7 +203,7 @@ func (o *OrganizationBackend) Update(name string, email string) (*types.Organiza
 	if org.Email != email {
 		updatedEmail = email
 	}
-	update, err := o.Client.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+	_, err = o.Client.UpdateItem(ctx, &dynamodb.UpdateItemInput{
 		TableName: &o.TableName,
 		Key: map[string]dynamodbtypes.AttributeValue{
 			"_id": &dynamodbtypes.AttributeValueMemberS{
@@ -228,12 +228,9 @@ func (o *OrganizationBackend) Update(name string, email string) (*types.Organiza
 	if err != nil {
 		return nil, err
 	}
-	updatedOrganizationObj := &types.Organization{}
-	err = attributevalue.UnmarshalMap(update.Attributes, &updatedOrganizationObj)
-	if err != nil {
-		return nil, err
-	}
-	return updatedOrganizationObj, nil
+	org.Email = updatedEmail
+	org.Name = updatedOrg
+	return org, nil
 }
 
 // Delete Removes an organization from the organization table
