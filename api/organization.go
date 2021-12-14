@@ -83,12 +83,12 @@ func (o *OrganizationAPI) UpdateOrganizationHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 		orgName := params["organization_name"]
-		_, err := o.OrganziationStore.ReadOne(orgName)
+		org, err := o.OrganziationStore.ReadOne(orgName)
+		if org == nil {
+			o.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
+			return
+		}
 		if err != nil {
-			if err.Error() == "mongo: no documents in result" {
-				o.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
-				return
-			}
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
@@ -97,7 +97,7 @@ func (o *OrganizationAPI) UpdateOrganizationHandler() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		org := &types.Organization{}
+		org = &types.Organization{}
 		err = json.Unmarshal(body, org)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
@@ -118,16 +118,12 @@ func (o *OrganizationAPI) GetOrganizationHandler() http.Handler {
 		params := mux.Vars(r)
 		orgName := params["organization_name"]
 		org, err := o.OrganziationStore.ReadOne(orgName)
-		if err != nil {
-			if err.Error() == "mongo: no documents in result" {
-				o.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
-				return
-			}
-			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
 		if org == nil {
 			o.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
+			return
+		}
+		if err != nil {
+			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
 		o.ResponseHandler.Write(rw, org, http.StatusOK)
