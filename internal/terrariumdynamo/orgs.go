@@ -3,6 +3,7 @@ package terrariumdynamo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -138,23 +139,25 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 // ReadOne Returns a single organization from the organizations table
 func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, error) {
 	ctx := context.TODO()
-	org, err := o.Client.GetItem(ctx, &dynamodb.GetItemInput{
-		Key: map[string]dynamodbtypes.AttributeValue{
-			"name": &dynamodbtypes.AttributeValueMemberS{
-				Value: orgName,
-			},
-		},
-		TableName: &o.TableName,
+	org, err := o.Client.Query(ctx, &dynamodb.QueryInput{
+		KeyConditionExpression: aws.String(fmt.Sprintf("name = %s", orgName)),
+		Limit:                  aws.Int32(int32(1)),
+		TableName:              &o.TableName,
 	})
 	if err != nil {
 		return nil, err
 	}
-	finalOrg := &types.Organization{}
-	err = attributevalue.UnmarshalMap(org.Item, &finalOrg)
-	if err != nil {
-		return nil, err
+
+	if org.Count > 0 {
+		finalOrg := &types.Organization{}
+		err = attributevalue.UnmarshalMap(org.Items[0], &finalOrg)
+		if err != nil {
+			return nil, err
+		}
+		return finalOrg, nil
 	}
-	return finalOrg, nil
+
+	return nil, nil
 }
 
 // Update Updates an organization in the organization table
