@@ -28,19 +28,22 @@ func getTableSchema(table string) *dynamodb.CreateTableInput {
 				AttributeName: aws.String("_id"),
 				AttributeType: dynamodbtypes.ScalarAttributeTypeS,
 			},
-			{
-				AttributeName: aws.String("name"),
-				AttributeType: dynamodbtypes.ScalarAttributeTypeS,
-			},
 		},
 		KeySchema: []dynamodbtypes.KeySchemaElement{
 			{
 				AttributeName: aws.String("_id"),
 				KeyType:       "HASH",
 			},
+		},
+		GlobalSecondaryIndexes: []dynamodbtypes.GlobalSecondaryIndex{
 			{
-				AttributeName: aws.String("name"),
-				KeyType:       "RANGE",
+				IndexName: aws.String("organization_index"),
+				KeySchema: []dynamodbtypes.KeySchemaElement{
+					{
+						AttributeName: aws.String("name"),
+						KeyType:       "HASH",
+					},
+				},
 			},
 		},
 		TableName:   aws.String(table),
