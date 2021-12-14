@@ -137,7 +137,23 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 
 // ReadOne Returns a single organization from the organizations table
 func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, error) {
-	return nil, nil
+	ctx := context.TODO()
+	org, err := o.Client.GetItem(ctx, &dynamodb.GetItemInput{
+		Key: map[string]dynamodbtypes.AttributeValue{
+			"name": &dynamodbtypes.AttributeValueMemberS{
+				Value: orgName,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	finalOrg := &types.Organization{}
+	err = attributevalue.UnmarshalMap(org.Item, &finalOrg)
+	if err != nil {
+		return nil, err
+	}
+	return finalOrg, nil
 }
 
 // Update Updates an organization in the organization table
