@@ -186,12 +186,58 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 
 // Update Updates an organization in the organization table
 func (o *OrganizationBackend) Update(name string, email string) (*types.Organization, error) {
-	return nil, nil
+	org, err := o.ReadOne(name)
+	if err != nil {
+		return nil, err
+	}
+	if org == nil {
+		return nil, errors.New("organization does not exist")
+	}
+	ctx := context.TODO()
+	id := org.ID.(string)
+	updatedOrg := org.Name
+	updatedEmail := org.Email
+	if org.Name != name {
+		updatedOrg = name
+	}
+	if org.Email != email {
+		updatedEmail = email
+	}
+	update, err := o.Client.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+		TableName: &o.TableName,
+		Key: map[string]dynamodbtypes.AttributeValue{
+			"_id": &dynamodbtypes.AttributeValueMemberS{
+				Value: id,
+			},
+		},
+		ConditionExpression: aws.String("#n = :o"),
+		ExpressionAttributeNames: map[string]string{
+			"#n": "name",
+			"#e": "email",
+		},
+		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
+			":o": &dynamodbtypes.AttributeValueMemberS{
+				Value: updatedOrg,
+			},
+			":e": &dynamodbtypes.AttributeValueMemberS{
+				Value: updatedEmail,
+			},
+		},
+		UpdateExpression: aws.String("set #n = :o, #e = :e"),
+	})
+	if err != nil {
+		return nil, err
+	}
+	updatedOrganizationObj := &types.Organization{}
+	err = attributevalue.UnmarshalMap(update.Attributes, &updatedOrganizationObj)
+	if err != nil {
+		return nil, err
+	}
+	return updatedOrganizationObj, nil
 }
 
 // Delete Removes an organization from the organization table
 func (o *OrganizationBackend) Delete(name string) error {
-	ctx := context.TODO()
 	org, err := o.ReadOne(name)
 	if err != nil {
 		return err
@@ -199,6 +245,7 @@ func (o *OrganizationBackend) Delete(name string) error {
 	if org == nil {
 		return nil
 	}
+	ctx := context.TODO()
 	id := org.ID.(string)
 	_, err = o.Client.DeleteItem(ctx, &dynamodb.DeleteItemInput{
 		TableName: &o.TableName,
