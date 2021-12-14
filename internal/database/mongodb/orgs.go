@@ -1,10 +1,10 @@
-package terrariummongo
+package mongodb
 
 import (
 	"context"
 	"time"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -36,8 +36,8 @@ func (o *OrganizationBackend) Init() error {
 }
 
 // Create Adds a new organization to the organizations table
-func (o *OrganizationBackend) Create(name string, email string) (*types.Organization, error) {
-	org := &types.Organization{
+func (o *OrganizationBackend) Create(name string, email string) (*organizations.Organization, error) {
+	org := &organizations.Organization{
 		ID:        primitive.NewObjectID(),
 		Name:      name,
 		Email:     email,
@@ -52,7 +52,7 @@ func (o *OrganizationBackend) Create(name string, email string) (*types.Organiza
 }
 
 // ReadAll Returns all organizations from the organizations table
-func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organization, error) {
+func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*organizations.Organization, error) {
 	ctx := context.TODO()
 	limitOpt := options.Find().SetLimit(int64(limit))
 	skipOpt := options.Find().SetSkip(int64(offset))
@@ -61,9 +61,9 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 		return nil, err
 	}
 	defer cur.Close(ctx)
-	var organizationList []*types.Organization = []*types.Organization{}
+	var organizationList []*organizations.Organization = []*organizations.Organization{}
 	for cur.Next(ctx) {
-		result := &types.Organization{}
+		result := &organizations.Organization{}
 		err := cur.Decode(result)
 		if err != nil {
 			return nil, err
@@ -74,9 +74,9 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 }
 
 // ReadOne Returns a single organization from the organizations table
-func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, error) {
+func (o *OrganizationBackend) ReadOne(orgName string) (*organizations.Organization, error) {
 	ctx := context.TODO()
-	org := &types.Organization{}
+	org := &organizations.Organization{}
 	result := o.Client.Database(o.Database).Collection(o.CollectionName).FindOne(ctx, bson.M{"name": orgName}, options.FindOne())
 	err := result.Decode(org)
 	if err != nil {
@@ -86,7 +86,7 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 }
 
 // Update Updates an organization in the organization table
-func (o *OrganizationBackend) Update(name string, email string) (*types.Organization, error) {
+func (o *OrganizationBackend) Update(name string, email string) (*organizations.Organization, error) {
 	ctx := context.TODO()
 	update := bson.M{}
 	if email != "" {

@@ -3,13 +3,14 @@ package api
 import (
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/discovery"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 )
 
 type DiscoveryAPI struct {
-	ErrorHandler    types.APIErrorWriter
-	ResponseHandler types.APIResponseWriter
-	LoginConfig     *types.LoginConfig
+	ErrorHandler    responses.APIErrorWriter
+	ResponseHandler responses.APIResponseWriter
+	LoginConfig     *discovery.LoginConfig
 	ModuleEndpoint  string
 }
 
@@ -19,7 +20,7 @@ type DiscoveryAPIInterface interface {
 
 func (d *DiscoveryAPI) DiscoveryHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		resp := &types.ServiceDiscoveryResponse{
+		resp := &discovery.ServiceDiscoveryResponse{
 			LoginV1:  d.LoginConfig,
 			ModuleV1: d.ModuleEndpoint,
 		}
@@ -27,7 +28,7 @@ func (d *DiscoveryAPI) DiscoveryHandler() http.Handler {
 	})
 }
 
-func NewDiscoveryAPI(loginConfig *types.LoginConfig, moduleEndpoint string, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *DiscoveryAPI {
+func NewDiscoveryAPI(loginConfig *discovery.LoginConfig, moduleEndpoint string, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *DiscoveryAPI {
 	return &DiscoveryAPI{
 		LoginConfig:     loginConfig,
 		ModuleEndpoint:  moduleEndpoint,

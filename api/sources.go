@@ -7,7 +7,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/relationships"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/gorilla/mux"
 )
 
@@ -18,18 +21,18 @@ type SourceAPIInterface interface {
 
 type SourceAPI struct {
 	Router          *mux.Router
-	ErrorHandler    types.APIErrorWriter
-	ResponseHandler types.APIResponseWriter
-	VCSStore        types.VCSSConnectionStore
-	SourceStore     types.TerrariumSourceDriver
+	ErrorHandler    responses.APIErrorWriter
+	ResponseHandler responses.APIResponseWriter
+	VCSStore        vcs.VCSSConnectionStore
+	SourceStore     drivers.TerrariumSourceDriver
 }
 
-func sourceToModule(data types.SourceData, provider string, orgLink *types.ResourceLink, vcsConnectionID string) *types.VCSModule {
-	return &types.VCSModule{
+func sourceToModule(data vcs.SourceData, provider string, orgLink *relationships.ResourceLink, vcsConnectionID string) *vcs.VCSModule {
+	return &vcs.VCSModule{
 		Name:        data.GetRepoName(),
 		Provider:    provider,
 		Description: data.GetRepoDescription(),
-		VCSConnection: &types.ResourceLink{
+		VCSConnection: &relationships.ResourceLink{
 			ID:   vcsConnectionID,
 			Link: fmt.Sprintf("/v1/oauth-clients/%s", vcsConnectionID),
 		},
@@ -38,8 +41,8 @@ func sourceToModule(data types.SourceData, provider string, orgLink *types.Resou
 	}
 }
 
-func (s *SourceAPI) detectStoreType(t string) (types.SourceProvider, error) {
-	var genericStore types.SourceProvider = nil
+func (s *SourceAPI) detectStoreType(t string) (vcs.SourceProvider, error) {
+	var genericStore vcs.SourceProvider = nil
 	switch t {
 	case "github":
 		genericStore = s.SourceStore.GithubSources()
@@ -60,7 +63,7 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusNotImplemented)
 			return
 		}
-		vcs, err := s.VCSStore.ReadOne(vcsConnID, true)
+		vcsItem, err := s.VCSStore.ReadOne(vcsConnID, true)
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
 				s.ErrorHandler.Write(rw, errors.New("vcs provider does not exist"), http.StatusNotFound)
@@ -69,7 +72,7 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		if vcs.OAuth.ServiceProvider != vcsProvider {
+		if vcsItem.OAuth.ServiceProvider != vcsProvider {
 			s.ErrorHandler.Write(rw, errors.New("vcs provider mismatch"), http.StatusBadRequest)
 			return
 		}
@@ -78,7 +81,7 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		reqBody := &types.SourceVCSRepoBody{}
+		reqBody := &vcs.SourceVCSRepoBody{}
 		err = json.Unmarshal(body, reqBody)
 		if err != nil {
 			s.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
@@ -89,12 +92,12 @@ func (s *SourceAPI) CreateVCSModule() http.Handler {
 			s.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		sourceRepo, err := genericStore.FetchVCSSource(vcs.OAuth.Token.AccessToken, repoName)
+		sourceRepo, err := genericStore.FetchVCSSource(vcsItem.OAuth.Token.AccessToken, repoName)
 		if err != nil {
 			s.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		module := sourceToModule(sourceRepo, reqBody.Provider, vcs.Organization, vcsConnID)
+		module := sourceToModule(sourceRepo, reqBody.Provider, vcsItem.Organization, vcsConnID)
 		s.ResponseHandler.Write(rw, module, http.StatusOK)
 	})
 }
@@ -104,7 +107,7 @@ func (s *SourceAPI) SetupRoutes() {
 	s.Router.Handle("/{vcsprovider}/{vcsconnid}/{reponame}", s.CreateVCSModule()).Methods(http.MethodPost)
 }
 
-func NewSourceAPI(router *mux.Router, path string, vcsconnstore types.VCSSConnectionStore, sourceProviders types.TerrariumSourceDriver, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *SourceAPI {
+func NewSourceAPI(router *mux.Router, path string, vcsconnstore vcs.VCSSConnectionStore, sourceProviders drivers.TerrariumSourceDriver, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *SourceAPI {
 	s := &SourceAPI{
 		Router:          router.PathPrefix(path).Subrouter(),
 		VCSStore:        vcsconnstore,

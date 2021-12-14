@@ -1,4 +1,4 @@
-package types
+package relationships
 
 type ResourceLink struct {
 	ID   interface{} `json:"id" bson:"_id"`

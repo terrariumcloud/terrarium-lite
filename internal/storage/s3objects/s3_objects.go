@@ -1,4 +1,4 @@
-package terrariums3
+package s3objects
 
 import (
 	"context"

@@ -19,11 +19,12 @@ import (
 	"log"
 
 	"github.com/dylanrhysscott/terrarium/api"
+
+	"github.com/dylanrhysscott/terrarium/internal/database/dynamo"
+	"github.com/dylanrhysscott/terrarium/internal/database/mongodb"
 	"github.com/dylanrhysscott/terrarium/internal/responder"
-	"github.com/dylanrhysscott/terrarium/internal/terrariumdynamo"
-	"github.com/dylanrhysscott/terrarium/internal/terrariummongo"
-	"github.com/dylanrhysscott/terrarium/internal/terrariums3"
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/internal/storage/s3objects"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/spf13/cobra"
 )
 
@@ -42,11 +43,11 @@ var moduleCmd = &cobra.Command{
 	Short: "Starts the Terrarium Module API",
 	Long:  `The Terrarium Module API allows users to manage Terraform modules in a private registry using Terrarium`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var driver types.TerrariumDatabaseDriver
-		var storage types.TerrariumStorageDriver
+		var driver drivers.TerrariumDatabaseDriver
+		var storage drivers.TerrariumStorageDriver
 		var err error
 		if databaseBackend == "mongo" {
-			driver, err = terrariummongo.New(databaseHost, databaseUser, databasePassword, databaseName)
+			driver, err = mongodb.New(databaseHost, databaseUser, databasePassword, databaseName)
 			if err != nil {
 				log.Fatalf("Error initialising database - %s", err.Error())
 			}
@@ -55,7 +56,7 @@ var moduleCmd = &cobra.Command{
 			if awsRegion == "" {
 				log.Fatal("Error: No AWS Region Set")
 			}
-			driver, err = terrariumdynamo.New(awsRegion)
+			driver, err = dynamo.New(awsRegion)
 			if err != nil {
 				log.Fatalf("Error initialising DynamoDB - %s", err.Error())
 			}
@@ -64,7 +65,7 @@ var moduleCmd = &cobra.Command{
 			if awsRegion == "" {
 				log.Fatal("Error: No AWS Region Set")
 			}
-			storage, err = terrariums3.New(awsRegion)
+			storage, err = s3objects.New(awsRegion)
 			if err != nil {
 				log.Fatalf("Error initialising S3 storage backend - %s", err.Error())
 			}

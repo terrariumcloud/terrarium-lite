@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
 	ghlib "github.com/google/go-github/v39/github"
 	"golang.org/x/oauth2"
 )
@@ -35,7 +35,7 @@ func (g *GithubBackend) init(ctx context.Context, token string) {
 // FetchVCSSource Accepts a Github OAuth token and a valid Github repo name. The Github API is queried
 // and a struct implementing the types.SourceData interface is returned. Typically this will then be
 // transformed into a Terraform compliant module document for storage in the database.
-func (g *GithubBackend) FetchVCSSource(token string, vcsRepoName string) (types.SourceData, error) {
+func (g *GithubBackend) FetchVCSSource(token string, vcsRepoName string) (vcs.SourceData, error) {
 	ctx := context.TODO()
 	g.init(ctx, token)
 	authenticated, _, err := g.client.Users.Get(ctx, "")

@@ -1,4 +1,4 @@
-package terrariumdynamo
+package dynamo
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
 )
 
 const orgNameIndex = "organization_index"
@@ -91,9 +91,9 @@ func (o *OrganizationBackend) Init() error {
 }
 
 // Create Adds a new organization to the organizations table
-func (o *OrganizationBackend) Create(name string, email string) (*types.Organization, error) {
+func (o *OrganizationBackend) Create(name string, email string) (*organizations.Organization, error) {
 	id := uuid.NewString()
-	org := &types.Organization{
+	org := &organizations.Organization{
 		ID:        id,
 		Name:      name,
 		Email:     email,
@@ -124,19 +124,19 @@ func (o *OrganizationBackend) Create(name string, email string) (*types.Organiza
 }
 
 // ReadAll Returns all organizations from the organizations table
-func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organization, error) {
+func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*organizations.Organization, error) {
 	// https://dynobase.dev/dynamodb-golang-query-examples/#pagination
 	ctx := context.TODO()
 	p := dynamodb.NewScanPaginator(o.Client, &dynamodb.ScanInput{
 		TableName: aws.String(o.TableName),
 	})
-	var orgs []*types.Organization
+	var orgs []*organizations.Organization
 	for p.HasMorePages() {
 		out, err := p.NextPage(ctx)
 		if err != nil {
 			return nil, err
 		}
-		var orgList []*types.Organization
+		var orgList []*organizations.Organization
 
 		err = attributevalue.UnmarshalListOfMaps(out.Items, &orgList)
 		if err != nil {
@@ -144,7 +144,7 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 		}
 		orgs = append(orgs, orgList...)
 	}
-	var finalOrgList []*types.Organization = orgs
+	var finalOrgList []*organizations.Organization = orgs
 	if offset+limit < len(orgs) {
 		finalOrgList = orgs[offset:limit]
 	}
@@ -152,7 +152,7 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 }
 
 // ReadOne Returns a single organization from the organizations table
-func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, error) {
+func (o *OrganizationBackend) ReadOne(orgName string) (*organizations.Organization, error) {
 	ctx := context.TODO()
 	org, err := o.Client.Query(ctx, &dynamodb.QueryInput{
 		KeyConditionExpression: aws.String("#n = :o"),
@@ -173,7 +173,7 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 	}
 
 	if org.Count > 0 {
-		finalOrg := &types.Organization{}
+		finalOrg := &organizations.Organization{}
 		err = attributevalue.UnmarshalMap(org.Items[0], &finalOrg)
 		if err != nil {
 			return nil, err
@@ -185,7 +185,7 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 }
 
 // Update Updates an organization in the organization table
-func (o *OrganizationBackend) Update(name string, email string) (*types.Organization, error) {
+func (o *OrganizationBackend) Update(name string, email string) (*organizations.Organization, error) {
 	org, err := o.ReadOne(name)
 	if err != nil {
 		return nil, err

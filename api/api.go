@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/dylanrhysscott/terrarium/internal/terrariumsource"
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/internal/sources"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -17,9 +18,9 @@ import (
 // Terrarium is a struct which contains methods for initialising the private Terraform Registry
 type Terrarium struct {
 	Port             int
-	DataStore        types.TerrariumDatabaseDriver
-	FileStore        types.TerrariumStorageDriver
-	Source           types.TerrariumSourceDriver
+	DataStore        drivers.TerrariumDatabaseDriver
+	FileStore        drivers.TerrariumStorageDriver
+	Source           drivers.TerrariumSourceDriver
 	OrganizationAPI  OrganizationAPIInterface
 	ModuleAPI        ModuleAPIInterface
 	VCSConnectionAPI VCSConnAPIInterface
@@ -27,8 +28,8 @@ type Terrarium struct {
 	SourceAPI        SourceAPIInterface
 	DiscoveryAPI     DiscoveryAPIInterface
 	Router           *mux.Router
-	Responder        types.APIResponseWriter
-	Errorer          types.APIErrorWriter
+	Responder        responses.APIResponseWriter
+	Errorer          responses.APIErrorWriter
 }
 
 // Serve starts the Terrarium Registry
@@ -53,12 +54,12 @@ func (t *Terrarium) Init() {
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes
-func NewTerrarium(port int, driver types.TerrariumDatabaseDriver, storageDriver types.TerrariumStorageDriver, responder types.APIResponseWriter, errorer types.APIErrorWriter) *Terrarium {
+func NewTerrarium(port int, driver drivers.TerrariumDatabaseDriver, storageDriver drivers.TerrariumStorageDriver, responder responses.APIResponseWriter, errorer responses.APIErrorWriter) *Terrarium {
 	return &Terrarium{
 		Port:      port,
 		DataStore: driver,
 		FileStore: storageDriver,
-		Source:    terrariumsource.NewTerrariumSourceDriver(),
+		Source:    sources.NewTerrariumSourceDriver(),
 		Router:    mux.NewRouter(),
 		Responder: responder,
 		Errorer:   errorer,

@@ -1,4 +1,4 @@
-package types
+package discovery
 
 type ServiceDiscoveryResponse struct {
 	LoginV1  *LoginConfig `json:"login.v1,omitempty"`

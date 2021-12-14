@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -21,10 +23,10 @@ type VCSConnAPIInterface interface {
 
 type VCSAPI struct {
 	Router            *mux.Router
-	OrganziationStore types.OrganizationStore
-	ErrorHandler      types.APIErrorWriter
-	ResponseHandler   types.APIResponseWriter
-	VCSStore          types.VCSSConnectionStore
+	OrganziationStore organizations.OrganizationStore
+	ErrorHandler      responses.APIErrorWriter
+	ResponseHandler   responses.APIResponseWriter
+	VCSStore          vcs.VCSSConnectionStore
 }
 
 // CreateVCSHandler is a handler for creating an organization VCS connection (POST)
@@ -41,7 +43,7 @@ func (v *VCSAPI) CreateVCSHandler() http.Handler {
 			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		link := &types.VCSOAuthClientLink{}
+		link := &vcs.VCSOAuthClientLink{}
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			v.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
@@ -118,7 +120,7 @@ func (v *VCSAPI) SetupRoutes() {
 
 // NewVCSAPI creates an instance of the VCS API with the reqired database
 // driver support
-func NewVCSAPI(router *mux.Router, path string, vcsconnstore types.VCSSConnectionStore, orgstore types.OrganizationStore, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *VCSAPI {
+func NewVCSAPI(router *mux.Router, path string, vcsconnstore vcs.VCSSConnectionStore, orgstore organizations.OrganizationStore, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *VCSAPI {
 	v := &VCSAPI{
 		Router:            router.PathPrefix(path).Subrouter(),
 		OrganziationStore: orgstore,

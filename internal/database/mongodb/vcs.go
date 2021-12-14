@@ -1,10 +1,11 @@
-package terrariummongo
+package mongodb
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/relationships"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,7 +19,7 @@ type VCSConnectionBackend struct {
 	Client         *mongo.Client
 }
 
-func stripVCSSecrets(connection *types.VCS) *types.VCS {
+func stripVCSSecrets(connection *vcs.VCS) *vcs.VCS {
 	connection.OAuth.ClientSecret = ""
 	connection.OAuth.Token = nil
 	return connection
@@ -30,7 +31,7 @@ func (v *VCSConnectionBackend) Init() error {
 }
 
 // Create Adds a new VCS to the VCS table
-func (v *VCSConnectionBackend) Create(orgID string, orgName string, link *types.VCSOAuthClientLink) (*types.VCS, error) {
+func (v *VCSConnectionBackend) Create(orgID string, orgName string, link *vcs.VCSOAuthClientLink) (*vcs.VCS, error) {
 	ctx := context.TODO()
 	oid, err := primitive.ObjectIDFromHex(orgID)
 	if err != nil {
@@ -38,9 +39,9 @@ func (v *VCSConnectionBackend) Create(orgID string, orgName string, link *types.
 	}
 	vcsID := primitive.NewObjectID()
 	link.CallbackURI = fmt.Sprintf("/oauth/github/%s/callback", vcsID.Hex())
-	vcsConnection := &types.VCS{
+	vcsConnection := &vcs.VCS{
 		ID: vcsID,
-		Organization: &types.ResourceLink{
+		Organization: &relationships.ResourceLink{
 			ID:   oid,
 			Link: fmt.Sprintf("/v1/organizations/%s", orgName),
 		},
@@ -54,7 +55,7 @@ func (v *VCSConnectionBackend) Create(orgID string, orgName string, link *types.
 }
 
 // ReadAll Returns all VCSs from the VCS table
-func (v *VCSConnectionBackend) ReadAll(limit int, offset int) ([]*types.VCS, error) {
+func (v *VCSConnectionBackend) ReadAll(limit int, offset int) ([]*vcs.VCS, error) {
 	// ctx := context.TODO()
 	// limitOpt := options.Find().SetLimit(int64(limit))
 	// skipOpt := options.Find().SetSkip(int64(offset))
@@ -66,9 +67,9 @@ func (v *VCSConnectionBackend) ReadAll(limit int, offset int) ([]*types.VCS, err
 }
 
 // ReadOne Returns a single VCS from the VCSs table
-func (v *VCSConnectionBackend) ReadOne(id string, showTokens bool) (*types.VCS, error) {
+func (v *VCSConnectionBackend) ReadOne(id string, showTokens bool) (*vcs.VCS, error) {
 	ctx := context.TODO()
-	vcs := &types.VCS{}
+	vcs := &vcs.VCS{}
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -90,12 +91,12 @@ func (v *VCSConnectionBackend) ReadOne(id string, showTokens bool) (*types.VCS, 
 }
 
 // Update Updates an VCS in the VCS table
-func (v *VCSConnectionBackend) Update(orgID string, orgName string, link *types.VCSOAuthClientLink) (*types.VCS, error) {
+func (v *VCSConnectionBackend) Update(orgID string, orgName string, link *vcs.VCSOAuthClientLink) (*vcs.VCS, error) {
 	return nil, nil
 }
 
 // UpdateVCSToken Updates the VCS OAuth Token in the database
-func (v *VCSConnectionBackend) UpdateVCSToken(clientID string, token *types.VCSToken) error {
+func (v *VCSConnectionBackend) UpdateVCSToken(clientID string, token *vcs.VCSToken) error {
 	ctx := context.TODO()
 	update := bson.M{
 		"$set": bson.M{

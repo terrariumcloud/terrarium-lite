@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/modules"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/gorilla/mux"
 )
 
@@ -29,9 +31,9 @@ type ModuleAPIInterface interface {
 type ModuleAPI struct {
 	Router          *mux.Router
 	ModuleStore     interface{}
-	FileStore       types.TerrariumStorageDriver
-	ErrorHandler    types.APIErrorWriter
-	ResponseHandler types.APIResponseWriter
+	FileStore       drivers.TerrariumStorageDriver
+	ErrorHandler    responses.APIErrorWriter
+	ResponseHandler responses.APIResponseWriter
 }
 
 func (m *ModuleAPI) CreateModuleHandler() http.Handler {
@@ -57,10 +59,10 @@ func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
 func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 	// TODO: Make this dynamic
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		vr := &types.ModuleVersionResponse{
-			Modules: []*types.ModuleVersions{
+		vr := &modules.ModuleVersionResponse{
+			Modules: []*modules.ModuleVersions{
 				{
-					Versions: []*types.ModuleVersionItem{
+					Versions: []*modules.ModuleVersionItem{
 						{
 							Version: "0.0.1",
 						},
@@ -126,7 +128,7 @@ func (m *ModuleAPI) SetupRoutes() {
 
 }
 
-func NewModuleAPI(router *mux.Router, path string, store interface{}, fileStore types.TerrariumStorageDriver, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *ModuleAPI {
+func NewModuleAPI(router *mux.Router, path string, store interface{}, fileStore drivers.TerrariumStorageDriver, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *ModuleAPI {
 	m := &ModuleAPI{
 		Router:          router.PathPrefix(path).Subrouter(),
 		ModuleStore:     store,

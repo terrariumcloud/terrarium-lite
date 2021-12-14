@@ -8,7 +8,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/dylanrhysscott/terrarium/pkg/types"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/gorilla/mux"
 )
 
@@ -45,9 +46,9 @@ type OrganizationAPIInterface interface {
 // OrganizationAPI is a struct implementing the handlers for the Organization API in Terrarium
 type OrganizationAPI struct {
 	Router            *mux.Router
-	OrganziationStore types.OrganizationStore
-	ErrorHandler      types.APIErrorWriter
-	ResponseHandler   types.APIResponseWriter
+	OrganziationStore organizations.OrganizationStore
+	ErrorHandler      responses.APIErrorWriter
+	ResponseHandler   responses.APIResponseWriter
 }
 
 // CreateOrganizationHandler is a handler for creating an organization (POST)
@@ -58,7 +59,7 @@ func (o *OrganizationAPI) CreateOrganizationHandler() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		org := &types.Organization{}
+		org := &organizations.Organization{}
 		err = json.Unmarshal(body, org)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
@@ -97,7 +98,7 @@ func (o *OrganizationAPI) UpdateOrganizationHandler() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusUnprocessableEntity)
 			return
 		}
-		org = &types.Organization{}
+		org = &organizations.Organization{}
 		err = json.Unmarshal(body, org)
 		if err != nil {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
@@ -177,7 +178,7 @@ func (o *OrganizationAPI) SetupRoutes(vcsAPI VCSConnAPIInterface) {
 
 // NewOrganizationAPI creates an instance of the organization API with the reqired database
 // driver support
-func NewOrganizationAPI(router *mux.Router, path string, store types.OrganizationStore, vcsAPI VCSConnAPIInterface, responseHandler types.APIResponseWriter, errorHandler types.APIErrorWriter) *OrganizationAPI {
+func NewOrganizationAPI(router *mux.Router, path string, store organizations.OrganizationStore, vcsAPI VCSConnAPIInterface, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *OrganizationAPI {
 	o := &OrganizationAPI{
 		Router:            router.PathPrefix(path).Subrouter(),
 		OrganziationStore: store,
