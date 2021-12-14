@@ -191,6 +191,14 @@ func (o *OrganizationBackend) Update(name string, email string) (*types.Organiza
 
 // Delete Removes an organization from the organization table
 func (o *OrganizationBackend) Delete(name string) error {
+	ctx := context.TODO()
+	_, err := o.Client.DeleteItem(ctx, &dynamodb.DeleteItemInput{
+		TableName:           &o.TableName,
+		ConditionExpression: aws.String("#n = :o"),
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
