@@ -144,7 +144,7 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 		Limit:                  aws.Int32(int32(1)),
 		TableName:              &o.TableName,
 		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
-			"#n": dynamodbtypes.AttributeValueMemberS{
+			"#n": &dynamodbtypes.AttributeValueMemberS{
 				Value: orgName,
 			},
 		},
