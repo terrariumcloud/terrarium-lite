@@ -28,7 +28,10 @@ func (d *TerrariumDynamoDB) Connect(ctx context.Context) error {
 
 // Organizations returns a DynamoDB compatible organization store which implements the OrganizationStore interface
 func (d *TerrariumDynamoDB) Organizations() types.OrganizationStore {
-	return nil
+	return &OrganizationBackend{
+		TableName: "terrarium_organizations",
+		Client:    d.Service,
+	}
 }
 
 // VCSConnections returns a DynamoDB compatible VCSConnection store which implements the VCSConnectionsStore interface
