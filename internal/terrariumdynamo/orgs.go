@@ -122,7 +122,7 @@ func (o *OrganizationBackend) ReadAll(limit int, offset int) ([]*types.Organizat
 		}
 		var orgList []*types.Organization
 
-		err = attributevalue.UnmarshalListOfMaps(out.Items, orgList)
+		err = attributevalue.UnmarshalListOfMaps(out.Items, &orgList)
 		if err != nil {
 			return nil, err
 		}
