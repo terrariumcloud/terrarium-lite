@@ -143,10 +143,8 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 		KeyConditionExpression: aws.String(fmt.Sprintf("#n = %s", orgName)),
 		Limit:                  aws.Int32(int32(1)),
 		TableName:              &o.TableName,
-		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
-			"#n": &dynamodbtypes.AttributeValueMemberS{
-				Value: orgName,
-			},
+		ExpressionAttributeNames: map[string]string{
+			"#n": "name",
 		},
 	})
 	if err != nil {
