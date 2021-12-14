@@ -1,6 +1,9 @@
 package vcs
 
-import "github.com/dylanrhysscott/terrarium/pkg/registry/data/relationships"
+import (
+	"github.com/dylanrhysscott/terrarium/pkg/registry/data/relationships"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/sources"
+)
 
 // VCS represents the VCS data structure stored in the database
 type VCS struct {
@@ -25,5 +28,5 @@ type VCSModule struct {
 	Description   string                      `json:"description"`
 	VCSConnection *relationships.ResourceLink `json:"vcs_connection"`
 	Organization  *relationships.ResourceLink `json:"organization"`
-	VCSRepo       SourceData                  `json:"vcs_repo"`
+	VCSRepo       sources.SourceData          `json:"vcs_repo"`
 }

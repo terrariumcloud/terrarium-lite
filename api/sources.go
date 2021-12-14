@@ -11,6 +11,8 @@ import (
 	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/sources"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"
 )
 
@@ -23,11 +25,11 @@ type SourceAPI struct {
 	Router          *mux.Router
 	ErrorHandler    responses.APIErrorWriter
 	ResponseHandler responses.APIResponseWriter
-	VCSStore        vcs.VCSSConnectionStore
+	VCSStore        stores.VCSSConnectionStore
 	SourceStore     drivers.TerrariumSourceDriver
 }
 
-func sourceToModule(data vcs.SourceData, provider string, orgLink *relationships.ResourceLink, vcsConnectionID string) *vcs.VCSModule {
+func sourceToModule(data sources.SourceData, provider string, orgLink *relationships.ResourceLink, vcsConnectionID string) *vcs.VCSModule {
 	return &vcs.VCSModule{
 		Name:        data.GetRepoName(),
 		Provider:    provider,
@@ -41,8 +43,8 @@ func sourceToModule(data vcs.SourceData, provider string, orgLink *relationships
 	}
 }
 
-func (s *SourceAPI) detectStoreType(t string) (vcs.SourceProvider, error) {
-	var genericStore vcs.SourceProvider = nil
+func (s *SourceAPI) detectStoreType(t string) (sources.SourceProvider, error) {
+	var genericStore sources.SourceProvider = nil
 	switch t {
 	case "github":
 		genericStore = s.SourceStore.GithubSources()
@@ -107,7 +109,7 @@ func (s *SourceAPI) SetupRoutes() {
 	s.Router.Handle("/{vcsprovider}/{vcsconnid}/{reponame}", s.CreateVCSModule()).Methods(http.MethodPost)
 }
 
-func NewSourceAPI(router *mux.Router, path string, vcsconnstore vcs.VCSSConnectionStore, sourceProviders drivers.TerrariumSourceDriver, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *SourceAPI {
+func NewSourceAPI(router *mux.Router, path string, vcsconnstore stores.VCSSConnectionStore, sourceProviders drivers.TerrariumSourceDriver, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *SourceAPI {
 	s := &SourceAPI{
 		Router:          router.PathPrefix(path).Subrouter(),
 		VCSStore:        vcsconnstore,

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/dylanrhysscott/terrarium/internal/sources"
+	"github.com/dylanrhysscott/terrarium/internal/sourcecontrol"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 
@@ -59,7 +59,7 @@ func NewTerrarium(port int, driver drivers.TerrariumDatabaseDriver, storageDrive
 		Port:      port,
 		DataStore: driver,
 		FileStore: storageDriver,
-		Source:    sources.NewTerrariumSourceDriver(),
+		Source:    sourcecontrol.NewTerrariumSourceDriver(),
 		Router:    mux.NewRouter(),
 		Responder: responder,
 		Errorer:   errorer,

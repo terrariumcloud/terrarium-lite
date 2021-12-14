@@ -6,8 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 )
 
 // TerrariumDynamoDB implements DynamoDB support for Terrarium for all API's
@@ -28,7 +27,7 @@ func (d *TerrariumDynamoDB) Connect(ctx context.Context) error {
 }
 
 // Organizations returns a DynamoDB compatible organization store which implements the OrganizationStore interface
-func (d *TerrariumDynamoDB) Organizations() organizations.OrganizationStore {
+func (d *TerrariumDynamoDB) Organizations() stores.OrganizationStore {
 	return &OrganizationBackend{
 		TableName: "terrarium_organizations",
 		Client:    d.Service,
@@ -36,7 +35,7 @@ func (d *TerrariumDynamoDB) Organizations() organizations.OrganizationStore {
 }
 
 // VCSConnections returns a DynamoDB compatible VCSConnection store which implements the VCSConnectionsStore interface
-func (d *TerrariumDynamoDB) VCSConnections() vcs.VCSSConnectionStore {
+func (d *TerrariumDynamoDB) VCSConnections() stores.VCSSConnectionStore {
 	return nil
 }
 

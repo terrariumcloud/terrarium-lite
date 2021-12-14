@@ -10,6 +10,7 @@ import (
 
 	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"
 )
 
@@ -46,7 +47,7 @@ type OrganizationAPIInterface interface {
 // OrganizationAPI is a struct implementing the handlers for the Organization API in Terrarium
 type OrganizationAPI struct {
 	Router            *mux.Router
-	OrganziationStore organizations.OrganizationStore
+	OrganziationStore stores.OrganizationStore
 	ErrorHandler      responses.APIErrorWriter
 	ResponseHandler   responses.APIResponseWriter
 }
@@ -178,7 +179,7 @@ func (o *OrganizationAPI) SetupRoutes(vcsAPI VCSConnAPIInterface) {
 
 // NewOrganizationAPI creates an instance of the organization API with the reqired database
 // driver support
-func NewOrganizationAPI(router *mux.Router, path string, store organizations.OrganizationStore, vcsAPI VCSConnAPIInterface, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *OrganizationAPI {
+func NewOrganizationAPI(router *mux.Router, path string, store stores.OrganizationStore, vcsAPI VCSConnAPIInterface, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *OrganizationAPI {
 	o := &OrganizationAPI{
 		Router:            router.PathPrefix(path).Subrouter(),
 		OrganziationStore: store,
