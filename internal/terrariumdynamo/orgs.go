@@ -193,7 +193,12 @@ func (o *OrganizationBackend) Update(name string, email string) (*types.Organiza
 func (o *OrganizationBackend) Delete(name string) error {
 	ctx := context.TODO()
 	_, err := o.Client.DeleteItem(ctx, &dynamodb.DeleteItemInput{
-		TableName:           &o.TableName,
+		TableName: &o.TableName,
+		Key: map[string]dynamodbtypes.AttributeValue{
+			":o": &dynamodbtypes.AttributeValueMemberS{
+				Value: name,
+			},
+		},
 		ConditionExpression: aws.String("#n = :o"),
 		ExpressionAttributeNames: map[string]string{
 			"#n": "name",
