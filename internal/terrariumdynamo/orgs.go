@@ -46,6 +46,9 @@ func getTableSchema(table string) *dynamodb.CreateTableInput {
 						KeyType:       "HASH",
 					},
 				},
+				Projection: &dynamodbtypes.Projection{
+					NonKeyAttributes: []string{"email", "created_at"},
+				},
 			},
 		},
 		TableName:   aws.String(table),
