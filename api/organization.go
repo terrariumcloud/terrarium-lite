@@ -126,6 +126,10 @@ func (o *OrganizationAPI) GetOrganizationHandler() http.Handler {
 			o.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
+		if org == nil {
+			o.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
+			return
+		}
 		o.ResponseHandler.Write(rw, org, http.StatusOK)
 	})
 }
