@@ -144,7 +144,7 @@ func (o *OrganizationBackend) ReadOne(orgName string) (*types.Organization, erro
 		Limit:                  aws.Int32(int32(1)),
 		TableName:              &o.TableName,
 		ExpressionAttributeNames: map[string]string{
-			"#n": orgName
+			"#n": orgName,
 		},
 	})
 	if err != nil {
