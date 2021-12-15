@@ -13,19 +13,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// ModuleAPIInterface specifies the required HTTP handlers for a Terrarium Modules API
-type ModuleAPIInterface interface {
-	CreateModuleHandler() http.Handler
-	GetModuleHandler() http.Handler
-	GetModuleVersionHandler() http.Handler
-	DownloadModuleHandler() http.Handler
-	ArchiveHandler() http.Handler
-	UpdateModuleHandler() http.Handler
-	ListModulesHandler() http.Handler
-	ListOrganizationModulesHandler() http.Handler
-	DeleteModuleHandler() http.Handler
-}
-
 // ModuleAPI is a struct implementing the handlers for the Module API in Terrarium
 // TODO: Implement Module Store
 type ModuleAPI struct {

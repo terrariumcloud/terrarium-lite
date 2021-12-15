@@ -9,6 +9,7 @@ import (
 
 	"github.com/dylanrhysscott/terrarium/internal/sourcecontrol"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/endpoints"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 
 	"github.com/gorilla/handlers"
@@ -21,12 +22,12 @@ type Terrarium struct {
 	DataStore        drivers.TerrariumDatabaseDriver
 	FileStore        drivers.TerrariumStorageDriver
 	Source           drivers.TerrariumSourceDriver
-	OrganizationAPI  OrganizationAPIInterface
-	ModuleAPI        ModuleAPIInterface
-	VCSConnectionAPI VCSConnAPIInterface
-	OAuthAPI         OAuthAPIInterface
-	SourceAPI        SourceAPIInterface
-	DiscoveryAPI     DiscoveryAPIInterface
+	OrganizationAPI  endpoints.OrganizationAPIInterface
+	ModuleAPI        endpoints.ModuleAPIInterface
+	VCSConnectionAPI endpoints.VCSConnAPIInterface
+	OAuthAPI         endpoints.OAuthAPIInterface
+	SourceAPI        endpoints.SourceAPIInterface
+	DiscoveryAPI     endpoints.DiscoveryAPIInterface
 	Router           *mux.Router
 	Responder        responses.APIResponseWriter
 	Errorer          responses.APIErrorWriter

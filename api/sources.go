@@ -16,11 +16,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type SourceAPIInterface interface {
-	SetupRoutes()
-	CreateVCSModule() http.Handler
-}
-
 type SourceAPI struct {
 	Router          *mux.Router
 	ErrorHandler    responses.APIErrorWriter

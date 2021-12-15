@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/endpoints"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"
@@ -33,15 +34,6 @@ func extractLimitAndOffset(qs url.Values) (int, int, error) {
 		offset = i
 	}
 	return limit, offset, nil
-}
-
-// OrganizationAPIInterface specifies the required HTTP handlers for a Terrarium Organizations API
-type OrganizationAPIInterface interface {
-	CreateOrganizationHandler() http.Handler
-	GetOrganizationHandler() http.Handler
-	UpdateOrganizationHandler() http.Handler
-	ListOrganizationsHandler() http.Handler
-	DeleteOrganizationHandler() http.Handler
 }
 
 // OrganizationAPI is a struct implementing the handlers for the Organization API in Terrarium
@@ -166,7 +158,7 @@ func (o *OrganizationAPI) DeleteOrganizationHandler() http.Handler {
 }
 
 // setupOrganizationRoutes configures the organization API subrouter
-func (o *OrganizationAPI) SetupRoutes(vcsAPI VCSConnAPIInterface) {
+func (o *OrganizationAPI) SetupRoutes(vcsAPI endpoints.VCSConnAPIInterface) {
 	o.Router.StrictSlash(true)
 	o.Router.Handle("/", o.ListOrganizationsHandler()).Methods(http.MethodGet)
 	o.Router.Handle("/", o.CreateOrganizationHandler()).Methods(http.MethodPost)
@@ -179,7 +171,7 @@ func (o *OrganizationAPI) SetupRoutes(vcsAPI VCSConnAPIInterface) {
 
 // NewOrganizationAPI creates an instance of the organization API with the reqired database
 // driver support
-func NewOrganizationAPI(router *mux.Router, path string, store stores.OrganizationStore, vcsAPI VCSConnAPIInterface, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *OrganizationAPI {
+func NewOrganizationAPI(router *mux.Router, path string, store stores.OrganizationStore, vcsAPI endpoints.VCSConnAPIInterface, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *OrganizationAPI {
 	o := &OrganizationAPI{
 		Router:            router.PathPrefix(path).Subrouter(),
 		OrganziationStore: store,

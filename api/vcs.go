@@ -13,14 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type VCSConnAPIInterface interface {
-	CreateVCSHandler() http.Handler
-	GetVCSHandler() http.Handler
-	UpdateVCSHandler() http.Handler
-	ListVCSHandler() http.Handler
-	DeleteVCSHandler() http.Handler
-}
-
 type VCSAPI struct {
 	Router            *mux.Router
 	OrganziationStore stores.OrganizationStore

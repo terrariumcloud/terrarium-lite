@@ -14,10 +14,6 @@ type DiscoveryAPI struct {
 	ModuleEndpoint  string
 }
 
-type DiscoveryAPIInterface interface {
-	DiscoveryHandler() http.Handler
-}
-
 func (d *DiscoveryAPI) DiscoveryHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		resp := &discovery.ServiceDiscoveryResponse{

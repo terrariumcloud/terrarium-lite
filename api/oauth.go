@@ -13,12 +13,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type OAuthAPIInterface interface {
-	SetupRoutes()
-	LoginHandler() http.Handler
-	GithubCallbackHandler() http.Handler
-}
-
 type OAuthAPI struct {
 	Router          *mux.Router
 	ErrorHandler    responses.APIErrorWriter
