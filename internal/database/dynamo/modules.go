@@ -170,7 +170,6 @@ func (m *ModuleBackend) ReadModuleVersions(orgName string, moduleName string, pr
 		ExpressionAttributeNames: map[string]string{
 			"#o": "organization",
 			"#n": "name",
-			"#p": "provider",
 		},
 		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
 			":o": &dynamodbtypes.AttributeValueMemberS{
@@ -178,9 +177,6 @@ func (m *ModuleBackend) ReadModuleVersions(orgName string, moduleName string, pr
 			},
 			":n": &dynamodbtypes.AttributeValueMemberS{
 				Value: moduleName,
-			},
-			":p": &dynamodbtypes.AttributeValueMemberS{
-				Value: providerName,
 			},
 		},
 		FilterExpression: aws.String(fmt.Sprintf("provider = %s", providerName)),
