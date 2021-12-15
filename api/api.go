@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/dylanrhysscott/terrarium/internal/sourcecontrol"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/endpoints"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
@@ -55,12 +54,12 @@ func (t *Terrarium) Init() {
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes
-func NewTerrarium(port int, driver drivers.TerrariumDatabaseDriver, storageDriver drivers.TerrariumStorageDriver, responder responses.APIResponseWriter, errorer responses.APIErrorWriter) *Terrarium {
+func NewTerrarium(port int, driver drivers.TerrariumDatabaseDriver, storageDriver drivers.TerrariumStorageDriver, sourceDriver drivers.TerrariumSourceDriver, responder responses.APIResponseWriter, errorer responses.APIErrorWriter) *Terrarium {
 	return &Terrarium{
 		Port:      port,
 		DataStore: driver,
 		FileStore: storageDriver,
-		Source:    sourcecontrol.NewTerrariumSourceDriver(),
+		Source:    sourceDriver,
 		Router:    mux.NewRouter(),
 		Responder: responder,
 		Errorer:   errorer,

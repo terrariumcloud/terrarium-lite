@@ -23,6 +23,7 @@ import (
 	"github.com/dylanrhysscott/terrarium/internal/database/dynamo"
 	"github.com/dylanrhysscott/terrarium/internal/database/mongodb"
 	"github.com/dylanrhysscott/terrarium/internal/responder"
+	"github.com/dylanrhysscott/terrarium/internal/sourcecontrol"
 	"github.com/dylanrhysscott/terrarium/internal/storage/s3objects"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/spf13/cobra"
@@ -76,7 +77,8 @@ var moduleCmd = &cobra.Command{
 		if storage == nil {
 			log.Fatalf("Unsupported storage driver: %s", storageBackend)
 		}
-		terrarium := api.NewTerrarium(3000, driver, storage, &responder.TerrariumAPIResponseWriter{}, &responder.TerrariumAPIErrorHandler{})
+		source := &sourcecontrol.TerrariumSourceControl{}
+		terrarium := api.NewTerrarium(3000, driver, storage, source, &responder.TerrariumAPIResponseWriter{}, &responder.TerrariumAPIErrorHandler{})
 		err = terrarium.Serve()
 		if err != nil {
 			log.Fatal(err)
