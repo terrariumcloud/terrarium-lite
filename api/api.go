@@ -46,7 +46,7 @@ func (t *Terrarium) Init() {
 	t.OAuthAPI = NewOAuthAPI(t.Router, "/oauth", t.DataStore.VCSConnections(), t.Responder, t.Errorer)
 	t.SourceAPI = NewSourceAPI(t.Router, "/v1/sources", t.DataStore.VCSConnections(), t.Source, t.Responder, t.Errorer)
 	t.OrganizationAPI = NewOrganizationAPI(t.Router, "/v1/organizations", t.DataStore.Organizations(), t.VCSConnectionAPI, t.Responder, t.Errorer)
-	t.ModuleAPI = NewModuleAPI(t.Router, "/v1/modules", nil, t.FileStore, t.Responder, t.Errorer)
+	t.ModuleAPI = NewModuleAPI(t.Router, "/v1/modules", t.DataStore.Modules(), t.FileStore, t.Responder, t.Errorer)
 	// TODO: Should this be it's own binary / sub command?
 	t.DiscoveryAPI = NewDiscoveryAPI(nil, "/v1/modules", t.Responder, t.Errorer)
 	// Register discovery route for Terraform native discovery

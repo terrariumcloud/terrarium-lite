@@ -6,13 +6,13 @@ import (
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/data/modules"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 )
 
-const versionIndex string = "module_version_index"
 const allModuleVersionIndex string = "all_module_versions_index"
 
 // ModuleBackend is a struct that implements Mongo operations for Modules
@@ -112,7 +112,29 @@ func (m *ModuleBackend) Create(name string, email string) (*modules.Module, erro
 
 // ReadAll Returns all Modules from the Modules table
 func (m *ModuleBackend) ReadAll(limit int, offset int) ([]*modules.Module, error) {
-	return nil, nil
+	ctx := context.TODO()
+	p := dynamodb.NewScanPaginator(m.Client, &dynamodb.ScanInput{
+		TableName: aws.String(m.TableName),
+	})
+	var terraformModules []*modules.Module
+	for p.HasMorePages() {
+		out, err := p.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+		var moduleList []*modules.Module
+
+		err = attributevalue.UnmarshalListOfMaps(out.Items, &moduleList)
+		if err != nil {
+			return nil, err
+		}
+		terraformModules = append(terraformModules, moduleList...)
+	}
+	var finalModuleList []*modules.Module = terraformModules
+	if offset+limit < len(terraformModules) {
+		finalModuleList = terraformModules[offset:limit]
+	}
+	return finalModuleList, nil
 }
 
 // ReadOne Returns a single module from the Modules table

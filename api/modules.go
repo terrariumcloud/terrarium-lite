@@ -10,6 +10,7 @@ import (
 	"github.com/dylanrhysscott/terrarium/pkg/registry/data/modules"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
+	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"
 )
 
@@ -17,7 +18,7 @@ import (
 // TODO: Implement Module Store
 type ModuleAPI struct {
 	Router          *mux.Router
-	ModuleStore     interface{}
+	ModuleStore     stores.ModuleStore
 	FileStore       drivers.TerrariumStorageDriver
 	ErrorHandler    responses.APIErrorWriter
 	ResponseHandler responses.APIResponseWriter
@@ -71,7 +72,19 @@ func (m *ModuleAPI) UpdateModuleHandler() http.Handler {
 
 func (m *ModuleAPI) ListModulesHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		limit, offset, err := extractLimitAndOffset(r.URL.Query())
+		if err != nil {
+			m.ErrorHandler.Write(rw, err, http.StatusBadRequest)
+			return
+		}
+		// Query organization store for all orgs using limit and offset
+		orgs, err := m.ModuleStore.ReadAll(limit, offset)
+		if err != nil {
+			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		// We have the orgs now return a 200
+		m.ResponseHandler.Write(rw, orgs, http.StatusOK)
 	})
 }
 
@@ -115,7 +128,7 @@ func (m *ModuleAPI) SetupRoutes() {
 
 }
 
-func NewModuleAPI(router *mux.Router, path string, store interface{}, fileStore drivers.TerrariumStorageDriver, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *ModuleAPI {
+func NewModuleAPI(router *mux.Router, path string, store stores.ModuleStore, fileStore drivers.TerrariumStorageDriver, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *ModuleAPI {
 	m := &ModuleAPI{
 		Router:          router.PathPrefix(path).Subrouter(),
 		ModuleStore:     store,
