@@ -1,17 +1,14 @@
 package modules
 
-import (
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/relationships"
-)
-
 type Module struct {
-	ID           string                      `json:"_id"`
-	Name         string                      `json:"name"`
-	Provider     string                      `json:"provider"`
-	Version      string                      `json:"version"`
-	Description  string                      `json:"description"`
-	Source       string                      `json:"source"`
-	Organization *relationships.ResourceLink `json:"organization"`
+	ID             string `json:"_id" dynamodbav:"_id"`
+	OrganizationID string `json:"_organization_id" dynamodbav:"_organization_id"`
+	Name           string `json:"name" dynamodbav:"name"`
+	Organization   string `json:"organization" dynamodbav:"organization"`
+	Provider       string `json:"provider" dynamodbav:"provider"`
+	Version        string `json:"version" dynamodbav:"version"`
+	Description    string `json:"description" dynamodbav:"description"`
+	Source         string `json:"source" dynamodbav:"source"`
 }
 
 type ModuleVersionItem struct {
