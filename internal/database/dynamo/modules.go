@@ -167,7 +167,7 @@ func (m *ModuleBackend) ReadOrganizationModules(orgName string, limit int, offse
 		IndexName:              aws.String(orgModulesIndex),
 		KeyConditionExpression: aws.String("#n = :o"),
 		ExpressionAttributeNames: map[string]string{
-			"#n": "name",
+			"#n": "organization",
 		},
 		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
 			":o": &dynamodbtypes.AttributeValueMemberS{
