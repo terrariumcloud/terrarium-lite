@@ -41,14 +41,6 @@ func (m *ModuleBackend) getTableSchema(table string) *dynamodb.CreateTableInput 
 				AttributeName: aws.String("name"),
 				AttributeType: dynamodbtypes.ScalarAttributeTypeS,
 			},
-			{
-				AttributeName: aws.String("provider"),
-				AttributeType: dynamodbtypes.ScalarAttributeTypeS,
-			},
-			{
-				AttributeName: aws.String("version"),
-				AttributeType: dynamodbtypes.ScalarAttributeTypeS,
-			},
 		},
 		KeySchema: []dynamodbtypes.KeySchemaElement{
 			{
@@ -70,38 +62,6 @@ func (m *ModuleBackend) getTableSchema(table string) *dynamodb.CreateTableInput 
 					},
 					{
 						AttributeName: aws.String("name"),
-						KeyType:       "RANGE",
-					},
-					{
-						AttributeName: aws.String("provider"),
-						KeyType:       "RANGE",
-					},
-				},
-				Projection: &dynamodbtypes.Projection{
-					ProjectionType: dynamodbtypes.ProjectionTypeAll,
-				},
-				ProvisionedThroughput: &dynamodbtypes.ProvisionedThroughput{
-					ReadCapacityUnits:  aws.Int64(1),
-					WriteCapacityUnits: aws.Int64(1),
-				},
-			},
-			{
-				IndexName: aws.String(versionIndex),
-				KeySchema: []dynamodbtypes.KeySchemaElement{
-					{
-						AttributeName: aws.String("organization"),
-						KeyType:       "RANGE",
-					},
-					{
-						AttributeName: aws.String("name"),
-						KeyType:       "RANGE",
-					},
-					{
-						AttributeName: aws.String("provider"),
-						KeyType:       "RANGE",
-					},
-					{
-						AttributeName: aws.String("version"),
 						KeyType:       "RANGE",
 					},
 				},
