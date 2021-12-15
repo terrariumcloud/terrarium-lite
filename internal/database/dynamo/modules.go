@@ -57,11 +57,11 @@ func (m *ModuleBackend) getTableSchema(table string) *dynamodb.CreateTableInput 
 				IndexName: aws.String(allModuleVersionIndex),
 				KeySchema: []dynamodbtypes.KeySchemaElement{
 					{
-						AttributeName: aws.String("name"),
+						AttributeName: aws.String("organization"),
 						KeyType:       "HASH",
 					},
 					{
-						AttributeName: aws.String("organization"),
+						AttributeName: aws.String("name"),
 						KeyType:       "RANGE",
 					},
 				},
