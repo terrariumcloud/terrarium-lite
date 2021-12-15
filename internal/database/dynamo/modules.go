@@ -3,6 +3,7 @@ package dynamo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -182,7 +183,7 @@ func (m *ModuleBackend) ReadModuleVersions(orgName string, moduleName string, pr
 				Value: providerName,
 			},
 		},
-		FilterExpression: aws.String("#p = :p"),
+		FilterExpression: aws.String(fmt.Sprintf("provider = %s", providerName)),
 	})
 	var terraformModules []*modules.Module
 	for p.HasMorePages() {
