@@ -22,6 +22,7 @@ type OrganizationStore interface {
 type ModuleStore interface {
 	Init() error
 	ReadAll(limit int, offset int) ([]*modules.Module, error)
+	ReadOrganizationModules(orgName string, limit int, offset int) ([]*modules.Module, error)
 	ReadOne(name string) (*modules.Module, error)
 }
 

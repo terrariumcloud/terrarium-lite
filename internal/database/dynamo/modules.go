@@ -13,6 +13,7 @@ import (
 	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 )
 
+const orgModulesIndex string = "organization_module_index"
 const allModuleVersionIndex string = "all_module_versions_index"
 
 // ModuleBackend is a struct that implements Mongo operations for Modules
@@ -63,6 +64,22 @@ func (m *ModuleBackend) getTableSchema(table string) *dynamodb.CreateTableInput 
 					{
 						AttributeName: aws.String("name"),
 						KeyType:       "RANGE",
+					},
+				},
+				Projection: &dynamodbtypes.Projection{
+					ProjectionType: dynamodbtypes.ProjectionTypeAll,
+				},
+				ProvisionedThroughput: &dynamodbtypes.ProvisionedThroughput{
+					ReadCapacityUnits:  aws.Int64(1),
+					WriteCapacityUnits: aws.Int64(1),
+				},
+			},
+			{
+				IndexName: aws.String(orgModulesIndex),
+				KeySchema: []dynamodbtypes.KeySchemaElement{
+					{
+						AttributeName: aws.String("organization"),
+						KeyType:       "HASH",
 					},
 				},
 				Projection: &dynamodbtypes.Projection{
@@ -140,6 +157,43 @@ func (m *ModuleBackend) ReadAll(limit int, offset int) ([]*modules.Module, error
 // ReadOne Returns a single module from the Modules table
 func (m *ModuleBackend) ReadOne(orgName string) (*modules.Module, error) {
 	return nil, nil
+}
+
+// ReadOrganizationModules Returns a list of organization modules
+func (m *ModuleBackend) ReadOrganizationModules(orgName string, limit int, offset int) ([]*modules.Module, error) {
+	ctx := context.TODO()
+	p := dynamodb.NewQueryPaginator(m.Client, &dynamodb.QueryInput{
+		TableName:              aws.String(m.TableName),
+		IndexName:              aws.String(orgNameIndex),
+		KeyConditionExpression: aws.String("#n = :o"),
+		ExpressionAttributeNames: map[string]string{
+			"#n": "name",
+		},
+		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
+			":o": &dynamodbtypes.AttributeValueMemberS{
+				Value: orgName,
+			},
+		},
+	})
+	var terraformModules []*modules.Module
+	for p.HasMorePages() {
+		out, err := p.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+		var moduleList []*modules.Module
+
+		err = attributevalue.UnmarshalListOfMaps(out.Items, &moduleList)
+		if err != nil {
+			return nil, err
+		}
+		terraformModules = append(terraformModules, moduleList...)
+	}
+	var finalModuleList []*modules.Module = terraformModules
+	if offset+limit < len(terraformModules) {
+		finalModuleList = terraformModules[offset:limit]
+	}
+	return finalModuleList, nil
 }
 
 // Update Updates an module in the module table

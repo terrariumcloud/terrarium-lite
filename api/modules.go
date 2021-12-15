@@ -77,20 +77,30 @@ func (m *ModuleAPI) ListModulesHandler() http.Handler {
 			m.ErrorHandler.Write(rw, err, http.StatusBadRequest)
 			return
 		}
-		// Query organization store for all orgs using limit and offset
-		orgs, err := m.ModuleStore.ReadAll(limit, offset)
+		modules, err := m.ModuleStore.ReadAll(limit, offset)
 		if err != nil {
 			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		// We have the orgs now return a 200
-		m.ResponseHandler.Write(rw, orgs, http.StatusOK)
+		m.ResponseHandler.Write(rw, modules, http.StatusOK)
 	})
 }
 
 func (m *ModuleAPI) ListOrganizationModulesHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		params := mux.Vars(r)
+		orgName := params["organization_name"]
+		limit, offset, err := extractLimitAndOffset(r.URL.Query())
+		if err != nil {
+			m.ErrorHandler.Write(rw, err, http.StatusBadRequest)
+			return
+		}
+		modules, err := m.ModuleStore.ReadOrganizationModules(orgName, limit, offset)
+		if err != nil {
+			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		m.ResponseHandler.Write(rw, modules, http.StatusOK)
 	})
 }
 
