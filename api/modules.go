@@ -54,8 +54,6 @@ func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
-		log.Println("Versions handler")
-		log.Printf("%v", modules)
 		m.ResponseHandler.Write(rw, modules, http.StatusOK)
 		// vr := &modules.ModuleVersionResponse{
 		// 	Modules: []*modules.ModuleVersions{
