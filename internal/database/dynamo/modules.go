@@ -164,7 +164,7 @@ func (m *ModuleBackend) ReadOrganizationModules(orgName string, limit int, offse
 	ctx := context.TODO()
 	p := dynamodb.NewQueryPaginator(m.Client, &dynamodb.QueryInput{
 		TableName:              aws.String(m.TableName),
-		IndexName:              aws.String(orgNameIndex),
+		IndexName:              aws.String(orgModulesIndex),
 		KeyConditionExpression: aws.String("#n = :o"),
 		ExpressionAttributeNames: map[string]string{
 			"#n": "name",
