@@ -165,7 +165,7 @@ func (m *ModuleBackend) ReadModuleVersions(orgName string, moduleName string, pr
 	p := dynamodb.NewQueryPaginator(m.Client, &dynamodb.QueryInput{
 		TableName:              aws.String(m.TableName),
 		IndexName:              aws.String(orgModulesIndex),
-		KeyConditionExpression: aws.String("#o = :o AND #n = :n AND #p = :p"),
+		KeyConditionExpression: aws.String("#o = :o AND #n = :n"),
 		ExpressionAttributeNames: map[string]string{
 			"#o": "organization",
 			"#n": "name",
@@ -182,6 +182,7 @@ func (m *ModuleBackend) ReadModuleVersions(orgName string, moduleName string, pr
 				Value: providerName,
 			},
 		},
+		FilterExpression: aws.String("#p = :p"),
 	})
 	var terraformModules []*modules.Module
 	for p.HasMorePages() {
