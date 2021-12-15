@@ -23,7 +23,7 @@ type OrganizationBackend struct {
 	Client    *dynamodb.Client
 }
 
-func getTableSchema(table string) *dynamodb.CreateTableInput {
+func (o *OrganizationBackend) getTableSchema(table string) *dynamodb.CreateTableInput {
 	return &dynamodb.CreateTableInput{
 		AttributeDefinitions: []dynamodbtypes.AttributeDefinition{
 			{
@@ -78,7 +78,7 @@ func (o *OrganizationBackend) Init() error {
 		var notFoundErr *dynamodbtypes.ResourceNotFoundException
 		if errors.As(err, &notFoundErr) {
 			log.Printf("Creating DynamoDB Table: %s", o.TableName)
-			_, err = o.Client.CreateTable(ctx, getTableSchema(o.TableName))
+			_, err = o.Client.CreateTable(ctx, o.getTableSchema(o.TableName))
 			if err != nil {
 				return err
 			}

@@ -42,6 +42,11 @@ func (m *TerrariumMongo) Organizations() stores.OrganizationStore {
 	}
 }
 
+// Modules returns a Mongo compatible ModuleBackend store which implements the VCSConnectionsStore interface
+func (m *TerrariumMongo) Modules() stores.ModuleStore {
+	return nil
+}
+
 // VCSConnections returns a Mongo compatible VCSConnection store which implements the VCSConnectionsStore interface
 func (m *TerrariumMongo) VCSConnections() stores.VCSSConnectionStore {
 	return &VCSConnectionBackend{

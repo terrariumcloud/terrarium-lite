@@ -34,6 +34,14 @@ func (d *TerrariumDynamoDB) Organizations() stores.OrganizationStore {
 	}
 }
 
+// Modules returns a DynamoDB compatible module store which implements the ModuleStore interface
+func (d *TerrariumDynamoDB) Modules() stores.ModuleStore {
+	return &ModuleBackend{
+		TableName: "terrarium_modules",
+		Client:    d.Service,
+	}
+}
+
 // VCSConnections returns a DynamoDB compatible VCSConnection store which implements the VCSConnectionsStore interface
 func (d *TerrariumDynamoDB) VCSConnections() stores.VCSSConnectionStore {
 	return nil
@@ -49,6 +57,10 @@ func New(region string) (*TerrariumDynamoDB, error) {
 		return nil, err
 	}
 	err = driver.Organizations().Init()
+	if err != nil {
+		return nil, err
+	}
+	err = driver.Modules().Init()
 	if err != nil {
 		return nil, err
 	}

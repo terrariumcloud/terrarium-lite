@@ -14,6 +14,7 @@ import (
 type TerrariumDatabaseDriver interface {
 	Connect(ctx context.Context) error
 	Organizations() stores.OrganizationStore
+	Modules() stores.ModuleStore
 	VCSConnections() stores.VCSSConnectionStore
 }
 
