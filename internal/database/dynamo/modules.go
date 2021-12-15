@@ -49,7 +49,7 @@ func (m *ModuleBackend) getTableSchema(table string) *dynamodb.CreateTableInput 
 			},
 			{
 				AttributeName: aws.String("_organization_id"),
-				KeyType:       "HASH",
+				KeyType:       "RANGE",
 			},
 		},
 		GlobalSecondaryIndexes: []dynamodbtypes.GlobalSecondaryIndex{
