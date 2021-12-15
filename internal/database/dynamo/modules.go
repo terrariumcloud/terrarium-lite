@@ -159,6 +159,48 @@ func (m *ModuleBackend) ReadOne(orgName string) (*modules.Module, error) {
 	return nil, nil
 }
 
+// ReadModuleVersions Returns all versions of a given module from the Modules table
+func (m *ModuleBackend) ReadModuleVersions(orgName string, moduleName string, providerName string) ([]*modules.Module, error) {
+	ctx := context.TODO()
+	p := dynamodb.NewQueryPaginator(m.Client, &dynamodb.QueryInput{
+		TableName:              aws.String(m.TableName),
+		IndexName:              aws.String(orgModulesIndex),
+		KeyConditionExpression: aws.String("#o = :o AND #n = :n AND #p = :p"),
+		ExpressionAttributeNames: map[string]string{
+			"#o": "organization",
+			"#n": "name",
+			"#p": "provider",
+		},
+		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
+			":o": &dynamodbtypes.AttributeValueMemberS{
+				Value: orgName,
+			},
+			":n": &dynamodbtypes.AttributeValueMemberS{
+				Value: moduleName,
+			},
+			":p": &dynamodbtypes.AttributeValueMemberS{
+				Value: providerName,
+			},
+		},
+	})
+	var terraformModules []*modules.Module
+	for p.HasMorePages() {
+		out, err := p.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+		var moduleList []*modules.Module
+
+		err = attributevalue.UnmarshalListOfMaps(out.Items, &moduleList)
+		if err != nil {
+			return nil, err
+		}
+		terraformModules = append(terraformModules, moduleList...)
+	}
+
+	return terraformModules, nil
+}
+
 // ReadOrganizationModules Returns a list of organization modules
 func (m *ModuleBackend) ReadOrganizationModules(orgName string, limit int, offset int) ([]*modules.Module, error) {
 	ctx := context.TODO()

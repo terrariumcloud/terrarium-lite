@@ -2,12 +2,10 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/modules"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
@@ -47,20 +45,30 @@ func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
 func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 	// TODO: Make this dynamic
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		vr := &modules.ModuleVersionResponse{
-			Modules: []*modules.ModuleVersions{
-				{
-					Versions: []*modules.ModuleVersionItem{
-						{
-							Version: "0.0.1",
-						},
-					},
-				},
-			},
+		params := mux.Vars(r)
+		orgName := params["organization_name"]
+		moduleName := params["name"]
+		providerName := params["provider"]
+		modules, err := m.ModuleStore.ReadModuleVersions(orgName, moduleName, providerName)
+		if err != nil {
+			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
 		}
-		data, _ := json.Marshal(vr)
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Write(data)
+		m.ResponseHandler.Write(rw, modules, http.StatusOK)
+		// vr := &modules.ModuleVersionResponse{
+		// 	Modules: []*modules.ModuleVersions{
+		// 		{
+		// 			Versions: []*modules.ModuleVersionItem{
+		// 				{
+		// 					Version: "0.0.1",
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// }
+		// data, _ := json.Marshal(vr)
+		// rw.Header().Add("Content-Type", "application/json")
+		// rw.Write(data)
 	})
 }
 
