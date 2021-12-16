@@ -31,7 +31,20 @@ func (m *ModuleAPI) CreateModuleHandler() http.Handler {
 
 func (m *ModuleAPI) GetModuleHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
+		params := mux.Vars(r)
+		orgName := params["organization_name"]
+		moduleName := params["name"]
+		providerName := params["provider"]
+		module, err := m.ModuleStore.ReadOne(orgName, moduleName, providerName)
+		if err != nil {
+			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		if module == nil {
+			m.ErrorHandler.Write(rw, errors.New("module not found"), http.StatusNotFound)
+			return
+		}
+		m.ResponseHandler.Write(rw, module, http.StatusOK)
 	})
 }
 
