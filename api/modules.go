@@ -53,6 +53,10 @@ func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
+		if len(moduleItems) == 0 {
+			m.ErrorHandler.Write(rw, errors.New("module not found"), http.StatusNotFound)
+			return
+		}
 		var versions []*modules.ModuleVersionItem
 		for _, moduleItem := range moduleItems {
 			versions = append(versions, &modules.ModuleVersionItem{
