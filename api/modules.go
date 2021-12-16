@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// ModuleAPI is a struct implementing the handlers for the Module API in Terrarium
+// ModuleAPI is a struct implementing the handlers for the ModuleAPIInterface from the endpoints package in Terrarium
 type ModuleAPI struct {
 	Router          *mux.Router
 	ModuleStore     stores.ModuleStore
@@ -23,12 +23,15 @@ type ModuleAPI struct {
 	ResponseHandler responses.APIResponseWriter
 }
 
+// TODO: Not yet implemented
 func (m *ModuleAPI) CreateModuleHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 
 	})
 }
 
+// GetModuleHandler Handles an API request to fetch a single module via organization name, module name and provider.
+// This will return the module from the backend if found or 404 if the module or organization doesn't exist
 func (m *ModuleAPI) GetModuleHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
@@ -48,6 +51,8 @@ func (m *ModuleAPI) GetModuleHandler() http.Handler {
 	})
 }
 
+// DownloadModuleHandler will return a header indicating where the requesting CLI can download module content from
+// This handler complies with the following implementation from the module protocol https://www.terraform.io/internals/module-registry-protocol#download-source-code-for-a-specific-module-version
 func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Add("X-Terraform-Get", "./archive?archive=zip")
@@ -55,6 +60,10 @@ func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
 	})
 }
 
+// GetModuleVersionHandler will return a list of available versions for a given module.
+// This signifies to the requesting CLI if that module is available to consume from the registry.
+// Will return a 404 if a non existent organization and/or module is requested.
+// This handler complies with the following implementation from the module protocol https://www.terraform.io/internals/module-registry-protocol#download-source-code-for-a-specific-module-version
 func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
@@ -64,6 +73,10 @@ func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 		moduleItems, err := m.ModuleStore.ReadModuleVersions(orgName, moduleName, providerName)
 		if err != nil {
 			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
+			return
+		}
+		if moduleItems == nil {
+			m.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
 			return
 		}
 		if len(moduleItems) == 0 {
@@ -163,6 +176,10 @@ func (m *ModuleAPI) ArchiveHandler() http.Handler {
 	})
 }
 
+// SetupRoutes Sets up the various endpoints for the modules API by registering handlers from this struct to it's
+// corresponding routes. This will register the routes required by the module registry protocol as defined here https://www.terraform.io/internals/module-registry-protocol
+// Additional routes not part of the specification will also be registered. These are used to provide additional functionality for a more
+// complete registry experience
 func (m *ModuleAPI) SetupRoutes() {
 	m.Router.StrictSlash(true)
 	m.Router.Handle("/", m.ListModulesHandler()).Methods(http.MethodGet)
@@ -177,6 +194,8 @@ func (m *ModuleAPI) SetupRoutes() {
 
 }
 
+// NewModuleAPI Creates a new instance of the module API setting up routes as well as any backend storage and responses
+// This function will call SetupRoutes() on your behalf to configure the router and associated handlers
 func NewModuleAPI(router *mux.Router, path string, store stores.ModuleStore, fileStore drivers.TerrariumStorageDriver, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *ModuleAPI {
 	m := &ModuleAPI{
 		Router:          router.PathPrefix(path).Subrouter(),

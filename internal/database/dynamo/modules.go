@@ -197,6 +197,13 @@ func (m *ModuleBackend) ReadOne(orgName string, moduleName string, providerName 
 // ReadModuleVersions Returns all versions of a given module from the Modules table
 func (m *ModuleBackend) ReadModuleVersions(orgName string, moduleName string, providerName string) ([]*modules.Module, error) {
 	ctx := context.TODO()
+	org, err := m.OrganizationBackend.ReadOne(orgName)
+	if err != nil {
+		return nil, err
+	}
+	if org == nil {
+		return nil, nil
+	}
 	p := dynamodb.NewQueryPaginator(m.Client, &dynamodb.QueryInput{
 		TableName:              aws.String(m.TableName),
 		IndexName:              aws.String(allModuleVersionIndex),

@@ -1,4 +1,5 @@
-// Package api implements the Terrarium API
+// Package api implements the Terrarium API. Terrarium aims to implement the protocols provided by Terraform
+// for a terraform cli compliant registry experience.
 package api
 
 import (
@@ -16,6 +17,8 @@ import (
 )
 
 // Terrarium is a struct which contains methods for initialising the private Terraform Registry
+// The Terrarium struct is a complete implementation of the product fully instantiated. An instance
+// of this struct is created by the CLI when `terrarium serve modules` is called from the command line
 type Terrarium struct {
 	Port             int
 	DataStore        drivers.TerrariumDatabaseDriver
@@ -32,7 +35,8 @@ type Terrarium struct {
 	Errorer          responses.APIErrorWriter
 }
 
-// Serve starts the Terrarium Registry
+// Serve starts the Terrarium Registry listening on the specified port. A web server will be listening ready to
+// serve API requests
 func (t *Terrarium) Serve() error {
 	bindAddress := fmt.Sprintf(":%d", t.Port)
 	t.Init()
@@ -40,7 +44,8 @@ func (t *Terrarium) Serve() error {
 	return http.ListenAndServe(bindAddress, handlers.CombinedLoggingHandler(os.Stdout, t.Router))
 }
 
-// Init calls the various API sub packages to setup routers for endpoints
+// Init calls the various API sub packages to setup routers for endpoints. This is a central function that wires all API routers together
+// providing OAuth, VCS, Discovery and many more features of Terrarium
 func (t *Terrarium) Init() {
 	t.VCSConnectionAPI = NewVCSAPI(t.Router, "/v1/oauth-clients", t.DataStore.VCSConnections(), t.DataStore.Organizations(), t.Responder, t.Errorer)
 	t.OAuthAPI = NewOAuthAPI(t.Router, "/oauth", t.DataStore.VCSConnections(), t.Responder, t.Errorer)
@@ -49,7 +54,6 @@ func (t *Terrarium) Init() {
 	t.ModuleAPI = NewModuleAPI(t.Router, "/v1/modules", t.DataStore.Modules(), t.FileStore, t.Responder, t.Errorer)
 	// TODO: Should this be it's own binary / sub command?
 	t.DiscoveryAPI = NewDiscoveryAPI(nil, "/v1/modules", t.Responder, t.Errorer)
-	// Register discovery route for Terraform native discovery
 	t.Router.Handle("/.well-known/terraform.json", t.DiscoveryAPI.DiscoveryHandler())
 }
 
