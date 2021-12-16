@@ -31,6 +31,7 @@ import (
 
 var awsRegion string
 var storageBackend string
+var storageBackendName string
 var databaseBackend string
 var databaseHost string
 var databaseUser string
@@ -66,7 +67,7 @@ var moduleCmd = &cobra.Command{
 			if awsRegion == "" {
 				log.Fatal("Error: No AWS Region Set")
 			}
-			storage, err = s3objects.New(awsRegion)
+			storage, err = s3objects.New(awsRegion, storageBackendName)
 			if err != nil {
 				log.Fatalf("Error initialising S3 storage backend - %s", err.Error())
 			}
@@ -90,6 +91,7 @@ func init() {
 	serveCmd.AddCommand(moduleCmd)
 	moduleCmd.Flags().StringVarP(&databaseBackend, "database-backend", "d", "mongo", "Controls the database storage backend. Available backends: 'mongo', 'dynamodb'")
 	moduleCmd.Flags().StringVarP(&storageBackend, "storage-backend", "s", "s3", "Controls the file storage backend. Available backends: 's3'")
+	moduleCmd.Flags().StringVarP(&storageBackendName, "storage-backend-name", "", "terrarium-dev", "Controls the name of the storage backend. For example in the case of s3 it will be a bucket name")
 	moduleCmd.Flags().StringVarP(&awsRegion, "aws-region", "", "eu-west-2", "AWS Region (required if S3 backend is used")
 	moduleCmd.Flags().StringVarP(&databaseHost, "database-host", "", "", "Database Host")
 	moduleCmd.Flags().StringVarP(&databaseName, "database", "", "terrarium", "Database Name")

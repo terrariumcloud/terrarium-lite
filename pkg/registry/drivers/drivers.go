@@ -27,5 +27,6 @@ type TerrariumSourceDriver interface {
 // TerrariumStorageDriver is a generic interface for interacting with underlying module storage.
 type TerrariumStorageDriver interface {
 	Init() error
+	GetBackingStoreName() string
 	FetchModuleSource(ctx context.Context, bucket string, key string) ([]byte, error)
 }

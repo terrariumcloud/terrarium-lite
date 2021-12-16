@@ -12,6 +12,7 @@ import (
 
 type TerrariumS3Storage struct {
 	Region  string
+	Bucket  string
 	Service *s3.Client
 	config  aws.Config
 }
@@ -41,9 +42,14 @@ func (s *TerrariumS3Storage) FetchModuleSource(ctx context.Context, bucket strin
 	return ioutil.ReadAll(data.Body)
 }
 
-func New(region string) (*TerrariumS3Storage, error) {
+func (s *TerrariumS3Storage) GetBackingStoreName() string {
+	return s.Bucket
+}
+
+func New(region string, bucket string) (*TerrariumS3Storage, error) {
 	s := &TerrariumS3Storage{
 		Region: region,
+		Bucket: bucket,
 	}
 	err := s.Init()
 	if err != nil {

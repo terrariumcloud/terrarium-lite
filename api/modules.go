@@ -15,7 +15,6 @@ import (
 )
 
 // ModuleAPI is a struct implementing the handlers for the Module API in Terrarium
-// TODO: Implement Module Store
 type ModuleAPI struct {
 	Router          *mux.Router
 	ModuleStore     stores.ModuleStore
@@ -37,7 +36,6 @@ func (m *ModuleAPI) GetModuleHandler() http.Handler {
 }
 
 func (m *ModuleAPI) DownloadModuleHandler() http.Handler {
-	// TODO: Make this dynamic and ensure header handling is compliant
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Add("X-Terraform-Get", "./archive?archive=zip")
 		m.ResponseHandler.Write(rw, nil, http.StatusNoContent)
@@ -121,9 +119,19 @@ func (m *ModuleAPI) DeleteModuleHandler() http.Handler {
 }
 
 func (m *ModuleAPI) ArchiveHandler() http.Handler {
-	// TODO: Make this flexible to fetch archives dynamically
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		zipData, err := m.FileStore.FetchModuleSource(context.TODO(), "terrarium-dev", "test.zip")
+		params := mux.Vars(r)
+		orgName := params["organization_name"]
+		moduleName := params["name"]
+		providerName := params["provider"]
+		version := params["version"]
+		key, err := m.ModuleStore.ReadModuleVersionSource(orgName, moduleName, providerName, version)
+		if err != nil {
+			log.Printf("[FILE STORE] Error: %s", err.Error())
+			m.ErrorHandler.Write(rw, errors.New("failed finding module source"), http.StatusInternalServerError)
+			return
+		}
+		zipData, err := m.FileStore.FetchModuleSource(context.TODO(), m.FileStore.GetBackingStoreName(), key)
 		if err != nil {
 			log.Printf("[FILE STORE] Error: %s", err.Error())
 			m.ErrorHandler.Write(rw, errors.New("failed fetching module source from file store"), http.StatusInternalServerError)

@@ -155,7 +155,7 @@ func (m *ModuleBackend) ReadAll(limit int, offset int) ([]*modules.Module, error
 }
 
 // ReadOne Returns a single module from the Modules table
-func (m *ModuleBackend) ReadOne(orgName string) (*modules.Module, error) {
+func (m *ModuleBackend) ReadOne(orgName string, moduleName string, providerName string, version string) (*modules.Module, error) {
 	return nil, nil
 }
 
@@ -237,6 +237,49 @@ func (m *ModuleBackend) ReadOrganizationModules(orgName string, limit int, offse
 		finalModuleList = terraformModules[offset:limit]
 	}
 	return finalModuleList, nil
+}
+
+func (m *ModuleBackend) ReadModuleVersionSource(orgName string, moduleName string, providerName string, version string) (string, error) {
+	ctx := context.TODO()
+	data, err := m.Client.Query(ctx, &dynamodb.QueryInput{
+		TableName:              aws.String(m.TableName),
+		IndexName:              aws.String(allModuleVersionIndex),
+		KeyConditionExpression: aws.String("#o = :o AND #n = :n"),
+		ExpressionAttributeNames: map[string]string{
+			"#o": "organization",
+			"#n": "name",
+			"#p": "provider",
+			"#v": "version",
+		},
+		ExpressionAttributeValues: map[string]dynamodbtypes.AttributeValue{
+			":o": &dynamodbtypes.AttributeValueMemberS{
+				Value: orgName,
+			},
+			":n": &dynamodbtypes.AttributeValueMemberS{
+				Value: moduleName,
+			},
+			":p": &dynamodbtypes.AttributeValueMemberS{
+				Value: providerName,
+			},
+			":v": &dynamodbtypes.AttributeValueMemberS{
+				Value: version,
+			},
+		},
+		FilterExpression: aws.String("#p = :p AND #v = :v"),
+	})
+	if err != nil {
+		return "", err
+	}
+	if data.Count == 0 {
+		return "", errors.New("module version not found")
+	}
+	var terraformModule *modules.Module
+	moduleItem := data.Items[0]
+	err = attributevalue.UnmarshalMap(moduleItem, &terraformModule)
+	if err != nil {
+		return "", err
+	}
+	return terraformModule.Source, nil
 }
 
 // Update Updates an module in the module table
