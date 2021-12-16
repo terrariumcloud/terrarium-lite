@@ -37,8 +37,9 @@ func (d *TerrariumDynamoDB) Organizations() stores.OrganizationStore {
 // Modules returns a DynamoDB compatible module store which implements the ModuleStore interface
 func (d *TerrariumDynamoDB) Modules() stores.ModuleStore {
 	return &ModuleBackend{
-		TableName: "terrarium_modules",
-		Client:    d.Service,
+		TableName:           "terrarium_modules",
+		Client:              d.Service,
+		OrganizationBackend: d.Organizations(),
 	}
 }
 
