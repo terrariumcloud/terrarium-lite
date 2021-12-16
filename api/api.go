@@ -1,5 +1,7 @@
-// Package api implements the Terrarium API. Terrarium aims to implement the protocols provided by Terraform
-// for a terraform cli compliant registry experience.
+// Package api is a meta package implementing the complete Terrarium product.
+// Terrarium aims to implement the protocols provided by Terraform for a terraform cli compliant registry experience.
+// The meta package is made up of sub packages to subdivide and organize code by function. For detailed explanations
+// on various API's please review these
 package api
 
 import (
@@ -8,10 +10,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/dylanrhysscott/terrarium/api/discovery"
+	"github.com/dylanrhysscott/terrarium/api/modules"
+	"github.com/dylanrhysscott/terrarium/api/oauth"
+	"github.com/dylanrhysscott/terrarium/api/organizations"
+	"github.com/dylanrhysscott/terrarium/api/sources"
+	"github.com/dylanrhysscott/terrarium/api/vcs"
+
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/endpoints"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
-
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -47,13 +55,13 @@ func (t *Terrarium) Serve() error {
 // Init calls the various API sub packages to setup routers for endpoints. This is a central function that wires all API routers together
 // providing OAuth, VCS, Discovery and many more features of Terrarium
 func (t *Terrarium) Init() {
-	t.VCSConnectionAPI = NewVCSAPI(t.Router, "/v1/oauth-clients", t.DataStore.VCSConnections(), t.DataStore.Organizations(), t.Responder, t.Errorer)
-	t.OAuthAPI = NewOAuthAPI(t.Router, "/oauth", t.DataStore.VCSConnections(), t.Responder, t.Errorer)
-	t.SourceAPI = NewSourceAPI(t.Router, "/v1/sources", t.DataStore.VCSConnections(), t.Source, t.Responder, t.Errorer)
-	t.OrganizationAPI = NewOrganizationAPI(t.Router, "/v1/organizations", t.DataStore.Organizations(), t.VCSConnectionAPI, t.Responder, t.Errorer)
-	t.ModuleAPI = NewModuleAPI(t.Router, "/v1/modules", t.DataStore.Modules(), t.FileStore, t.Responder, t.Errorer)
+	t.VCSConnectionAPI = vcs.NewVCSAPI(t.Router, "/v1/oauth-clients", t.DataStore.VCSConnections(), t.DataStore.Organizations(), t.Responder, t.Errorer)
+	t.OAuthAPI = oauth.NewOAuthAPI(t.Router, "/oauth", t.DataStore.VCSConnections(), t.Responder, t.Errorer)
+	t.SourceAPI = sources.NewSourceAPI(t.Router, "/v1/sources", t.DataStore.VCSConnections(), t.Source, t.Responder, t.Errorer)
+	t.OrganizationAPI = organizations.NewOrganizationAPI(t.Router, "/v1/organizations", t.DataStore.Organizations(), t.VCSConnectionAPI, t.Responder, t.Errorer)
+	t.ModuleAPI = modules.NewModuleAPI(t.Router, "/v1/modules", t.DataStore.Modules(), t.FileStore, t.Responder, t.Errorer)
 	// TODO: Should this be it's own binary / sub command?
-	t.DiscoveryAPI = NewDiscoveryAPI(nil, "/v1/modules", t.Responder, t.Errorer)
+	t.DiscoveryAPI = discovery.NewDiscoveryAPI(nil, "/v1/modules", t.Responder, t.Errorer)
 	t.Router.Handle("/.well-known/terraform.json", t.DiscoveryAPI.DiscoveryHandler())
 }
 

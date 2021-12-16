@@ -1,4 +1,4 @@
-package api
+package oauth
 
 import (
 	"encoding/json"
@@ -9,10 +9,10 @@ import (
 	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
-
 	"github.com/gorilla/mux"
 )
 
+// OAuthAPI is a struct implementing the handlers for the OAuthAPIInterface from the endpoints package in Terrarium
 type OAuthAPI struct {
 	Router          *mux.Router
 	ErrorHandler    responses.APIErrorWriter
@@ -20,12 +20,17 @@ type OAuthAPI struct {
 	VCSStore        stores.VCSSConnectionStore
 }
 
+// TODO: Not yet implemented
 func (o *OAuthAPI) LoginHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 
 	})
 }
 
+// GithubCallbackHandler implements an API route to handle the exchange of an OAuth code for a Github access token
+// The resulting access token is then stored in the VCS store for later use by Terrarium on the users behalf. Typically
+// this will be to sync source code stored in Git to the registry in response to webhook events
+// TODO: Remove the mongo specfic code check for database agnostic approach
 func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		code := r.URL.Query().Get("code")
@@ -81,18 +86,10 @@ func (o *OAuthAPI) GithubCallbackHandler() http.Handler {
 	})
 }
 
+// SetupRoutes Sets up the various callback handlers for supported OAuth providers in the Terraform login flow
+// as defined here https://www.terraform.io/internals/login-protocol. Ultimately these routes will allow
+// terraform to login with providers such as Github, Google etc
 func (o *OAuthAPI) SetupRoutes() {
 	o.Router.StrictSlash(true)
 	o.Router.Handle("/github/{id}/callback", o.GithubCallbackHandler()).Methods(http.MethodGet)
-}
-
-func NewOAuthAPI(router *mux.Router, path string, vcsconnstore stores.VCSSConnectionStore, responseHandler responses.APIResponseWriter, errorHandler responses.APIErrorWriter) *OAuthAPI {
-	a := &OAuthAPI{
-		Router:          router.PathPrefix(path).Subrouter(),
-		VCSStore:        vcsconnstore,
-		ResponseHandler: responseHandler,
-		ErrorHandler:    errorHandler,
-	}
-	a.SetupRoutes()
-	return a
 }
