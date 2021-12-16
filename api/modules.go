@@ -112,6 +112,10 @@ func (m *ModuleAPI) ListOrganizationModulesHandler() http.Handler {
 			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
 			return
 		}
+		if modules == nil {
+			m.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
+			return
+		}
 		m.ResponseHandler.Write(rw, modules, http.StatusOK)
 	})
 }

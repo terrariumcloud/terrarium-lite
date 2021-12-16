@@ -133,7 +133,7 @@ func (m *ModuleBackend) ReadAll(limit int, offset int) ([]*modules.Module, error
 	p := dynamodb.NewScanPaginator(m.Client, &dynamodb.ScanInput{
 		TableName: aws.String(m.TableName),
 	})
-	var terraformModules []*modules.Module
+	var terraformModules []*modules.Module = []*modules.Module{}
 	for p.HasMorePages() {
 		out, err := p.NextPage(ctx)
 		if err != nil {
@@ -205,6 +205,13 @@ func (m *ModuleBackend) ReadModuleVersions(orgName string, moduleName string, pr
 // ReadOrganizationModules Returns a list of organization modules
 func (m *ModuleBackend) ReadOrganizationModules(orgName string, limit int, offset int) ([]*modules.Module, error) {
 	ctx := context.TODO()
+	org, err := m.OrganizationBackend.ReadOne(orgName)
+	if err != nil {
+		return nil, err
+	}
+	if org == nil {
+		return nil, nil
+	}
 	p := dynamodb.NewQueryPaginator(m.Client, &dynamodb.QueryInput{
 		TableName:              aws.String(m.TableName),
 		IndexName:              aws.String(orgModulesIndex),
@@ -218,7 +225,7 @@ func (m *ModuleBackend) ReadOrganizationModules(orgName string, limit int, offse
 			},
 		},
 	})
-	var terraformModules []*modules.Module
+	var terraformModules []*modules.Module = []*modules.Module{}
 	for p.HasMorePages() {
 		out, err := p.NextPage(ctx)
 		if err != nil {
