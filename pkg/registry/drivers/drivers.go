@@ -33,7 +33,6 @@ type TerrariumSourceDriver interface {
 // different module storage beyond the core drivers this interface should be extended
 // Terrarium currently supports S3 (WIP)
 type TerrariumStorageDriver interface {
-	Init() error
 	GetBackingStoreName() string
-	FetchModuleSource(ctx context.Context, bucket string, key string) ([]byte, error)
+	FetchModuleSource(ctx context.Context, key string) ([]byte, error)
 }

@@ -17,7 +17,7 @@ type TerrariumS3Storage struct {
 	config  aws.Config
 }
 
-func (s *TerrariumS3Storage) Init() error {
+func (s *TerrariumS3Storage) init() error {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(s.Region))
 	if err != nil {
 		return err
@@ -27,9 +27,9 @@ func (s *TerrariumS3Storage) Init() error {
 	return nil
 }
 
-func (s *TerrariumS3Storage) FetchModuleSource(ctx context.Context, bucket string, key string) ([]byte, error) {
+func (s *TerrariumS3Storage) FetchModuleSource(ctx context.Context, key string) ([]byte, error) {
 	data, err := s.Service.GetObject(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(bucket),
+		Bucket: &s.Bucket,
 		Key:    aws.String(key),
 	})
 	if err != nil {
@@ -51,7 +51,7 @@ func New(region string, bucket string) (*TerrariumS3Storage, error) {
 		Region: region,
 		Bucket: bucket,
 	}
-	err := s.Init()
+	err := s.init()
 	if err != nil {
 		return nil, err
 	}
