@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/dylanrhysscott/terrarium/internal/storage/filesystem"
 	"log"
 
 	"github.com/dylanrhysscott/terrarium/api"
@@ -30,6 +31,7 @@ import (
 )
 
 var awsRegion string
+var storageFilesystemRootPath string
 var storageBackend string
 var storageBackendName string
 var databaseBackend string
@@ -72,6 +74,15 @@ var moduleCmd = &cobra.Command{
 				log.Fatalf("Error initialising S3 storage backend - %s", err.Error())
 			}
 		}
+		if storageBackend == "filesystem" {
+			if storageFilesystemRootPath == "" {
+				log.Fatal("Error: No root path for the filesystem storage")
+			}
+			storage, err = filesystem.New(storageFilesystemRootPath)
+			if err != nil {
+				log.Fatalf("Error initialising filesystem storage backend - %s", err.Error())
+			}
+		}
 		if driver == nil {
 			log.Fatalf("Unsupported database driver: %s", databaseBackend)
 		}
@@ -93,6 +104,7 @@ func init() {
 	moduleCmd.Flags().StringVarP(&storageBackend, "storage-backend", "s", "s3", "Controls the file storage backend. Available backends: 's3'")
 	moduleCmd.Flags().StringVarP(&storageBackendName, "storage-backend-name", "", "terrarium-dev", "Controls the name of the storage backend. For example in the case of s3 it will be a bucket name")
 	moduleCmd.Flags().StringVarP(&awsRegion, "aws-region", "", "eu-west-2", "AWS Region (required if S3 backend is used")
+	moduleCmd.Flags().StringVarP(&storageFilesystemRootPath, "filesystem-storage-root", "", "/terrarium/store", "Path to the storage for the filesystem storage")
 	moduleCmd.Flags().StringVarP(&databaseHost, "database-host", "", "", "Database Host")
 	moduleCmd.Flags().StringVarP(&databaseName, "database", "", "terrarium", "Database Name")
 	moduleCmd.Flags().StringVarP(&databaseUser, "database-user", "", "terrarium", "Database User")

@@ -178,7 +178,7 @@ func (m *ModuleAPI) ArchiveHandler() http.Handler {
 			m.ErrorHandler.Write(rw, errors.New("failed finding module source"), http.StatusInternalServerError)
 			return
 		}
-		zipData, err := m.FileStore.FetchModuleSource(context.TODO(), m.FileStore.GetBackingStoreName(), key)
+		zipData, err := m.FileStore.FetchModuleSource(context.TODO(), key)
 		if err != nil {
 			log.Printf("[FILE STORE] Error: %s", err.Error())
 			m.ErrorHandler.Write(rw, errors.New("failed fetching module source from file store"), http.StatusInternalServerError)
