@@ -1,12 +1,15 @@
+// Package drivers provides interfaces to implement a Terrarium API. Generally these interfaces are not intended for 3rd
+// party implementation and serve to allow for internal implementation testing of handlers for the various APIs
 package endpoints
 
 import "net/http"
 
+// OrganizationAPIInterface specifies the required HTTP handlers for a Terrarium Discovery API
 type DiscoveryAPIInterface interface {
 	DiscoveryHandler() http.Handler
 }
 
-// ModuleAPIInterface specifies the required HTTP handlers for a Terrarium Modules API
+// ModuleAPIInterface specifies the required HTTP handlers for a Terrarium Modules API implementation
 type ModuleAPIInterface interface {
 	CreateModuleHandler() http.Handler
 	GetModuleHandler() http.Handler
@@ -19,6 +22,7 @@ type ModuleAPIInterface interface {
 	DeleteModuleHandler() http.Handler
 }
 
+// ModuleAPIInterface specifies the required HTTP handlers for a Terrarium OAuth API implementation
 type OAuthAPIInterface interface {
 	SetupRoutes()
 	LoginHandler() http.Handler
@@ -34,11 +38,13 @@ type OrganizationAPIInterface interface {
 	DeleteOrganizationHandler() http.Handler
 }
 
+// OrganizationAPIInterface specifies the required HTTP handlers for a Terrarium Sources API
 type SourceAPIInterface interface {
 	SetupRoutes()
 	CreateVCSModule() http.Handler
 }
 
+// OrganizationAPIInterface specifies the required HTTP handlers for a Terrarium VCS Connections API
 type VCSConnAPIInterface interface {
 	CreateVCSHandler() http.Handler
 	GetVCSHandler() http.Handler

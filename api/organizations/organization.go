@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/endpoints"
+	"github.com/dylanrhysscott/terrarium/internal/endpoints"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"

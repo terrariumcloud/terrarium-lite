@@ -17,8 +17,8 @@ import (
 	"github.com/dylanrhysscott/terrarium/api/sources"
 	"github.com/dylanrhysscott/terrarium/api/vcs"
 
+	"github.com/dylanrhysscott/terrarium/internal/endpoints"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/endpoints"
 	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
