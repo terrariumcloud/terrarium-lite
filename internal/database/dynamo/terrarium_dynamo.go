@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 )
 
 // TerrariumDynamoDB implements DynamoDB support for Terrarium for all API's

@@ -16,21 +16,24 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/dylanrhysscott/terrarium/internal/storage/filesystem"
+
 	"log"
 
-	"github.com/dylanrhysscott/terrarium/api"
+	"github.com/terrariumcloud/terrarium/api"
 
-	"github.com/dylanrhysscott/terrarium/internal/database/dynamo"
-	"github.com/dylanrhysscott/terrarium/internal/database/mongodb"
-	"github.com/dylanrhysscott/terrarium/internal/responder"
-	"github.com/dylanrhysscott/terrarium/internal/sourcecontrol"
-	"github.com/dylanrhysscott/terrarium/internal/storage/s3objects"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
 	"github.com/spf13/cobra"
+	"github.com/terrariumcloud/terrarium/internal/database/dynamo"
+	"github.com/terrariumcloud/terrarium/internal/database/json"
+	"github.com/terrariumcloud/terrarium/internal/database/mongodb"
+	"github.com/terrariumcloud/terrarium/internal/responder"
+	"github.com/terrariumcloud/terrarium/internal/sourcecontrol"
+	"github.com/terrariumcloud/terrarium/internal/storage/s3objects"
+  "github.com/terrariumcloud/terrarium/internal/storage/filesystem"
+	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
 )
 
 var awsRegion string
+var databaseJsonPath string
 var storageFilesystemRootPath string
 var storageBackend string
 var storageBackendName string
@@ -63,6 +66,15 @@ var moduleCmd = &cobra.Command{
 			driver, err = dynamo.New(awsRegion)
 			if err != nil {
 				log.Fatalf("Error initialising DynamoDB - %s", err.Error())
+			}
+		}
+		if databaseBackend == "json" {
+			if databaseJsonPath == "" {
+				log.Fatal("Error: No metadata file path set")
+			}
+			driver, err = json.New(databaseJsonPath)
+			if err != nil {
+				log.Fatalf("Error initializing the JSon database driver - %s", err.Error())
 			}
 		}
 		if storageBackend == "s3" {
@@ -105,6 +117,7 @@ func init() {
 	moduleCmd.Flags().StringVarP(&storageBackendName, "storage-backend-name", "", "terrarium-dev", "Controls the name of the storage backend. For example in the case of s3 it will be a bucket name")
 	moduleCmd.Flags().StringVarP(&awsRegion, "aws-region", "", "eu-west-2", "AWS Region (required if S3 backend is used")
 	moduleCmd.Flags().StringVarP(&storageFilesystemRootPath, "filesystem-storage-root", "", "/terrarium/store", "Path to the storage for the filesystem storage")
+	moduleCmd.Flags().StringVarP(&databaseJsonPath, "database-json-path", "", "", "Metadata file for the JSON metadata file")
 	moduleCmd.Flags().StringVarP(&databaseHost, "database-host", "", "", "Database Host")
 	moduleCmd.Flags().StringVarP(&databaseName, "database", "", "terrarium", "Database Name")
 	moduleCmd.Flags().StringVarP(&databaseUser, "database-user", "", "terrarium", "Database User")

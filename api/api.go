@@ -10,18 +10,18 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/dylanrhysscott/terrarium/api/discovery"
-	"github.com/dylanrhysscott/terrarium/api/modules"
-	"github.com/dylanrhysscott/terrarium/api/oauth"
-	"github.com/dylanrhysscott/terrarium/api/organizations"
-	"github.com/dylanrhysscott/terrarium/api/sources"
-	"github.com/dylanrhysscott/terrarium/api/vcs"
+	"github.com/terrariumcloud/terrarium/api/discovery"
+	"github.com/terrariumcloud/terrarium/api/modules"
+	"github.com/terrariumcloud/terrarium/api/oauth"
+	"github.com/terrariumcloud/terrarium/api/organizations"
+	"github.com/terrariumcloud/terrarium/api/sources"
+	"github.com/terrariumcloud/terrarium/api/vcs"
 
-	"github.com/dylanrhysscott/terrarium/internal/endpoints"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/terrariumcloud/terrarium/internal/endpoints"
+	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
+	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
 )
 
 // Terrarium is a struct which contains methods for initialising the private Terraform Registry

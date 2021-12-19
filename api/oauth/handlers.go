@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/vcs"
+	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 )
 
 // OAuthAPI is a struct implementing the handlers for the OAuthAPIInterface from the endpoints package in Terrarium

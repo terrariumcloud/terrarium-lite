@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/relationships"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/relationships"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/vcs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

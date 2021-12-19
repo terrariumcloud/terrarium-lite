@@ -3,8 +3,8 @@ package discovery
 import (
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/discovery"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/discovery"
+	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
 )
 
 // DiscoveryAPI is a struct implementing the handlers for the DiscoveryAPIInterface from the endpoints package in Terrarium

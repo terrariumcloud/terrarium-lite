@@ -6,11 +6,11 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/internal/endpoints"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"
+	"github.com/terrariumcloud/terrarium/internal/endpoints"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/organizations"
+	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 )
 
 // OrganizationAPI is a struct implementing the handlers for the OrganizationAPIInterface from the endpoints package in Terrarium

@@ -8,10 +8,10 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"
+	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
+	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 )
 
 // extractLimitAndOffset is a convience method to extract pagination and limit values passed

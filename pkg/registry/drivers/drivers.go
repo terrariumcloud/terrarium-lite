@@ -7,8 +7,8 @@ package drivers
 import (
 	"context"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/sources"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
+	"github.com/terrariumcloud/terrarium/pkg/registry/sources"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 )
 
 // TerrariumDriver is a generic database interface to allow further database implementations for Terrarium
