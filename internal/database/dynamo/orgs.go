@@ -12,7 +12,7 @@ import (
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/organizations"
 )
 
 const orgNameIndex = "organization_index"

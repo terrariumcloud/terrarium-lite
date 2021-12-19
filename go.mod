@@ -1,4 +1,4 @@
-module github.com/dylanrhysscott/terrarium
+module github.com/terrariumcloud/terrarium
 
 go 1.17
 

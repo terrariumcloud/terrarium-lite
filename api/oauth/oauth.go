@@ -5,8 +5,8 @@
 package oauth
 
 import (
-	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
+	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 
 	"github.com/gorilla/mux"
 )

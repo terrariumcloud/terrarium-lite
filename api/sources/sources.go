@@ -7,13 +7,13 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/relationships"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/drivers"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/sources"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
 	"github.com/gorilla/mux"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/relationships"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/vcs"
+	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
+	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium/pkg/registry/sources"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 )
 
 type SourceAPI struct {

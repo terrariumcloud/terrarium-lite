@@ -1,8 +1,8 @@
 package vcs
 
 import (
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/relationships"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/sources"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/relationships"
+	"github.com/terrariumcloud/terrarium/pkg/registry/sources"
 )
 
 // VCS represents the VCS data structure stored in the database

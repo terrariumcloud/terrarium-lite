@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/modules"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/modules"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 )
 
 const orgModulesIndex string = "organization_module_index"

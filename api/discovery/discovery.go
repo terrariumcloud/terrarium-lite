@@ -5,8 +5,8 @@
 package discovery
 
 import (
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/discovery"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/discovery"
+	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
 )
 
 // NewDiscoveryAPI Creates a new instance of the discovery API that defines a static well known route pointing

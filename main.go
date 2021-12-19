@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/dylanrhysscott/terrarium/cmd"
+import "github.com/terrariumcloud/terrarium/cmd"
 
 func main() {
 	cmd.Execute()

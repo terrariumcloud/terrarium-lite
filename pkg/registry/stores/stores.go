@@ -1,9 +1,9 @@
 package stores
 
 import (
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/modules"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/organizations"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/data/vcs"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/modules"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/organizations"
+	"github.com/terrariumcloud/terrarium/pkg/registry/data/vcs"
 )
 
 // OrganizationStore is a generic data interface for implementaing database operations relating to organizations

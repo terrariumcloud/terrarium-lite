@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/sources"
 	ghlib "github.com/google/go-github/v39/github"
+	"github.com/terrariumcloud/terrarium/pkg/registry/sources"
 	"golang.org/x/oauth2"
 )
 

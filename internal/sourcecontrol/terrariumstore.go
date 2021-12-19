@@ -5,8 +5,8 @@
 package sourcecontrol
 
 import (
-	"github.com/dylanrhysscott/terrarium/internal/sourcecontrol/github"
-	"github.com/dylanrhysscott/terrarium/pkg/registry/sources"
+	"github.com/terrariumcloud/terrarium/internal/sourcecontrol/github"
+	"github.com/terrariumcloud/terrarium/pkg/registry/sources"
 )
 
 // TerrariumSourceControl implements the types.TerrariumSourceDriver interface for generic multi provider interactions.

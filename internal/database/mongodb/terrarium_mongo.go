@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/dylanrhysscott/terrarium/pkg/registry/stores"
+	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
