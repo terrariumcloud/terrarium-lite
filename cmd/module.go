@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/terrariumcloud/terrarium/internal/storage/filesystem"
+
 	"log"
 
 	"github.com/terrariumcloud/terrarium/api"
@@ -28,6 +28,7 @@ import (
 	"github.com/terrariumcloud/terrarium/internal/responder"
 	"github.com/terrariumcloud/terrarium/internal/sourcecontrol"
 	"github.com/terrariumcloud/terrarium/internal/storage/s3objects"
+  "github.com/terrariumcloud/terrarium/internal/storage/filesystem"
 	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
 )
 
