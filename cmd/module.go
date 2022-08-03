@@ -13,6 +13,8 @@ import (
 )
 
 var storageFilesystemRootPath string
+var certFile string
+var keyFile string
 
 // moduleCmd represents the module command
 var moduleCmd = &cobra.Command{
@@ -25,7 +27,15 @@ var moduleCmd = &cobra.Command{
 		var err error
 
 		if storageFilesystemRootPath == "" {
-			log.Fatal("Error: No root path specified")
+			log.Fatal("ERROR: No root path specified")
+		}
+
+		if certFile == "" {
+			log.Fatal("ERROR: No certificate file specified")
+		}
+
+		if keyFile == "" {
+			log.Fatal("ERROR: No private key file specified")
 		}
 
 		driver, err = fs_db.New(storageFilesystemRootPath)
@@ -38,7 +48,7 @@ var moduleCmd = &cobra.Command{
 			log.Fatalf("Error initialising filesystem storage backend - %s", err.Error())
 		}
 
-		terrarium := api.NewTerrarium(443, driver, storage, &responder.TerrariumAPIResponseWriter{}, &responder.TerrariumAPIErrorHandler{})
+		terrarium := api.NewTerrarium(443, certFile, keyFile, driver, storage, &responder.TerrariumAPIResponseWriter{}, &responder.TerrariumAPIErrorHandler{})
 		err = terrarium.Serve()
 		if err != nil {
 			log.Fatal(err)
@@ -49,4 +59,6 @@ var moduleCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(moduleCmd)
 	moduleCmd.Flags().StringVarP(&storageFilesystemRootPath, "filesystem-storage-root", "", "/terrarium/store", "Path to the storage for the filesystem storage")
+	moduleCmd.Flags().StringVarP(&certFile, "certificate-file", "", "", "Path to the SSL certificate file")
+	moduleCmd.Flags().StringVarP(&keyFile, "key-file", "", "", "Path to the SSL private key file")
 }
