@@ -6,9 +6,9 @@ import (
 	"github.com/terrariumcloud/terrarium/api"
 
 	"github.com/spf13/cobra"
-	"github.com/terrariumcloud/terrarium/internal/database/json"
+	fs_db "github.com/terrariumcloud/terrarium/internal/database/filesystem"
 	"github.com/terrariumcloud/terrarium/internal/responder"
-	"github.com/terrariumcloud/terrarium/internal/storage/filesystem"
+	fs_storage "github.com/terrariumcloud/terrarium/internal/storage/filesystem"
 	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
 )
 
@@ -28,12 +28,12 @@ var moduleCmd = &cobra.Command{
 			log.Fatal("Error: No root path specified")
 		}
 
-		driver, err = json.New(storageFilesystemRootPath)
+		driver, err = fs_db.New(storageFilesystemRootPath)
 		if err != nil {
-			log.Fatalf("Error initializing the JSon database driver - %s", err.Error())
+			log.Fatalf("Error initializing the filesystem database driver - %s", err.Error())
 		}
 
-		storage, err = filesystem.New(storageFilesystemRootPath)
+		storage, err = fs_storage.New(storageFilesystemRootPath)
 		if err != nil {
 			log.Fatalf("Error initialising filesystem storage backend - %s", err.Error())
 		}

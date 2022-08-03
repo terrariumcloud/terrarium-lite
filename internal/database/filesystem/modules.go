@@ -1,17 +1,17 @@
-package json
+package filesystem
 
 import (
 	"errors"
 	"github.com/terrariumcloud/terrarium/pkg/registry/data/modules"
 )
 
-// jsonModuleBackend is a struct that implements Mongo operations for Modules
-type jsonModuleBackend struct {
+// fsModuleBackend is a struct that implements Mongo operations for Modules
+type fsModuleBackend struct {
 	modules []*modules.Module
 }
 
 // Init initializes the Modules table
-func (m *jsonModuleBackend) Init() error {
+func (m *fsModuleBackend) Init() error {
 	return nil
 }
 
@@ -19,7 +19,7 @@ func isModuleMatching(module *modules.Module, orgName string, moduleName string,
 	return module.Organization == orgName && module.Name == moduleName && module.Provider == providerName
 }
 
-func (m *jsonModuleBackend) filterModules(orgName string, moduleName string, providerName string) []*modules.Module {
+func (m *fsModuleBackend) filterModules(orgName string, moduleName string, providerName string) []*modules.Module {
 	result := make([]*modules.Module, 0, len(m.modules))
 	for _, module := range m.modules {
 		if isModuleMatching(module, orgName, moduleName, providerName) {
@@ -29,7 +29,7 @@ func (m *jsonModuleBackend) filterModules(orgName string, moduleName string, pro
 	return result
 }
 
-func (m *jsonModuleBackend) findModuleByVersion(orgName string, moduleName string, providerName string, version string) *modules.Module {
+func (m *fsModuleBackend) findModuleByVersion(orgName string, moduleName string, providerName string, version string) *modules.Module {
 	for _, module := range m.modules {
 		if isModuleMatching(module, orgName, moduleName, providerName) && module.Version == version {
 			return module
@@ -38,7 +38,7 @@ func (m *jsonModuleBackend) findModuleByVersion(orgName string, moduleName strin
 	return nil
 }
 
-func (m *jsonModuleBackend) findModulesByOrganization(orgName string) []*modules.Module {
+func (m *fsModuleBackend) findModulesByOrganization(orgName string) []*modules.Module {
 	result := make([]*modules.Module, 0, len(m.modules))
 	for _, module := range m.modules {
 		if module.Organization == orgName {
@@ -48,13 +48,8 @@ func (m *jsonModuleBackend) findModulesByOrganization(orgName string) []*modules
 	return result
 }
 
-// Create Adds a new module to the Modules table
-func (m *jsonModuleBackend) Create(name string, email string) (*modules.Module, error) {
-	return nil, errors.New("Operation not supported on Json Backend")
-}
-
 // ReadAll Returns all Modules from the Modules table
-func (m *jsonModuleBackend) ReadAll(limit int, offset int) ([]*modules.Module, error) {
+func (m *fsModuleBackend) ReadAll(limit int, offset int) ([]*modules.Module, error) {
 	count := len(m.modules)
 	if offset >= count {
 		return []*modules.Module{}, nil
@@ -66,7 +61,7 @@ func (m *jsonModuleBackend) ReadAll(limit int, offset int) ([]*modules.Module, e
 }
 
 // ReadOne Returns a single module from the Modules table
-func (m *jsonModuleBackend) ReadOne(orgName string, moduleName string, providerName string) (*modules.Module, error) {
+func (m *fsModuleBackend) ReadOne(orgName string, moduleName string, providerName string) (*modules.Module, error) {
 	matchingModules := m.filterModules(orgName, moduleName, providerName)
 	if len(matchingModules) < 1 {
 		return nil, errors.New("No matching modules found")
@@ -75,7 +70,7 @@ func (m *jsonModuleBackend) ReadOne(orgName string, moduleName string, providerN
 }
 
 // ReadModuleVersions Returns all versions of a given module from the Modules table
-func (m *jsonModuleBackend) ReadModuleVersions(orgName string, moduleName string, providerName string) ([]*modules.Module, error) {
+func (m *fsModuleBackend) ReadModuleVersions(orgName string, moduleName string, providerName string) ([]*modules.Module, error) {
 	matchingModules := m.filterModules(orgName, moduleName, providerName)
 	if len(matchingModules) < 1 {
 		return nil, errors.New("No matching modules found")
@@ -84,7 +79,7 @@ func (m *jsonModuleBackend) ReadModuleVersions(orgName string, moduleName string
 }
 
 // ReadOrganizationModules Returns a list of organization modules
-func (m *jsonModuleBackend) ReadOrganizationModules(orgName string, limit int, offset int) ([]*modules.Module, error) {
+func (m *fsModuleBackend) ReadOrganizationModules(orgName string, limit int, offset int) ([]*modules.Module, error) {
 	modulesForOrganization := m.findModulesByOrganization(orgName)
 	count := len(modulesForOrganization)
 	if offset >= count {
@@ -96,7 +91,7 @@ func (m *jsonModuleBackend) ReadOrganizationModules(orgName string, limit int, o
 	return modulesForOrganization[offset:limit], nil
 }
 
-func (m *jsonModuleBackend) ReadModuleVersionSource(orgName string, moduleName string, providerName string, version string) (string, error) {
+func (m *fsModuleBackend) ReadModuleVersionSource(orgName string, moduleName string, providerName string, version string) (string, error) {
 	module := m.findModuleByVersion(orgName, moduleName, providerName, version)
 	if nil != module {
 		return module.Source, nil
@@ -104,17 +99,7 @@ func (m *jsonModuleBackend) ReadModuleVersionSource(orgName string, moduleName s
 	return "", errors.New("No module found for the specified version")
 }
 
-// Update Updates an module in the module table
-func (m *jsonModuleBackend) Update(name string, email string) (*modules.Module, error) {
-	return nil, errors.New("Operation not supported on Json Backend")
-}
-
-// Delete Removes an module from the module table
-func (m *jsonModuleBackend) Delete(name string) error {
-	return errors.New("Operation not supported on Json Backend")
-}
-
 // GetBackendType Returns the type of backend used
-func (m *jsonModuleBackend) GetBackendType() string {
-	return "json"
+func (m *fsModuleBackend) GetBackendType() string {
+	return "filesystem"
 }
