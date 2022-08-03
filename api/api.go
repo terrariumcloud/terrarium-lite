@@ -10,15 +10,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/terrariumcloud/terrarium/api/discovery"
-	"github.com/terrariumcloud/terrarium/api/modules"
-	"github.com/terrariumcloud/terrarium/api/oauth"
-	"github.com/terrariumcloud/terrarium/api/organizations"
-	"github.com/terrariumcloud/terrarium/api/sources"
-	"github.com/terrariumcloud/terrarium/api/vcs"
-
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/terrariumcloud/terrarium/api/discovery"
+	"github.com/terrariumcloud/terrarium/api/modules"
 	"github.com/terrariumcloud/terrarium/internal/endpoints"
 	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
 	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
@@ -28,19 +23,14 @@ import (
 // The Terrarium struct is a complete implementation of the product fully instantiated. An instance
 // of this struct is created by the CLI when `terrarium serve modules` is called from the command line
 type Terrarium struct {
-	Port             int
-	DataStore        drivers.TerrariumDatabaseDriver
-	FileStore        drivers.TerrariumStorageDriver
-	Source           drivers.TerrariumSourceDriver
-	OrganizationAPI  endpoints.OrganizationAPIInterface
-	ModuleAPI        endpoints.ModuleAPIInterface
-	VCSConnectionAPI endpoints.VCSConnAPIInterface
-	OAuthAPI         endpoints.OAuthAPIInterface
-	SourceAPI        endpoints.SourceAPIInterface
-	DiscoveryAPI     endpoints.DiscoveryAPIInterface
-	Router           *mux.Router
-	Responder        responses.APIResponseWriter
-	Errorer          responses.APIErrorWriter
+	Port         int
+	DataStore    drivers.TerrariumDatabaseDriver
+	FileStore    drivers.TerrariumStorageDriver
+	ModuleAPI    endpoints.ModuleAPIInterface
+	DiscoveryAPI endpoints.DiscoveryAPIInterface
+	Router       *mux.Router
+	Responder    responses.APIResponseWriter
+	Errorer      responses.APIErrorWriter
 }
 
 // Serve starts the Terrarium Registry listening on the specified port. A web server will be listening ready to
@@ -53,12 +43,7 @@ func (t *Terrarium) Serve() error {
 }
 
 // Init calls the various API sub packages to setup routers for endpoints. This is a central function that wires all API routers together
-// providing OAuth, VCS, Discovery and many more features of Terrarium
 func (t *Terrarium) Init() {
-	t.VCSConnectionAPI = vcs.NewVCSAPI(t.Router, "/v1/oauth-clients", t.DataStore.VCSConnections(), t.DataStore.Organizations(), t.Responder, t.Errorer)
-	t.OAuthAPI = oauth.NewOAuthAPI(t.Router, "/oauth", t.DataStore.VCSConnections(), t.Responder, t.Errorer)
-	t.SourceAPI = sources.NewSourceAPI(t.Router, "/v1/sources", t.DataStore.VCSConnections(), t.Source, t.Responder, t.Errorer)
-	t.OrganizationAPI = organizations.NewOrganizationAPI(t.Router, "/v1/organizations", t.DataStore.Organizations(), t.VCSConnectionAPI, t.Responder, t.Errorer)
 	t.ModuleAPI = modules.NewModuleAPI(t.Router, "/v1/modules", t.DataStore.Modules(), t.FileStore, t.Responder, t.Errorer)
 	// TODO: Should this be it's own binary / sub command?
 	t.DiscoveryAPI = discovery.NewDiscoveryAPI(nil, "/v1/modules", t.Responder, t.Errorer)
@@ -66,12 +51,11 @@ func (t *Terrarium) Init() {
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes
-func NewTerrarium(port int, driver drivers.TerrariumDatabaseDriver, storageDriver drivers.TerrariumStorageDriver, sourceDriver drivers.TerrariumSourceDriver, responder responses.APIResponseWriter, errorer responses.APIErrorWriter) *Terrarium {
+func NewTerrarium(port int, driver drivers.TerrariumDatabaseDriver, storageDriver drivers.TerrariumStorageDriver, responder responses.APIResponseWriter, errorer responses.APIErrorWriter) *Terrarium {
 	return &Terrarium{
 		Port:      port,
 		DataStore: driver,
 		FileStore: storageDriver,
-		Source:    sourceDriver,
 		Router:    mux.NewRouter(),
 		Responder: responder,
 		Errorer:   errorer,

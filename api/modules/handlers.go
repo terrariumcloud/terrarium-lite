@@ -23,13 +23,6 @@ type ModuleAPI struct {
 	ResponseHandler responses.APIResponseWriter
 }
 
-// TODO: Not yet implemented
-func (m *ModuleAPI) CreateModuleHandler() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
-	})
-}
-
 // GetModuleHandler Handles an API request to fetch a single module via organization name, module name and provider.
 // This will return the module from the backend if found or 404 if the module or organization doesn't exist
 func (m *ModuleAPI) GetModuleHandler() http.Handler {
@@ -104,13 +97,6 @@ func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 	})
 }
 
-// TODO: Not yet implemented
-func (m *ModuleAPI) UpdateModuleHandler() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
-	})
-}
-
 // ListModulesHandler Lists all modules currently available in the registry.
 // This is a convience handler to allow for module browsing and discovery
 // Will return an error if communicating with the backend failed
@@ -155,13 +141,6 @@ func (m *ModuleAPI) ListOrganizationModulesHandler() http.Handler {
 	})
 }
 
-// TODO: Not yet implemented
-func (m *ModuleAPI) DeleteModuleHandler() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
-	})
-}
-
 // ArchiveHandler performs a fetch of the requested module source code from the chosen backing store and presents it to the client
 // As part of the module flow clients are redirected here from the DownloadModuleHandler x-terraform-get header. This handler
 // makes the stored registry code available to the client
@@ -197,12 +176,8 @@ func (m *ModuleAPI) SetupRoutes() {
 	m.Router.StrictSlash(true)
 	m.Router.Handle("/", m.ListModulesHandler()).Methods(http.MethodGet)
 	m.Router.Handle("/{organization_name}", m.ListOrganizationModulesHandler()).Methods(http.MethodGet)
-	m.Router.Handle("/", m.CreateModuleHandler()).Methods(http.MethodPost)
 	m.Router.Handle("/{organization_name}/{name}/{provider}", m.GetModuleHandler()).Methods(http.MethodGet)
 	m.Router.Handle("/{organization_name}/{name}/{provider}/versions", m.GetModuleVersionHandler()).Methods(http.MethodGet)
 	m.Router.Handle("/{organization_name}/{name}/{provider}/{version}/download", m.DownloadModuleHandler()).Methods(http.MethodGet)
-	m.Router.Handle("/{organization_name}/{name}/{provider}", m.UpdateModuleHandler()).Methods(http.MethodPatch)
-	m.Router.Handle("/{organization_name}/{name}/{provider}", m.DeleteModuleHandler()).Methods(http.MethodDelete)
 	m.Router.Handle("/{organization_name}/{name}/{provider}/{version}/archive", m.ArchiveHandler()).Methods(http.MethodGet)
-
 }
