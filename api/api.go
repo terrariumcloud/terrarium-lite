@@ -12,11 +12,11 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/terrariumcloud/terrarium/api/discovery"
-	"github.com/terrariumcloud/terrarium/api/modules"
-	"github.com/terrariumcloud/terrarium/internal/endpoints"
-	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
-	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium-lite/api/discovery"
+	"github.com/terrariumcloud/terrarium-lite/api/modules"
+	"github.com/terrariumcloud/terrarium-lite/internal/endpoints"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/drivers"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/responses"
 )
 
 // Terrarium is a struct which contains methods for initialising the private Terraform Registry

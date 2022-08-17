@@ -1,7 +1,7 @@
 package stores
 
 import (
-	"github.com/terrariumcloud/terrarium/pkg/registry/data/modules"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/data/modules"
 )
 
 type ModuleStore interface {

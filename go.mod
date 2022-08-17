@@ -1,4 +1,4 @@
-module github.com/terrariumcloud/terrarium
+module github.com/terrariumcloud/terrarium-lite
 
 go 1.17
 

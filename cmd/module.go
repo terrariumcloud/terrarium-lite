@@ -3,13 +3,13 @@ package cmd
 import (
 	"log"
 
-	"github.com/terrariumcloud/terrarium/api"
+	"github.com/terrariumcloud/terrarium-lite/api"
 
 	"github.com/spf13/cobra"
-	fs_db "github.com/terrariumcloud/terrarium/internal/database/filesystem"
-	"github.com/terrariumcloud/terrarium/internal/responder"
-	fs_storage "github.com/terrariumcloud/terrarium/internal/storage/filesystem"
-	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
+	fs_db "github.com/terrariumcloud/terrarium-lite/internal/database/filesystem"
+	"github.com/terrariumcloud/terrarium-lite/internal/responder"
+	fs_storage "github.com/terrariumcloud/terrarium-lite/internal/storage/filesystem"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/drivers"
 )
 
 var storageFilesystemRootPath string
