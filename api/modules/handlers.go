@@ -8,10 +8,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/terrariumcloud/terrarium/pkg/registry/data/modules"
-	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
-	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
-	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/data/modules"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/drivers"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/stores"
 )
 
 // ModuleAPI is a struct implementing the handlers for the ModuleAPIInterface from the endpoints package in Terrarium

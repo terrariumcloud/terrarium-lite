@@ -12,11 +12,11 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/terrariumcloud/terrarium/api/discovery"
-	"github.com/terrariumcloud/terrarium/api/modules"
-	"github.com/terrariumcloud/terrarium/internal/endpoints"
-	"github.com/terrariumcloud/terrarium/pkg/registry/drivers"
-	"github.com/terrariumcloud/terrarium/pkg/registry/responses"
+	"github.com/terrariumcloud/terrarium-lite/api/discovery"
+	"github.com/terrariumcloud/terrarium-lite/api/modules"
+	"github.com/terrariumcloud/terrarium-lite/internal/endpoints"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/drivers"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/responses"
 )
 
 // Terrarium is a struct which contains methods for initialising the private Terraform Registry
@@ -24,6 +24,8 @@ import (
 // of this struct is created by the CLI when `terrarium serve modules` is called from the command line
 type Terrarium struct {
 	Port         int
+	CertFile     string
+	KeyFile      string
 	DataStore    drivers.TerrariumDatabaseDriver
 	FileStore    drivers.TerrariumStorageDriver
 	ModuleAPI    endpoints.ModuleAPIInterface
@@ -39,7 +41,7 @@ func (t *Terrarium) Serve() error {
 	bindAddress := fmt.Sprintf(":%d", t.Port)
 	t.Init()
 	log.Println(fmt.Sprintf("Listening on %s", bindAddress))
-	return http.ListenAndServe(bindAddress, handlers.CombinedLoggingHandler(os.Stdout, t.Router))
+	return http.ListenAndServeTLS(bindAddress, t.CertFile, t.KeyFile, handlers.CombinedLoggingHandler(os.Stdout, t.Router))
 }
 
 // Init calls the various API sub packages to setup routers for endpoints. This is a central function that wires all API routers together
@@ -51,9 +53,11 @@ func (t *Terrarium) Init() {
 }
 
 // NewTerrarium creates a new Terrarium instance setting up the required API routes
-func NewTerrarium(port int, driver drivers.TerrariumDatabaseDriver, storageDriver drivers.TerrariumStorageDriver, responder responses.APIResponseWriter, errorer responses.APIErrorWriter) *Terrarium {
+func NewTerrarium(port int, certFile string, keyFile string, driver drivers.TerrariumDatabaseDriver, storageDriver drivers.TerrariumStorageDriver, responder responses.APIResponseWriter, errorer responses.APIErrorWriter) *Terrarium {
 	return &Terrarium{
 		Port:      port,
+		CertFile:  certFile,
+		KeyFile:   keyFile,
 		DataStore: driver,
 		FileStore: storageDriver,
 		Router:    mux.NewRouter(),

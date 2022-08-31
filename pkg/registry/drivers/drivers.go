@@ -5,7 +5,7 @@ package drivers
 import (
 	"context"
 
-	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/stores"
 )
 
 type TerrariumDatabaseDriver interface {

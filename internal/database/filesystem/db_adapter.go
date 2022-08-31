@@ -3,8 +3,8 @@ package filesystem
 import (
 	"context"
 	"fmt"
-	"github.com/terrariumcloud/terrarium/pkg/registry/data/modules"
-	"github.com/terrariumcloud/terrarium/pkg/registry/stores"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/data/modules"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/stores"
 	"log"
 	"path/filepath"
 	"strings"

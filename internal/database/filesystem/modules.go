@@ -2,7 +2,7 @@ package filesystem
 
 import (
 	"errors"
-	"github.com/terrariumcloud/terrarium/pkg/registry/data/modules"
+	"github.com/terrariumcloud/terrarium-lite/pkg/registry/data/modules"
 )
 
 // fsModuleBackend is a struct that implements Mongo operations for Modules
