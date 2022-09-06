@@ -6,6 +6,7 @@ import (
 	"github.com/terrariumcloud/terrarium-lite/pkg/registry/data/modules"
 	"github.com/terrariumcloud/terrarium-lite/pkg/registry/stores"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -25,7 +26,7 @@ func (m *adapter) Modules() stores.ModuleStore {
 func loadFromPath(modulesPath string) ([]*modules.Module, error) {
 	allModules := make([]*modules.Module, 0)
 
-	matches, _ := filepath.Glob(fmt.Sprintf("%s/**.zip", modulesPath))
+	matches, _ := filepath.Glob(fmt.Sprintf("%s/*/*/*/*.zip", modulesPath))
 
 	for _, name := range matches {
 		sourcePath, err := filepath.Rel(modulesPath, name)
@@ -33,37 +34,21 @@ func loadFromPath(modulesPath string) ([]*modules.Module, error) {
 			return nil, err
 		}
 
-		elements := filepath.SplitList(sourcePath)
-		switch len(elements) {
-		case 4: // organization / module name / provider / version.zip
+		elements := strings.Split(sourcePath, string(os.PathSeparator))
+		if len(elements) == 4 {
 			module := modules.Module{
 				ID:             strings.Join(elements, "/"),
 				OrganizationID: elements[0],
 				Name:           elements[1],
 				Organization:   elements[0],
 				Provider:       elements[2],
-				Version:        elements[3][:len(elements[3])-4],
+				Version:        elements[3][:len(elements[3])-4], // remove .zip from the version name.
 				Description:    "",
 				Source:         sourcePath,
 			}
 			allModules = append(allModules, &module)
 			log.Printf("INFO: Added module %s", name)
-			break
-		case 3: // organization / module name / version.zip
-			module := modules.Module{
-				ID:             strings.Join(elements, "/"),
-				OrganizationID: elements[0],
-				Name:           elements[1],
-				Organization:   elements[0],
-				Provider:       "",
-				Version:        elements[2][:len(elements[2])-4],
-				Description:    "",
-				Source:         name,
-			}
-			allModules = append(allModules, &module)
-			log.Printf("INFO: Added module %s", name)
-			break
-		default:
+		} else {
 			log.Printf("WARN: Ignoring invalid module path: %s", name)
 		}
 	}
