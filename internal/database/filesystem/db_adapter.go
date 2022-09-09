@@ -37,14 +37,10 @@ func loadFromPath(modulesPath string) ([]*modules.Module, error) {
 		elements := strings.Split(sourcePath, string(os.PathSeparator))
 		if len(elements) == 4 {
 			module := modules.Module{
-				ID:             strings.Join(elements, "/"),
-				OrganizationID: elements[0],
-				Name:           elements[1],
-				Organization:   elements[0],
-				Provider:       elements[2],
-				Version:        elements[3][:len(elements[3])-4], // remove .zip from the version name.
-				Description:    "",
-				Source:         sourcePath,
+				Name:         elements[1],
+				Organization: elements[0],
+				Provider:     elements[2],
+				Version:      elements[3][:len(elements[3])-4], // remove .zip from the version name.
 			}
 			allModules = append(allModules, &module)
 			log.Printf("INFO: Added module %s", name)

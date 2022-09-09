@@ -44,11 +44,11 @@ func (t *Terrarium) Serve() error {
 	return http.ListenAndServeTLS(bindAddress, t.CertFile, t.KeyFile, handlers.CombinedLoggingHandler(os.Stdout, t.Router))
 }
 
-// Init calls the various API sub packages to setup routers for endpoints. This is a central function that wires all API routers together
+// Init calls the various API sub packages to set up routers for endpoints. This is a central function that wires all API routers together
 func (t *Terrarium) Init() {
 	t.ModuleAPI = modules.NewModuleAPI(t.Router, "/v1/modules", t.DataStore.Modules(), t.FileStore, t.Responder, t.Errorer)
 	// TODO: Should this be it's own binary / sub command?
-	t.DiscoveryAPI = discovery.NewDiscoveryAPI(nil, "/v1/modules", t.Responder, t.Errorer)
+	t.DiscoveryAPI = discovery.NewDiscoveryAPI("/v1/modules", t.Responder, t.Errorer)
 	t.Router.Handle("/.well-known/terraform.json", t.DiscoveryAPI.DiscoveryHandler())
 }
 
