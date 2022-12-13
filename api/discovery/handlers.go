@@ -11,7 +11,6 @@ import (
 type DiscoveryAPI struct {
 	ErrorHandler    responses.APIErrorWriter
 	ResponseHandler responses.APIResponseWriter
-	LoginConfig     *discovery.LoginConfig
 	ModuleEndpoint  string
 }
 
@@ -21,7 +20,6 @@ type DiscoveryAPI struct {
 func (d *DiscoveryAPI) DiscoveryHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		resp := &discovery.ServiceDiscoveryResponse{
-			LoginV1:  d.LoginConfig,
 			ModuleV1: d.ModuleEndpoint,
 		}
 		d.ResponseHandler.WriteRaw(rw, resp, http.StatusOK)

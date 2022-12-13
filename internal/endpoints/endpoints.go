@@ -11,10 +11,7 @@ type DiscoveryAPIInterface interface {
 
 // ModuleAPIInterface specifies the required HTTP handlers for a Terrarium Modules API implementation
 type ModuleAPIInterface interface {
-	GetModuleHandler() http.Handler
 	GetModuleVersionHandler() http.Handler
 	DownloadModuleHandler() http.Handler
 	ArchiveHandler() http.Handler
-	ListModulesHandler() http.Handler
-	ListOrganizationModulesHandler() http.Handler
 }

@@ -23,27 +23,6 @@ type ModuleAPI struct {
 	ResponseHandler responses.APIResponseWriter
 }
 
-// GetModuleHandler Handles an API request to fetch a single module via organization name, module name and provider.
-// This will return the module from the backend if found or 404 if the module or organization doesn't exist
-func (m *ModuleAPI) GetModuleHandler() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
-		orgName := params["organization_name"]
-		moduleName := params["name"]
-		providerName := params["provider"]
-		module, err := m.ModuleStore.ReadOne(orgName, moduleName, providerName)
-		if err != nil {
-			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
-		if module == nil {
-			m.ErrorHandler.Write(rw, errors.New("module not found"), http.StatusNotFound)
-			return
-		}
-		m.ResponseHandler.Write(rw, module, http.StatusOK)
-	})
-}
-
 // DownloadModuleHandler will return a header indicating where the requesting CLI can download module content from
 // This handler complies with the following implementation from the module protocol
 // https://www.terraform.io/internals/module-registry-protocol#download-source-code-for-a-specific-module-version
@@ -97,50 +76,6 @@ func (m *ModuleAPI) GetModuleVersionHandler() http.Handler {
 	})
 }
 
-// ListModulesHandler Lists all modules currently available in the registry.
-// This is a convience handler to allow for module browsing and discovery
-// Will return an error if communicating with the backend failed
-func (m *ModuleAPI) ListModulesHandler() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		limit, offset, err := extractLimitAndOffset(r.URL.Query())
-		if err != nil {
-			m.ErrorHandler.Write(rw, err, http.StatusBadRequest)
-			return
-		}
-		modules, err := m.ModuleStore.ReadAll(limit, offset)
-		if err != nil {
-			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
-		m.ResponseHandler.Write(rw, modules, http.StatusOK)
-	})
-}
-
-// ListModulesHandler Lists all modules for a given organization available in the registry.
-// This is a convience handler to allow for module browsing and discovery
-// Will return an error if communicating with the backend failed or a 404 not found if the organization does not exist
-func (m *ModuleAPI) ListOrganizationModulesHandler() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
-		orgName := params["organization_name"]
-		limit, offset, err := extractLimitAndOffset(r.URL.Query())
-		if err != nil {
-			m.ErrorHandler.Write(rw, err, http.StatusBadRequest)
-			return
-		}
-		modules, err := m.ModuleStore.ReadOrganizationModules(orgName, limit, offset)
-		if err != nil {
-			m.ErrorHandler.Write(rw, err, http.StatusInternalServerError)
-			return
-		}
-		if modules == nil {
-			m.ErrorHandler.Write(rw, errors.New("organization does not exist"), http.StatusNotFound)
-			return
-		}
-		m.ResponseHandler.Write(rw, modules, http.StatusOK)
-	})
-}
-
 // ArchiveHandler performs a fetch of the requested module source code from the chosen backing store and presents it to the client
 // As part of the module flow clients are redirected here from the DownloadModuleHandler x-terraform-get header. This handler
 // makes the stored registry code available to the client
@@ -174,9 +109,6 @@ func (m *ModuleAPI) ArchiveHandler() http.Handler {
 // These are used to provide additional functionality for a more complete registry experience
 func (m *ModuleAPI) SetupRoutes() {
 	m.Router.StrictSlash(true)
-	m.Router.Handle("/", m.ListModulesHandler()).Methods(http.MethodGet)
-	m.Router.Handle("/{organization_name}", m.ListOrganizationModulesHandler()).Methods(http.MethodGet)
-	m.Router.Handle("/{organization_name}/{name}/{provider}", m.GetModuleHandler()).Methods(http.MethodGet)
 	m.Router.Handle("/{organization_name}/{name}/{provider}/versions", m.GetModuleVersionHandler()).Methods(http.MethodGet)
 	m.Router.Handle("/{organization_name}/{name}/{provider}/{version}/download", m.DownloadModuleHandler()).Methods(http.MethodGet)
 	m.Router.Handle("/{organization_name}/{name}/{provider}/{version}/archive", m.ArchiveHandler()).Methods(http.MethodGet)
