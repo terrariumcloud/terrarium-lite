@@ -16,3 +16,5 @@
 .certs
 terrarium
 .env
+.DS_Store
+.idea
